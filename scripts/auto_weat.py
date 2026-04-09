@@ -48,9 +48,9 @@ DEFAULT_OLLAMA_HOST = "http://127.0.0.1:11434"
 DEFAULT_OLLAMA_TIMEOUT_SECONDS = 1200
 DEFAULT_OLLAMA_THINK = "auto"
 
-MODEL_ALIASES = {
-    "qwen3.5:9b": "qwen3.5:9b-bf16",
-    "qwen3.5:37b": "qwen3.5:35b",
+MODEL_FALLBACKS = {
+    "qwen3.5:9b": ["qwen3.5:9b", "qwen3.5:9b-bf16"],
+    "qwen3.5:37b": ["qwen3.5:37b", "qwen3.5:35b"],
 }
 
 
@@ -70,17 +70,16 @@ def resolve_project_path(value: str | Path) -> Path:
     return PROJECT_ROOT / path
 
 
-def canonical_model_name(model: str) -> str:
-    return MODEL_ALIASES.get(model, model)
+def model_candidates(model: str) -> list[str]:
+    return MODEL_FALLBACKS.get(model, [model])
 
 
 def model_family(model: str) -> str:
-    canonical = canonical_model_name(model)
-    if canonical.startswith("gpt-oss"):
+    if model.startswith("gpt-oss"):
         return "gpt-oss"
-    if canonical.startswith("gemma4"):
+    if model.startswith("gemma4"):
         return "gemma4"
-    if canonical.startswith("qwen3.5"):
+    if model.startswith("qwen3.5"):
         return "qwen3.5"
     return "generic"
 
@@ -906,8 +905,7 @@ def ollama_generate(
     think: str | None = None,
     json_mode: bool = True,
 ) -> dict[str, Any]:
-    canonical_model = canonical_model_name(model)
-    family = model_family(canonical_model)
+    family = model_family(model)
 
     options: dict[str, Any] = {"temperature": 0}
     if family == "gpt-oss":
@@ -922,7 +920,7 @@ def ollama_generate(
         effective_prompt = "<|think|>\n" + prompt
 
     payload = {
-        "model": canonical_model,
+        "model": model,
         "prompt": effective_prompt,
         "stream": False,
         "options": options,
@@ -949,8 +947,12 @@ def ollama_generate(
             f"Ollama request timed out after {timeout_seconds} seconds for model {model}. "
             "Try a larger --ollama-timeout value."
         ) from exc
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            raise RuntimeError(f"Ollama model or endpoint not found for model {model}: HTTP 404") from exc
+        raise RuntimeError(f"Ollama request failed for model {model}: HTTP {exc.code}") from exc
     except urllib.error.URLError as exc:
-        raise RuntimeError(f"Ollama request failed: {exc}") from exc
+        raise RuntimeError(f"Ollama request failed for model {model}: {exc}") from exc
 
 
 def social_science_rules_backend(n_proposals: int) -> list[dict[str, Any]]:
@@ -1013,13 +1015,13 @@ def ollama_backend(
     (run_dir / "ollama_prompt.txt").write_text(prompt, encoding="utf-8")
 
     resolved_think = resolve_ollama_think(model, think)
-    canonical_model = canonical_model_name(model)
-    family = model_family(canonical_model)
+    candidate_models = model_candidates(model)
+    family = model_family(model)
     write_json(
         run_dir / "ollama_request_settings.json",
         {
             "requested_model": model,
-            "effective_model": canonical_model,
+            "candidate_models": candidate_models,
             "model_family": family,
             "host": host,
             "timeout_seconds": timeout_seconds,
@@ -1035,39 +1037,52 @@ def ollama_backend(
 
     attempts = [("json_mode", True, prompt), ("plain_json_fallback", False, fallback_prompt)]
     errors: list[str] = []
-    for label, json_mode, attempt_prompt in attempts:
-        body = ollama_generate(
-            attempt_prompt,
-            canonical_model,
-            host,
-            timeout_seconds,
-            think=resolved_think,
-            json_mode=json_mode,
-        )
-        raw = body.get("response", "")
-        thinking = body.get("thinking", "")
-        write_json(run_dir / f"ollama_response_body_{label}.json", body)
-        (run_dir / f"ollama_raw_response_{label}.txt").write_text(str(raw), encoding="utf-8")
-        if thinking:
-            (run_dir / f"ollama_thinking_{label}.txt").write_text(str(thinking), encoding="utf-8")
-        if body.get("error"):
-            errors.append(f"{label}: {body['error']}")
-            continue
-        try:
-            parsed = extract_json_payload(str(raw))
-        except ValueError as exc:
-            if thinking and not raw:
-                errors.append(
-                    f"{label}: model produced thinking output but an empty final response for "
-                    f"{canonical_model}; try a different model tag or disable thinking"
+    for candidate_model in candidate_models:
+        model_not_found = False
+        for label, json_mode, attempt_prompt in attempts:
+            try:
+                body = ollama_generate(
+                    attempt_prompt,
+                    candidate_model,
+                    host,
+                    timeout_seconds,
+                    think=resolved_think,
+                    json_mode=json_mode,
                 )
-            else:
-                errors.append(f"{label}: {exc}")
+            except RuntimeError as exc:
+                message = str(exc)
+                errors.append(f"{candidate_model}/{label}: {message}")
+                if "HTTP 404" in message:
+                    model_not_found = True
+                    break
+                continue
+
+            raw = body.get("response", "")
+            thinking = body.get("thinking", "")
+            write_json(run_dir / f"ollama_response_body_{candidate_model.replace(':', '_')}_{label}.json", body)
+            (run_dir / f"ollama_raw_response_{candidate_model.replace(':', '_')}_{label}.txt").write_text(str(raw), encoding="utf-8")
+            if thinking:
+                (run_dir / f"ollama_thinking_{candidate_model.replace(':', '_')}_{label}.txt").write_text(str(thinking), encoding="utf-8")
+            if body.get("error"):
+                errors.append(f"{candidate_model}/{label}: {body['error']}")
+                continue
+            try:
+                parsed = extract_json_payload(str(raw))
+            except ValueError as exc:
+                if thinking and not raw:
+                    errors.append(
+                        f"{candidate_model}/{label}: model produced thinking output but an empty final response; "
+                        "try disabling thinking for this model"
+                    )
+                else:
+                    errors.append(f"{candidate_model}/{label}: {exc}")
+                continue
+            if not isinstance(parsed, dict) or "proposals" not in parsed:
+                errors.append(f"{candidate_model}/{label}: missing top-level proposals key")
+                continue
+            return parsed["proposals"]
+        if model_not_found:
             continue
-        if not isinstance(parsed, dict) or "proposals" not in parsed:
-            errors.append(f"{label}: missing top-level proposals key")
-            continue
-        return parsed["proposals"]
 
     raise ValueError(" ; ".join(errors))
 

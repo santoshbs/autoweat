@@ -152,8 +152,8 @@ The same codebase works on macOS or Linux. The runner applies model-family defau
 
 Compatibility alias:
 
-- `qwen3.5:9b` is accepted by the runner and automatically mapped to `qwen3.5:9b-bf16`
-- `qwen3.5:37b` is accepted by the runner and automatically mapped to `qwen3.5:35b`
+- `qwen3.5:9b` tries `qwen3.5:9b` first and falls back to `qwen3.5:9b-bf16` if needed
+- `qwen3.5:37b` tries `qwen3.5:37b` first and falls back to `qwen3.5:35b` if needed
 
 If you want to rely on the built-in model profile, you can omit `--ollama-think` entirely.
 
