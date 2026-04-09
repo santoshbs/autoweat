@@ -49,6 +49,7 @@ DEFAULT_OLLAMA_TIMEOUT_SECONDS = 1200
 DEFAULT_OLLAMA_THINK = "auto"
 
 MODEL_ALIASES = {
+    "qwen3.5:9b": "qwen3.5:9b-bf16",
     "qwen3.5:37b": "qwen3.5:35b",
 }
 
@@ -1044,12 +1045,24 @@ def ollama_backend(
             json_mode=json_mode,
         )
         raw = body.get("response", "")
+        thinking = body.get("thinking", "")
         write_json(run_dir / f"ollama_response_body_{label}.json", body)
         (run_dir / f"ollama_raw_response_{label}.txt").write_text(str(raw), encoding="utf-8")
+        if thinking:
+            (run_dir / f"ollama_thinking_{label}.txt").write_text(str(thinking), encoding="utf-8")
+        if body.get("error"):
+            errors.append(f"{label}: {body['error']}")
+            continue
         try:
             parsed = extract_json_payload(str(raw))
         except ValueError as exc:
-            errors.append(f"{label}: {exc}")
+            if thinking and not raw:
+                errors.append(
+                    f"{label}: model produced thinking output but an empty final response for "
+                    f"{canonical_model}; try a different model tag or disable thinking"
+                )
+            else:
+                errors.append(f"{label}: {exc}")
             continue
         if not isinstance(parsed, dict) or "proposals" not in parsed:
             errors.append(f"{label}: missing top-level proposals key")
