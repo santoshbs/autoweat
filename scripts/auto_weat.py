@@ -816,7 +816,11 @@ def resolve_ollama_think(model: str, think: str | None) -> str | None:
     if think in (None, "", "auto"):
         if model.startswith("gpt-oss"):
             return "low"
+        if model.startswith("gemma4"):
+            return "false"
         return None
+    if model.startswith("gemma4") and think in ("low", "medium", "high"):
+        return "true"
     if think in ("low", "medium", "high"):
         return think
     if think == "true":
@@ -869,15 +873,25 @@ def ollama_generate(
     think: str | None = None,
     json_mode: bool = True,
 ) -> dict[str, Any]:
+    options: dict[str, Any] = {"temperature": 0}
+    if model.startswith("gemma4"):
+        options = {"temperature": 1.0, "top_p": 0.95, "top_k": 64}
+
+    effective_prompt = prompt
+    if model.startswith("gemma4") and think == "true":
+        effective_prompt = "<|think|>\n" + prompt
+
     payload = {
         "model": model,
-        "prompt": prompt,
+        "prompt": effective_prompt,
         "stream": False,
-        "options": {"temperature": 0},
+        "options": options,
     }
     if json_mode:
         payload["format"] = "json"
-    if think in ("true", "false"):
+    if model.startswith("gemma4"):
+        pass
+    elif think in ("true", "false"):
         payload["think"] = (think == "true")
     elif think is not None:
         payload["think"] = think

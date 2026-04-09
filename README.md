@@ -53,6 +53,12 @@ Run one Ollama round on the active embedding source:
 python3 scripts/auto_weat.py round --backend ollama --model gpt-oss:120b --n-proposals 3 --ollama-timeout 1800 --ollama-think high
 ```
 
+Run one Ollama round with Gemma 4:
+
+```bash
+python3 scripts/auto_weat.py round --backend ollama --model gemma4:latest --n-proposals 1 --ollama-timeout 1800 --ollama-think false
+```
+
 Run several rounds:
 
 ```bash
@@ -116,3 +122,5 @@ and extract the text file into:
 - The evaluator is fixed; the LLM never changes the math.
 - This is not trying to find literally every possible bias.
 - It is trying to discover many large, significant, human-interpretable WEATs that would interest organizational, psychology, sociology, and related scholars.
+- For `gemma4`, the runner uses the model-family sampling guidance (`temperature=1.0`, `top_p=0.95`, `top_k=64`).
+- For `gemma4`, `--ollama-think true` enables thinking and `--ollama-think false` disables it. The default `auto` mode resolves to `false` for `gemma4`.
