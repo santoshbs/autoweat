@@ -7,8 +7,8 @@
     "permutation_mode": "exact_target_partition"
   },
   "proposal_limits": {
-    "max_candidate_terms_per_set": 12,
-    "min_candidate_terms_per_set": 8
+    "max_candidate_terms_per_set": 20,
+    "min_candidate_terms_per_set": 16
   },
   "domains_of_interest": [
     "organizational behavior",

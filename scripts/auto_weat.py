@@ -563,6 +563,13 @@ def dashboard_html(payload: dict[str, Any]) -> str:
         ['A attributes', sets.a_terms || []],
         ['B attributes', sets.b_terms || []],
       ];
+      const dropped = item.dropped_terms || {{}};
+      const droppedFlat = [
+        ...(dropped.x_terms || []).map(value => `X:${{value}}`),
+        ...(dropped.y_terms || []).map(value => `Y:${{value}}`),
+        ...(dropped.a_terms || []).map(value => `A:${{value}}`),
+        ...(dropped.b_terms || []).map(value => `B:${{value}}`),
+      ];
       return `
         <article class="card">
           <div class="card-top">
@@ -594,6 +601,7 @@ def dashboard_html(payload: dict[str, Any]) -> str:
               </div>
             `).join('')}
           </div>
+          ${droppedFlat.length ? `<div class="footer">Dropped terms: ${{escapeHtml(droppedFlat.join(', '))}}</div>` : ''}
           ${item.error ? `<div class="footer">Error: ${{escapeHtml(item.error)}}</div>` : ''}
         </article>
       `;
@@ -951,12 +959,18 @@ def ollama_backend(
 ) -> list[dict[str, Any]]:
     prompt_template = PROMPT_PATH.read_text(encoding="utf-8").strip()
     research_config = load_json(RESEARCH_CONFIG)
+    proposal_limits = research_config.get("proposal_limits", {})
     prompt = textwrap.dedent(
         f"""
         {prompt_template}
 
         Research interests:
         {json.dumps(research_config['domains_of_interest'], indent=2)}
+
+        Candidate set size guidance:
+        - minimum candidates per set: {proposal_limits.get('min_candidate_terms_per_set', 16)}
+        - maximum candidates per set: {proposal_limits.get('max_candidate_terms_per_set', 20)}
+        - evaluator keeps only the first 8 unique in-vocabulary tokens per set
 
         Structured history:
         {history_summary()}
