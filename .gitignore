@@ -1,0 +1,7 @@
+.DS_Store
+__pycache__/
+scripts/__pycache__/
+data/
+runs/
+state/
+dashboard/index.html

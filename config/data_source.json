@@ -1,0 +1,8 @@
+{
+  "embedding_name": "glove.2024.wikigiga.300d",
+  "download_url": "https://nlp.stanford.edu/data/wordvecs/glove.2024.wikigiga.300d.zip",
+  "zip_path": "data/raw/glove.2024.wikigiga.300d.zip",
+  "text_path": "data/raw/glove.2024.wikigiga.300d.txt",
+  "index_path": "data/index/glove.2024.wikigiga.300d.sqlite",
+  "note": "Stanford GloVe 2024 WikiGigaword 300d source."
+}

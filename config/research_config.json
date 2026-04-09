@@ -1,0 +1,27 @@
+{
+  "weat": {
+    "target_set_size": 8,
+    "attribute_set_size": 8,
+    "min_abs_effect_size": 0.8,
+    "p_value_threshold": 0.05,
+    "permutation_mode": "exact_target_partition"
+  },
+  "proposal_limits": {
+    "max_candidate_terms_per_set": 12,
+    "min_candidate_terms_per_set": 8
+  },
+  "domains_of_interest": [
+    "organizational behavior",
+    "organizational psychology",
+    "social psychology",
+    "sociology",
+    "stratification",
+    "gender",
+    "class",
+    "race and ethnicity",
+    "migration",
+    "age",
+    "disability",
+    "religion"
+  ]
+}

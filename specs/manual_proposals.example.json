@@ -1,0 +1,14 @@
+{
+  "proposals": [
+    {
+      "proposal_id": "manual_gender_career_01",
+      "discipline": "social psychology",
+      "bias_name": "Gender-career association",
+      "hypothesis": "Male terms may be associated more strongly with career and status terms than female terms are.",
+      "x_terms": ["man", "male", "brother", "father", "son", "uncle", "husband", "he"],
+      "y_terms": ["woman", "female", "sister", "mother", "daughter", "aunt", "wife", "she"],
+      "a_terms": ["career", "office", "salary", "professional", "corporation", "management", "executive", "business"],
+      "b_terms": ["home", "parents", "children", "family", "marriage", "wedding", "relatives", "house"]
+    }
+  ]
+}
