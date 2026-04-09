@@ -56,7 +56,7 @@ python3 scripts/auto_weat.py round --backend ollama --model gpt-oss:120b --n-pro
 Run one Ollama round with Gemma 4:
 
 ```bash
-python3 scripts/auto_weat.py round --backend ollama --model gemma4:latest --n-proposals 1 --ollama-timeout 1800 --ollama-think false
+python3 scripts/auto_weat.py round --backend ollama --model gemma4:latest --n-proposals 1 --ollama-timeout 1800 --ollama-think true
 ```
 
 Run several rounds:
@@ -75,6 +75,13 @@ Run a fresh 10-round search with 1 proposal per round:
 
 ```bash
 python3 scripts/auto_weat.py loop --backend ollama --model gpt-oss:120b --rounds 10 --n-proposals 1 --ollama-timeout 1800 --ollama-think high
+```
+
+Reset and run a fresh 10-round search with model-specific automatic settings:
+
+```bash
+python3 scripts/auto_weat.py reset
+python3 scripts/auto_weat.py loop --backend ollama --model gemma4:latest --rounds 10 --n-proposals 1 --ollama-timeout 2400
 ```
 
 Show current active source and best accepted finding:
@@ -122,5 +129,39 @@ and extract the text file into:
 - The evaluator is fixed; the LLM never changes the math.
 - This is not trying to find literally every possible bias.
 - It is trying to discover many large, significant, human-interpretable WEATs that would interest organizational, psychology, sociology, and related scholars.
-- For `gemma4`, the runner uses the model-family sampling guidance (`temperature=1.0`, `top_p=0.95`, `top_k=64`).
-- For `gemma4`, `--ollama-think true` enables thinking and `--ollama-think false` disables it. The default `auto` mode resolves to `false` for `gemma4`.
+
+## Supported Ollama Model Profiles
+
+The same codebase works on macOS or Linux. The runner applies model-family defaults when `--ollama-think` is omitted or set to `auto`.
+
+- `gpt-oss:120b`
+  - default thinking: `high`
+  - sampling: `temperature=1.0`, `top_p=1.0`
+- `gemma4:latest`
+  - default thinking: enabled
+  - sampling: `temperature=1.0`, `top_p=0.95`, `top_k=64`
+- `qwen3.5:9b`
+  - default thinking: enabled
+  - sampling: `temperature=1.0`, `top_p=0.95`, `top_k=20`, `presence_penalty=1.5`
+- `qwen3.5:35b`
+  - default thinking: enabled
+  - sampling: `temperature=1.0`, `top_p=0.95`, `top_k=20`, `presence_penalty=1.5`
+- `qwen3.5:122b`
+  - default thinking: enabled
+  - sampling: `temperature=1.0`, `top_p=0.95`, `top_k=20`, `presence_penalty=1.5`
+
+Compatibility alias:
+
+- `qwen3.5:37b` is accepted by the runner and automatically mapped to `qwen3.5:35b`
+
+If you want to rely on the built-in model profile, you can omit `--ollama-think` entirely.
+
+Examples:
+
+```bash
+python3 scripts/auto_weat.py loop --backend ollama --model gpt-oss:120b --rounds 10 --n-proposals 1 --ollama-timeout 2400
+python3 scripts/auto_weat.py loop --backend ollama --model gemma4:latest --rounds 10 --n-proposals 1 --ollama-timeout 2400
+python3 scripts/auto_weat.py loop --backend ollama --model qwen3.5:9b --rounds 10 --n-proposals 1 --ollama-timeout 2400
+python3 scripts/auto_weat.py loop --backend ollama --model qwen3.5:37b --rounds 10 --n-proposals 1 --ollama-timeout 2400
+python3 scripts/auto_weat.py loop --backend ollama --model qwen3.5:122b --rounds 10 --n-proposals 1 --ollama-timeout 2400
+```

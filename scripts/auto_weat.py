@@ -48,6 +48,10 @@ DEFAULT_OLLAMA_HOST = "http://127.0.0.1:11434"
 DEFAULT_OLLAMA_TIMEOUT_SECONDS = 1200
 DEFAULT_OLLAMA_THINK = "auto"
 
+MODEL_ALIASES = {
+    "qwen3.5:37b": "qwen3.5:35b",
+}
+
 
 def now_stamp() -> str:
     return datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -63,6 +67,21 @@ def resolve_project_path(value: str | Path) -> Path:
     if path.is_absolute():
         return path
     return PROJECT_ROOT / path
+
+
+def canonical_model_name(model: str) -> str:
+    return MODEL_ALIASES.get(model, model)
+
+
+def model_family(model: str) -> str:
+    canonical = canonical_model_name(model)
+    if canonical.startswith("gpt-oss"):
+        return "gpt-oss"
+    if canonical.startswith("gemma4"):
+        return "gemma4"
+    if canonical.startswith("qwen3.5"):
+        return "qwen3.5"
+    return "generic"
 
 
 def source_manifest() -> dict[str, Any]:
@@ -821,13 +840,18 @@ def command_status(_args: argparse.Namespace) -> None:
 
 
 def resolve_ollama_think(model: str, think: str | None) -> str | None:
+    family = model_family(model)
     if think in (None, "", "auto"):
-        if model.startswith("gpt-oss"):
-            return "low"
-        if model.startswith("gemma4"):
-            return "false"
+        if family == "gpt-oss":
+            return "high"
+        if family in ("gemma4", "qwen3.5"):
+            return "true"
         return None
-    if model.startswith("gemma4") and think in ("low", "medium", "high"):
+    if family == "gpt-oss" and think == "true":
+        return "high"
+    if family == "gpt-oss" and think == "false":
+        return "low"
+    if family in ("gemma4", "qwen3.5") and think in ("low", "medium", "high"):
         return "true"
     if think in ("low", "medium", "high"):
         return think
@@ -881,23 +905,30 @@ def ollama_generate(
     think: str | None = None,
     json_mode: bool = True,
 ) -> dict[str, Any]:
+    canonical_model = canonical_model_name(model)
+    family = model_family(canonical_model)
+
     options: dict[str, Any] = {"temperature": 0}
-    if model.startswith("gemma4"):
+    if family == "gpt-oss":
+        options = {"temperature": 1.0, "top_p": 1.0}
+    elif family == "gemma4":
         options = {"temperature": 1.0, "top_p": 0.95, "top_k": 64}
+    elif family == "qwen3.5":
+        options = {"temperature": 1.0, "top_p": 0.95, "top_k": 20, "presence_penalty": 1.5}
 
     effective_prompt = prompt
-    if model.startswith("gemma4") and think == "true":
+    if family == "gemma4" and think == "true":
         effective_prompt = "<|think|>\n" + prompt
 
     payload = {
-        "model": model,
+        "model": canonical_model,
         "prompt": effective_prompt,
         "stream": False,
         "options": options,
     }
     if json_mode:
         payload["format"] = "json"
-    if model.startswith("gemma4"):
+    if family == "gemma4":
         pass
     elif think in ("true", "false"):
         payload["think"] = (think == "true")
@@ -981,9 +1012,18 @@ def ollama_backend(
     (run_dir / "ollama_prompt.txt").write_text(prompt, encoding="utf-8")
 
     resolved_think = resolve_ollama_think(model, think)
+    canonical_model = canonical_model_name(model)
+    family = model_family(canonical_model)
     write_json(
         run_dir / "ollama_request_settings.json",
-        {"model": model, "host": host, "timeout_seconds": timeout_seconds, "think": resolved_think},
+        {
+            "requested_model": model,
+            "effective_model": canonical_model,
+            "model_family": family,
+            "host": host,
+            "timeout_seconds": timeout_seconds,
+            "think": resolved_think,
+        },
     )
 
     fallback_prompt = (
@@ -997,7 +1037,7 @@ def ollama_backend(
     for label, json_mode, attempt_prompt in attempts:
         body = ollama_generate(
             attempt_prompt,
-            model,
+            canonical_model,
             host,
             timeout_seconds,
             think=resolved_think,
