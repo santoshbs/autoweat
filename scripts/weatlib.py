@@ -154,7 +154,7 @@ class EmbeddingStore:
         return vector
 
 
-def canonicalize_terms(raw_terms: list[str], store: EmbeddingStore, required_size: int) -> tuple[list[str], list[str]]:
+def canonicalize_terms(raw_terms: list[str], store: EmbeddingStore) -> tuple[list[str], list[str]]:
     accepted: list[str] = []
     dropped: list[str] = []
     seen: set[str] = set()
@@ -167,9 +167,32 @@ def canonicalize_terms(raw_terms: list[str], store: EmbeddingStore, required_siz
             accepted.append(token)
         else:
             dropped.append(token)
-        if len(accepted) >= required_size:
-            break
     return accepted, dropped
+
+
+def select_disjoint_terms(
+    candidates_by_set: list[list[str]],
+    required_sizes: list[int],
+) -> tuple[list[list[str]], list[list[str]]]:
+    used: set[str] = set()
+    selected_by_set: list[list[str]] = []
+    overlap_dropped_by_set: list[list[str]] = []
+
+    for candidates, required_size in zip(candidates_by_set, required_sizes):
+        selected: list[str] = []
+        overlap_dropped: list[str] = []
+        for token in candidates:
+            if token in used:
+                overlap_dropped.append(token)
+                continue
+            selected.append(token)
+            used.add(token)
+            if len(selected) >= required_size:
+                break
+        selected_by_set.append(selected)
+        overlap_dropped_by_set.append(overlap_dropped)
+
+    return selected_by_set, overlap_dropped_by_set
 
 
 def make_signature(x_terms: list[str], y_terms: list[str], a_terms: list[str], b_terms: list[str]) -> str:
@@ -238,37 +261,44 @@ def evaluate_proposal(
     target_size = int(weat_cfg["target_set_size"])
     attribute_size = int(weat_cfg["attribute_set_size"])
 
-    x_terms, x_dropped = canonicalize_terms(proposal.get("x_terms", []), store, target_size)
-    y_terms, y_dropped = canonicalize_terms(proposal.get("y_terms", []), store, target_size)
-    a_terms, a_dropped = canonicalize_terms(proposal.get("a_terms", []), store, attribute_size)
-    b_terms, b_dropped = canonicalize_terms(proposal.get("b_terms", []), store, attribute_size)
+    x_candidates, x_dropped = canonicalize_terms(proposal.get("x_terms", []), store)
+    y_candidates, y_dropped = canonicalize_terms(proposal.get("y_terms", []), store)
+    a_candidates, a_dropped = canonicalize_terms(proposal.get("a_terms", []), store)
+    b_candidates, b_dropped = canonicalize_terms(proposal.get("b_terms", []), store)
 
-    final_sets = [x_terms, y_terms, a_terms, b_terms]
+    selected_sets, overlap_dropped_sets = select_disjoint_terms(
+        [x_candidates, y_candidates, a_candidates, b_candidates],
+        [target_size, target_size, attribute_size, attribute_size],
+    )
+    x_terms, y_terms, a_terms, b_terms = selected_sets
+    x_overlap, y_overlap, a_overlap, b_overlap = overlap_dropped_sets
+
+    x_dropped_all = x_dropped + x_overlap
+    y_dropped_all = y_dropped + y_overlap
+    a_dropped_all = a_dropped + a_overlap
+    b_dropped_all = b_dropped + b_overlap
+
     if any(len(terms) < required for terms, required in ((x_terms, target_size), (y_terms, target_size), (a_terms, attribute_size), (b_terms, attribute_size))):
+        has_overlap_shortage = any(overlap_dropped_sets)
         return {
             "proposal_id": proposal.get("proposal_id", ""),
             "discipline": proposal.get("discipline", ""),
             "bias_name": proposal.get("bias_name", ""),
             "hypothesis": proposal.get("hypothesis", ""),
-            "error": "Not enough in-vocabulary terms to form exact equal-sized sets.",
+            "error": (
+                "Not enough unique in-vocabulary terms to form exact equal-sized sets."
+                if has_overlap_shortage
+                else "Not enough in-vocabulary terms to form exact equal-sized sets."
+            ),
             "canonical_sets": {"x_terms": x_terms, "y_terms": y_terms, "a_terms": a_terms, "b_terms": b_terms},
-            "dropped_terms": {"x_terms": x_dropped, "y_terms": y_dropped, "a_terms": a_dropped, "b_terms": b_dropped},
+            "dropped_terms": {
+                "x_terms": x_dropped_all,
+                "y_terms": y_dropped_all,
+                "a_terms": a_dropped_all,
+                "b_terms": b_dropped_all,
+            },
             "accepted": False,
-            "rationale_code": "invalid_vocab",
-        }
-
-    all_terms = x_terms + y_terms + a_terms + b_terms
-    if len(set(all_terms)) != len(all_terms):
-        return {
-            "proposal_id": proposal.get("proposal_id", ""),
-            "discipline": proposal.get("discipline", ""),
-            "bias_name": proposal.get("bias_name", ""),
-            "hypothesis": proposal.get("hypothesis", ""),
-            "error": "Final target and attribute sets overlap after canonicalization.",
-            "canonical_sets": {"x_terms": x_terms, "y_terms": y_terms, "a_terms": a_terms, "b_terms": b_terms},
-            "dropped_terms": {"x_terms": x_dropped, "y_terms": y_dropped, "a_terms": a_dropped, "b_terms": b_dropped},
-            "accepted": False,
-            "rationale_code": "overlapping_terms",
+            "rationale_code": "overlapping_terms" if has_overlap_shortage else "invalid_vocab",
         }
 
     signature = make_signature(x_terms, y_terms, a_terms, b_terms)
@@ -281,7 +311,12 @@ def evaluate_proposal(
             "error": "Duplicate final signature.",
             "signature": signature,
             "canonical_sets": {"x_terms": x_terms, "y_terms": y_terms, "a_terms": a_terms, "b_terms": b_terms},
-            "dropped_terms": {"x_terms": x_dropped, "y_terms": y_dropped, "a_terms": a_dropped, "b_terms": b_dropped},
+            "dropped_terms": {
+                "x_terms": x_dropped_all,
+                "y_terms": y_dropped_all,
+                "a_terms": a_dropped_all,
+                "b_terms": b_dropped_all,
+            },
             "accepted": False,
             "rationale_code": "duplicate_signature",
         }
@@ -305,7 +340,12 @@ def evaluate_proposal(
         "hypothesis": proposal.get("hypothesis", ""),
         "signature": signature,
         "canonical_sets": {"x_terms": x_terms, "y_terms": y_terms, "a_terms": a_terms, "b_terms": b_terms},
-        "dropped_terms": {"x_terms": x_dropped, "y_terms": y_dropped, "a_terms": a_dropped, "b_terms": b_dropped},
+        "dropped_terms": {
+            "x_terms": x_dropped_all,
+            "y_terms": y_dropped_all,
+            "a_terms": a_dropped_all,
+            "b_terms": b_dropped_all,
+        },
         "metrics": metrics,
         "accepted": accepted,
         "rationale_code": rationale,
