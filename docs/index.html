@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoWEAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #ffffff;
+    --bg-code:   #f6f5f3;
+    --code-tab:  #ecebe7;
+    --rule:      #ececea;
+    --rule-soft: #f3f2ef;
+    --fg:        #18181b;
+    --fg-2:      #3f3f46;
+    --fg-dim:    #71717a;
+    --fg-dimer:  #a1a1aa;
+
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #0f0f0f;
+      --bg-code:   #1a1a1a;
+      --code-tab:  #232323;
+      --rule:      #232323;
+      --rule-soft: #1c1c1c;
+      --fg:        #ededed;
+      --fg-2:      #c8c8c8;
+      --fg-dim:    #8a8a8a;
+      --fg-dimer:  #5a5a5a;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    font-feature-settings: "ss01", "cv11";
+  }
+  a {
+    color: var(--fg);
+    text-decoration: none;
+  }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+  }
+
+  /* ── Top nav (tiny, restrained) ── */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 80px;
+    font-size: 14px;
+  }
+  .nav .brand {
+    font-weight: 600;
+    color: var(--fg);
+    margin-right: auto;
+    letter-spacing: -0.005em;
+  }
+  .nav a { color: var(--fg-dim); }
+  .nav a:hover { color: var(--fg); text-decoration: none; }
+
+  /* ── List view ── */
+  .section-label {
+    font-size: 14px;
+    color: var(--fg-dim);
+    margin: 0 0 12px;
+    font-weight: 400;
+  }
+  .list-title {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--fg);
+    margin: 0 0 24px;
+    letter-spacing: -0.025em;
+  }
+  .about {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg-2);
+    margin: 0 0 64px;
+    max-width: 56ch;
+  }
+
+  .month-group {
+    margin-bottom: 36px;
+  }
+  .month-label {
+    font-size: 14px;
+    color: var(--fg-dim);
+    margin: 0 0 16px;
+    font-weight: 400;
+  }
+
+  /* Vertical timeline rail running down the left of all entries */
+  .entries {
+    border-left: 1px solid var(--rule);
+    padding-left: 24px;
+    position: relative;
+  }
+  /* Inside the rail the month label sits flush with the entries; no need to indent it differently */
+
+  .entry-link {
+    display: block;
+    margin-bottom: 22px;
+    position: relative;
+  }
+  /* Dot on the rail. Sits at left: -28.5px to land centered on the 1px border
+     (which is at -24px from .entry-link's content edge). 7px dot, ringed
+     in the page background so it visually breaks the rail. */
+  .entry-link::before {
+    content: "";
+    position: absolute;
+    left: -28.5px;
+    top: 7px;             /* aligns ~midline of e-title's first line at 16px/1.4 */
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: transparent;   /* no dot for non-significant */
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+  .entry-link.aligned::before  { background: #16a34a; }   /* green */
+  .entry-link.notaligned::before { background: #ca8a04; } /* amber/yellow */
+  .entry-link:last-child { margin-bottom: 0; }
+  .entry-link:hover { text-decoration: none; }
+  .entry-link .e-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.4;
+    margin: 0 0 2px;
+    letter-spacing: -0.005em;
+  }
+  .entry-link:hover .e-title {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .entry-link .e-title .vs,
+  .entry-link .e-desc .vs { color: var(--fg-dim); font-weight: 400; }
+  .entry-link .e-desc {
+    font-size: 14.5px;
+    color: var(--fg-dim);
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  /* ── Detail view ── */
+  .back-link {
+    font-size: 14px;
+    color: var(--fg-dim);
+    margin-bottom: 24px;
+    display: inline-block;
+  }
+  .back-link:hover { color: var(--fg); text-decoration: none; }
+
+  .detail-title {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--fg);
+    margin: 0 0 8px;
+    letter-spacing: -0.025em;
+  }
+  .detail-title .vs { color: var(--fg-dim); font-weight: 400; }
+
+  .byline {
+    font-size: 14px;
+    color: var(--fg-dim);
+    margin: 0 0 40px;
+  }
+
+  /* Lede paragraph (Lingxi's first-paragraph weight) */
+  .lede {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg-2);
+    margin: 0 0 32px;
+  }
+  .lede strong { color: var(--fg); font-weight: 500; }
+
+  /* Section headings inside detail (his "# Heading 1" style) */
+  .detail-section {
+    margin-bottom: 32px;
+  }
+  .detail-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0 0 16px;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+
+  /* ── Code-window block (Lingxi's Ghost code box style) ── */
+  .code-window {
+    background: var(--bg-code);
+    border-radius: 6px;
+    margin: 0 0 12px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .code-window .tab {
+    background: var(--code-tab);
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg-dim);
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .code-window .tab .tab-label { color: var(--fg-2); font-weight: 500; }
+  .code-window .tab .tab-meta { color: var(--fg-dim); }
+  .code-window pre {
+    margin: 0;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--fg);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .code-window pre.no-wrap {
+    white-space: pre;
+    word-break: normal;
+  }
+  .code-window .k    { color: var(--fg-dim); }
+  .code-window .num  { color: var(--fg); font-variant-numeric: tabular-nums; }
+  .code-window .pval { color: var(--fg-dim); }
+  .code-window .annot { color: var(--fg-dim); font-style: italic; }
+
+  /* Interpretation: prose, not a code window */
+  .interpretation {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--fg-2);
+    margin: 0;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 96px;
+    padding-top: 20px;
+    font-size: 13px;
+    color: var(--fg-dim);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 640px) {
+    body { font-size: 15px; }
+    .page { padding: 40px 18px 80px; }
+    .nav { margin-bottom: 56px; gap: 16px; flex-wrap: wrap; }
+    .list-title { font-size: 28px; margin-bottom: 48px; }
+    .month-group { margin-bottom: 32px; }
+    .entries { padding-left: 18px; }
+    .entry-link::before { left: -22.5px; width: 8px; height: 8px; }
+    .entry-link { margin-bottom: 20px; }
+    .entry-link .e-title { font-size: 15.5px; }
+    .entry-link .e-desc { font-size: 14px; }
+    .detail-title { font-size: 26px; }
+    .detail-section h2 { font-size: 19px; }
+    .code-window pre { font-size: 12px; padding: 12px 14px; }
+    .interpretation { font-size: 15.5px; }
+  }
+
+  .empty {
+    color: var(--fg-dim);
+    font-style: italic;
+    padding: 24px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <nav class="nav">
+    <a href="#" class="brand">AutoWEAT</a>
+    <a href="https://github.com/santoshbs/autoweat" target="_blank" rel="noopener">Source</a>
+    <a href="https://santoshbs.github.io" target="_blank" rel="noopener">santoshbs</a>
+  </nav>
+
+  <main id="view">
+    <div class="empty">loading…</div>
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 Santosh B. Srinivas.</span>
+    <span>schema inductive.v7</span>
+  </footer>
+
+</div>
+
+<script>
+/* ─── Sample data (replaced by fetch('feed.json') on deploy) ─── */
+
+const SAMPLE = [
+  {
+    id: "e14", timestamp: "2026-04-15T08:30:00Z",
+    interpretive_fired: true,
+    effect_size: 1.78, p_value: 0.0002,
+    sc_weat_x_mean: 0.40, sc_p_x: 0.18,
+    sc_weat_y_mean: -0.80, sc_p_y: 0.012,
+    labels: { X: "technology and digital terms", Y: "nature and organic terms",
+              A: "speed and immediacy terms", B: "slowness and duration terms" },
+    words: {
+      X_used: ["technology","digital","computer","internet","software","device","screen","phone","online","electronic"],
+      Y_used: ["nature","organic","natural","forest","tree","river","earth","plant","wild","soil"],
+      A_used: ["fast","quick","instant","immediate","rapid","swift","speedy","sudden","snap","flash"],
+      B_used: ["slow","gradual","lengthy","prolonged","patient","lasting","enduring","steady","leisurely","extended"],
+    },
+    interpretive_paragraph: "The contrast is large and statistically robust: technology and digital language clusters with speed and immediacy, while nature and organic language clusters with slowness and duration. The decomposition tells a more specific story — the effect is carried mainly by the slowness side. Nature terms are described in the corpus using markedly slow-tempo language, while technology terms are not described as especially fast in absolute terms. The bias, in other words, is less about how technology gets framed and more about how nature gets framed."
+  },
+  {
+    id: "e13", timestamp: "2026-04-14T22:15:00Z",
+    interpretive_fired: false,
+    effect_size: 0.54, p_value: 0.205,
+    sc_weat_x_mean: 0.51, sc_p_x: 0.197,
+    sc_weat_y_mean: 0.41, sc_p_y: 0.297,
+    labels: { X: "wealth and capital terms", Y: "poverty and debt terms",
+              A: "power and agency terms", B: "need and dependence terms" },
+    words: {
+      X_used: ["wealth","capital","fortune","riches","assets","investment","prosperity","affluence","income","earnings","savings","equity"],
+      Y_used: ["poverty","debt","destitution","hardship","deprivation","scarcity","want","lack","indigence","owing","arrears","burden"],
+      A_used: ["power","agency","control","influence","authority","command","force","leverage","autonomy","freedom","choice","decision"],
+      B_used: ["need","dependence","reliance","vulnerability","fragility","subjection","weakness","helplessness","support","aid","assistance","succor"],
+    }
+  },
+  {
+    id: "e12", timestamp: "2026-04-14T16:42:00Z",
+    interpretive_fired: false,
+    effect_size: 0.92, p_value: 0.007,
+    sc_weat_x_mean: 0.75, sc_p_x: 0.018,
+    sc_weat_y_mean: 0.22, sc_p_y: 0.41,
+    labels: { X: "public and shared spaces", Y: "private and personal spaces",
+              A: "visibility and openness terms", B: "secrecy and concealment terms" },
+    words: {
+      X_used: ["plaza","park","square","market","street","commons","hall","library","stadium","forum"],
+      Y_used: ["bedroom","diary","study","den","closet","attic","basement","chamber","cellar","nook"],
+      A_used: ["visible","open","transparent","exposed","obvious","apparent","displayed","shown","evident","clear"],
+      B_used: ["secret","hidden","concealed","private","covert","veiled","masked","obscured","shrouded","covered"],
+    },
+    interpretive_paragraph: "WEAT fires significantly: public spaces associate more with visibility-language than private spaces do. But the decomposition is asymmetric in a revealing way. The public-space side shows a strong, significant pull toward openness vocabulary (SC = +0.75, p = .018). The private-space side, however, does not show a corresponding significant pull toward secrecy (SC = +0.22, p = .41). So the contrast is real but one-sided: it is the conspicuousness of public language doing the work, not the secrecy of private language."
+  },
+  {
+    id: "e11", timestamp: "2026-03-28T11:20:00Z",
+    interpretive_fired: false,
+    effect_size: -0.10, p_value: 0.820,
+    sc_weat_x_mean: 0.34, sc_p_x: 0.42,
+    sc_weat_y_mean: 0.37, sc_p_y: 0.39,
+    labels: { X: "modern and innovation terms", Y: "traditional and heritage terms",
+              A: "individual and self terms", B: "collective and community terms" },
+    words: {
+      X_used: ["modern","innovation","novel","cutting-edge","contemporary","advanced","progressive","fresh","new","current"],
+      Y_used: ["traditional","heritage","ancestral","classical","timeless","established","conventional","longstanding","historical","rooted"],
+      A_used: ["individual","self","personal","private","own","single","alone","solo","independent","autonomous"],
+      B_used: ["collective","community","shared","common","joint","mutual","social","public","group","together"],
+    }
+  },
+  {
+    id: "e10", timestamp: "2026-03-21T09:08:00Z",
+    interpretive_fired: true,
+    effect_size: 0.93, p_value: 0.012,
+    sc_weat_x_mean: 0.33, sc_p_x: 0.21,
+    sc_weat_y_mean: -0.20, sc_p_y: 0.36,
+    labels: { X: "old and elderly terms", Y: "young and child terms",
+              A: "competence and intelligence terms", B: "warmth and care terms" },
+    words: {
+      X_used: ["old","elderly","aged","senior","mature","veteran","grandparent","retired","wise","experienced"],
+      Y_used: ["young","child","youth","junior","kid","infant","toddler","teen","minor","novice"],
+      A_used: ["competent","intelligent","capable","skilled","expert","proficient","adept","sharp","knowledgeable","clever"],
+      B_used: ["warm","caring","kind","nurturing","gentle","tender","loving","compassionate","affectionate","supportive"],
+    },
+    interpretive_paragraph: "Old and elderly language clusters with competence and intelligence, while young and child language clusters with warmth and care. Both decompositions point in the WEAT-consistent direction even though neither is individually significant — the signal is in the relative contrast across the four categories rather than in either side alone."
+  },
+];
+
+/* ─── Helpers ─── */
+
+function fmtD(v) {
+  if (v == null || isNaN(v)) return "—";
+  const n = +v;
+  return (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(2);
+}
+function fmtP(v) {
+  if (v == null || isNaN(v)) return "—";
+  const n = +v;
+  if (n < 0.001) return "<.001";
+  return n.toFixed(3).replace(/^0\./, ".");
+}
+function fmtMonthYear(ts) {
+  if (!ts) return "Unknown";
+  const d = new Date(ts);
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+function fmtFullDate(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+}
+function esc(s) {
+  if (s == null) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function tidy(s) {
+  if (!s) return "?";
+  return String(s).toLowerCase().trim().replace(/\s+(terms|words|items|things)$/i, "");
+}
+
+/* Verdict in plain words, no glyphs */
+function verdictText(t) {
+  const sig = (t.p_value != null && t.p_value < 0.05);
+  if (!sig) return "non-significant";
+  const sx = t.sc_weat_x_mean, sy = t.sc_weat_y_mean, d = t.effect_size;
+  const aligned = sig && d != null && d !== 0 && sx != null && sy != null && sx*sy < 0 && (sx > 0) === (d > 0);
+  return aligned ? "significant, decomposition aligns" : "significant, decomposition does not align";
+}
+
+/* ─── List view ─── */
+
+function renderList() {
+  const view = document.getElementById("view");
+
+  const sorted = TESTS.slice().sort((a, b) =>
+    (b.timestamp || "").localeCompare(a.timestamp || "")
+  );
+
+  // Group by month
+  const groups = [];
+  const seen = new Map();
+  for (const t of sorted) {
+    const key = fmtMonthYear(t.timestamp);
+    if (!seen.has(key)) {
+      seen.set(key, { month: key, tests: [] });
+      groups.push(seen.get(key));
+    }
+    seen.get(key).tests.push(t);
+  }
+
+  const groupsHtml = groups.map(g => {
+    const items = g.tests.map(t => {
+      const v = verdictText(t);
+      const dotClass = v === "significant, decomposition aligns" ? "aligned"
+                     : v === "significant, decomposition does not align" ? "notaligned"
+                     : "";
+      return `
+        <a class="entry-link ${dotClass}" href="#${esc(t.id)}">
+          <h3 class="e-title">${esc(tidy(t.labels.X))} <span class="vs">vs</span> ${esc(tidy(t.labels.Y))}</h3>
+          <p class="e-desc">On ${esc(tidy(t.labels.A))} <span class="vs">vs</span> ${esc(tidy(t.labels.B))}.</p>
+        </a>
+      `;
+    }).join("");
+    return `
+      <section class="month-group">
+        <p class="month-label">${esc(g.month)}</p>
+        ${items}
+      </section>
+    `;
+  }).join("");
+
+  view.innerHTML = `
+    <h1 class="list-title">An autonomous bench of word-embedding bias tests.</h1>
+    <p class="about">
+      A small local language model proposes WEAT-style hypotheses
+      (Caliskan, Bryson &amp; Narayanan, 2017); a locked Python script
+      computes them. Results below in reverse chronological order;
+      no human curation between proposal and posting.
+    </p>
+    ${groupsHtml ? `<div class="entries">${groupsHtml}</div>` : '<div class="empty">No tests in feed yet.</div>'}
+  `;
+  window.scrollTo(0, 0);
+}
+
+/* ─── Detail view ─── */
+
+function renderDetail(id) {
+  const view = document.getElementById("view");
+
+  const t = TESTS.find(x => x.id === id);
+  if (!t) {
+    view.innerHTML = `<div class="empty">Test not found. <a href="#">Back to all tests</a>.</div>`;
+    return;
+  }
+
+  const labels = t.labels || {};
+  const words = t.words || {};
+
+  const statsBody =
+    `<span class="k">WEAT       </span> d = <span class="num">${fmtD(t.effect_size)}</span>   <span class="pval">p = ${fmtP(t.p_value)}</span>\n` +
+    `<span class="k">SC-WEAT(X) </span> <span class="num">${fmtD(t.sc_weat_x_mean)}</span>   <span class="pval">p = ${fmtP(t.sc_p_x)}</span>   <span class="annot">→ ${esc(tidy(labels.X))}</span>\n` +
+    `<span class="k">SC-WEAT(Y) </span> <span class="num">${fmtD(t.sc_weat_y_mean)}</span>   <span class="pval">p = ${fmtP(t.sc_p_y)}</span>   <span class="annot">→ ${esc(tidy(labels.Y))}</span>`;
+
+  const sets = [
+    { key: "X", lbl: tidy(labels.X), wl: words.X_used || [], role: "target" },
+    { key: "Y", lbl: tidy(labels.Y), wl: words.Y_used || [], role: "target" },
+    { key: "A", lbl: tidy(labels.A), wl: words.A_used || [], role: "attribute" },
+    { key: "B", lbl: tidy(labels.B), wl: words.B_used || [], role: "attribute" },
+  ];
+  const wordsHtml = sets.map(w => `
+    <div class="code-window">
+      <div class="tab">
+        <span class="tab-label">${w.key} &nbsp;·&nbsp; ${esc(w.lbl)}</span>
+        <span class="tab-meta">${w.role} &nbsp;·&nbsp; ${w.wl.length} words</span>
+      </div>
+      <pre>${esc(w.wl.join(", "))}</pre>
+    </div>
+  `).join("");
+
+  const interp = (t.interpretive_fired && t.interpretive_paragraph)
+    ? `<div class="detail-section">
+        <h2>Interpretation</h2>
+        <p class="interpretation">${esc(t.interpretive_paragraph)}</p>
+      </div>`
+    : "";
+
+  // Embedding source — read from config if present, else generic fallback
+  const embedSrc = (t.config && t.config.embedding_backend)
+    || (t.config && t.config.embedding_source)
+    || t.embedding_source
+    || "word embedding";
+
+  view.innerHTML = `
+    <a class="back-link" href="#">← All tests</a>
+
+    <h1 class="detail-title">${esc(tidy(labels.X))} <span class="vs">vs</span> ${esc(tidy(labels.Y))}</h1>
+    <p class="byline">${fmtFullDate(t.timestamp)} &nbsp;·&nbsp; ${esc(verdictText(t))} &nbsp;·&nbsp; ${esc(embedSrc)}</p>
+
+    <p class="lede">
+      A WEAT test of <strong>${esc(tidy(labels.X))}</strong> <span class="vs">vs</span> <strong>${esc(tidy(labels.Y))}</strong>,
+      on <strong>${esc(tidy(labels.A))}</strong> <span class="vs">vs</span> <strong>${esc(tidy(labels.B))}</strong>.
+    </p>
+
+    <div class="detail-section">
+      <h2>Word lists</h2>
+      ${wordsHtml}
+    </div>
+
+    <div class="detail-section">
+      <h2>Results</h2>
+      <div class="code-window">
+        <div class="tab">
+          <span class="tab-label">WEAT &nbsp;·&nbsp; SC-WEAT decomposition</span>
+          <span class="tab-meta">${esc(embedSrc)}</span>
+        </div>
+        <pre class="no-wrap">${statsBody}</pre>
+      </div>
+    </div>
+
+    ${interp}
+  `;
+  window.scrollTo(0, 0);
+}
+
+/* ─── Data layer ───
+   On a real deploy this fetches feed.json from the same directory.
+   The SAMPLE array above is used as a fallback when feed.json
+   isn't reachable (e.g. opening the file directly off disk for preview). */
+
+let TESTS = [];
+
+function dataReady(fn) {
+  fetch("feed.json?cache=" + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(data => {
+      const arr = Array.isArray(data) ? data : (data.tests || []);
+      // Filter to schema v7 if the field is present; otherwise accept all
+      TESTS = arr.filter(t => !t.schema_version || t.schema_version === "inductive.v7");
+      if (TESTS.length === 0) TESTS = SAMPLE;
+      fn();
+    })
+    .catch(() => {
+      // Fallback to embedded sample (preview / file:// usage)
+      TESTS = SAMPLE;
+      fn();
+    });
+}
+
+/* ─── Hash router ─── */
+
+function route() {
+  const hash = (window.location.hash || "").replace(/^#/, "");
+  if (hash) renderDetail(hash);
+  else renderList();
+}
+
+window.addEventListener("hashchange", route);
+dataReady(route);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1279 @@
+"""
+proposer.py — LLM-driven WEAT proposal loop (inductive, two-phase).
+
+AUTOWEAT_PROPOSER_VERSION = "2026-04-12-v12.2-pooled-lean-honest"
+(grep for AUTOWEAT_PROPOSER_VERSION to confirm this file is in place.)
+
+The LLM operates in two phases per iteration:
+
+  Phase 1 (propose):  Pick a contrast and supply word lists. No hypothesis,
+                      no rationale, no theory citations. The model is choosing
+                      what to look at, not arguing for what it expects.
+
+  Phase 2 (interpret): After the locked WEAT computer produces d and p, the
+                      model is shown its own word lists, the per-word association
+                      scores, AND a pre-computed direction diagnostic that tells
+                      it whether the effect is a real two-way contrast or a
+                      one-sided magnitude difference. It returns a citation-free,
+                      direction-honest description.
+
+The p-value is two-sided: it answers "is the result real in some direction?"
+The direction (sign of d, plus the per-word means) answers "which direction?"
+Those two pieces of information together are everything the LLM needs to
+write an honest description.
+"""
+
+from __future__ import annotations
+
+import json
+import random
+import re
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+
+AUTOWEAT_PROPOSER_VERSION = "2026-04-12-v12.2-pooled-lean-honest"
+
+
+# The social-science domains AutoWEAT rotates through. Edit freely.
+DOMAINS = [
+    "management",
+    "sociology",
+    "social psychology",
+    "cognitive psychology",
+    "economics",
+    "political science",
+    "anthropology",
+    "organizational behavior",
+    "science and technology studies",
+    "cultural sociology",
+]
+
+
+# ─── Phase 1: proposal schema ─────────────────────────────────────────
+
+PROPOSAL_SCHEMA = """
+Return a SINGLE JSON object and nothing else. No prose before or after.
+No markdown fences. No commentary.
+
+Schema:
+
+{
+  "domain": "<one of the domains listed in the system prompt>",
+  "contrast_label": "<short plain-English description of what you're looking at, e.g. 'startup vs incumbent firms with animal vs machine attributes'>",
+  "X_label": "<short noun phrase naming the first target concept>",
+  "Y_label": "<short noun phrase naming the contrasting target concept>",
+  "A_label": "<short noun phrase naming the first attribute>",
+  "B_label": "<short noun phrase naming the contrasting attribute>",
+  "X": ["word1", "word2", ...],   // EXACTLY 12-16 single-token common English words
+  "Y": ["word1", "word2", ...],   // EXACTLY 12-16 single-token common English words
+  "A": ["word1", "word2", ...],   // EXACTLY 12-16 single-token common English words
+  "B": ["word1", "word2", ...],   // EXACTLY 12-16 single-token common English words
+  "has_prior": <true or false>,
+  "prior_statement": "<1-2 sentences>"
+}
+
+Rules for has_prior and prior_statement:
+  - has_prior: true MEANS a loose, plain common-sense intuition exists
+    about how this contrast should behave. An ordinary non-researcher
+    reader would recognize the intuition. Example: "hierarchical vs
+    egalitarian roles × angular vs round shapes" — the loose cultural
+    association of power with hard edges and equality with softer
+    shapes is common-sense recognizable even without any theory.
+  - has_prior: false MEANS the contrast is genuinely exploratory. You
+    are curious but have no everyday intuition about what should
+    happen. Example: "retrieval vs encoding actions × motion vs touch
+    verbs" — no everyday intuition, this is open inquiry.
+  - prior_statement is 1-2 sentences either explaining the plain
+    common-sense prior (when has_prior is true) or explaining why the
+    test is genuinely open (when has_prior is false).
+  - DO NOT cite any theory, author, framework, or published finding
+    in prior_statement. Plain common-sense language only.
+  - DO NOT confabulate a prior to look smart. If you cannot state the
+    prior as something a non-researcher would recognize, has_prior is
+    false. The downstream interpretation will treat the two types of
+    tests differently, and a fake prior is worse than no prior.
+
+Rules for the word lists:
+  - CRITICAL: Each list must contain AT LEAST 12 words. If you can only
+    think of 10-11 coherent words for a category, PICK A DIFFERENT
+    CATEGORY. Do not propose lists with fewer than 12 words. Tests with
+    fewer than 12 vocab-present words per pool will be rejected before
+    computation and the iteration wasted.
+  - Single common English words, lowercase, no phrases, no hyphens, no punctuation.
+  - Words must be plausible members of pretrained word2vec / GloVe vocabulary.
+  - X and Y must be CONTRASTING categories (e.g. "startups" vs "incumbents").
+  - A and B must be CONTRASTING attributes (e.g. "animals" vs "machines").
+  - The attribute pools (A, B) must come from a SEMANTICALLY DIFFERENT register
+    than the targets (X, Y). If A is a near-synonym of X, the test is rigged.
+  - The two attribute pools (A and B) must be drawn from registers of
+    ROUGHLY EQUAL everyday-English frequency. Do NOT pair a dense common
+    register (colors, body parts, materials, household items) with a rare
+    register (geometric shapes, fruits, sounds, weather phenomena). When
+    one pool is much more common than the other, almost every target word
+    will cluster with the dense pool, and the test will report a "magnitude
+    difference" rather than a real two-way contrast. See the persona's
+    base-rate balancing section.
+  - Avoid proper nouns unless the contrast is explicitly about them.
+  - Do not repeat any contrast from the prior tests shown in the history.
+
+CRITICAL: The proposal has a hypothesis FIELD now (has_prior +
+prior_statement), but it is NOT an outcome prediction. You state
+whether a common-sense prior exists. You do NOT state what d value
+you expect. The interpretation comes later, after the result is known.
+"""
+
+
+# ─── Phase 2: interpretation prompt template ──────────────────────────
+
+INTERPRETATION_SCHEMA = """
+Return a SINGLE JSON object and nothing else. No prose before or after.
+
+Schema (v12 four-beat card):
+
+{
+  "headline_format": "<one of: declarative_claim | question | puzzle | hedged_claim | neutral_label>",
+  "headline_text": "<ONE short sentence or phrase; see format-specific rules below>",
+  "expectation": "<2-3 sentences of plain-language framing: why this contrast is worth testing, what a loose common-sense intuition would suggest. Use hedged language. NO citations.>",
+  "observation": "<2-4 sentences of rigorous prose reporting the numbers in Charlesworth register. Names the Cohen's d magnitude explicitly. Uses the exact label strings verbatim. See Observation section below.>",
+  "finding_line": "<ONE short sentence that resolves the headline and captures the takeaway. See Finding Line section below.>"
+}
+
+You are producing the four beats of a research card. The card has a
+specific rhetorical structure: the headline hooks the reader, the
+expectation sets up why the test is worth running, the observation
+reports the numbers with rigor, and the finding line lands the
+takeaway. All four beats must harmonize.
+
+LABEL VERBATIM RULE (CRITICAL):
+
+The observation sentence MUST contain the X label, Y label, and the
+relevant attribute labels EXACTLY as given to you (case-insensitive).
+The headline text MUST also contain the relevant labels verbatim
+unless you're using the question or neutral_label format. The
+rendering code bolds these labels; if you paraphrase, the bolding
+breaks and the card reads wrong.
+
+Example labels: X="hierarchical roles", Y="egalitarian roles",
+A="round objects", B="angular objects".
+
+GOOD observation: "A significant and large relative WEAT effect
+emerged (D = -0.92, p = .025), with hierarchical roles associated
+with angular objects and egalitarian roles associated with round
+objects."
+
+BAD observation: "Roles in positions of power are associated with
+sharper shape vocabulary, while more egalitarian role words lean
+toward softer forms." (all four labels paraphrased — REJECTED)
+
+THE HEADLINE FORMAT MENU (CRITICAL — read this carefully):
+
+You have five headline formats to choose from. Each has preconditions
+tied to what the data show. You do NOT pick the format that makes the
+card feel most impressive; you pick the format that honestly matches
+the epistemic shape of the finding. The format selection is
+constrained by the verdict pattern (the system tells you which pattern
+the test fell into) and by has_prior (which you set in Phase 1).
+
+**1. declarative_claim** — for clean, strong, directionally clear findings.
+   PRECONDITION: the relative WEAT is significant (p < .05) AND |d| >= 0.5,
+   AND the verdict pattern is GENUINE TWO-WAY CONTRAST, MAGNITUDE
+   DIFFERENCE, DRIVEN BY X, or DRIVEN BY Y. (Yes, including DRIVEN BY
+   X/Y — a strong significant relative WEAT is a real finding even when
+   only one side carries the effect. The asymmetry is prose texture for
+   the observation paragraph, not a reason to hedge the headline.)
+   HEADLINE SHAPE: a sentence that names the finding directly.
+   Example: "Hierarchical roles align with angular shapes; egalitarian
+   roles align with round shapes."
+   Example: "Scientific professions align with logic and reasoning,
+   artistic professions with emotion and feeling." (Even when only the
+   scientific side carries the effect at the SC-WEAT level — the
+   relative WEAT is large and significant, so the headline is
+   declarative; the SC-WEAT asymmetry goes in the observation.)
+   The declarative claim is the confident voice. Use it when the data
+   give you something substantive to claim.
+
+**2. hedged_claim** — for real but structurally subtle findings, AND for
+   POOLED LEAN findings (non-directional but real).
+   PRECONDITION: ONE of the following is true:
+   (a) the verdict pattern is WEAK TWO-WAY or WEAK POOLED LEAN, OR
+   (b) the verdict pattern is POOLED LEAN (both sides individually
+       significant, same direction, relative WEAT null), OR
+   (c) the verdict pattern is DRIVEN BY X/Y AND |d| < 0.5 OR the
+       relative WEAT is non-significant.
+   For POOLED LEAN specifically: the headline reports the pooled lean
+   directly as a finding about the broader vocabulary category, NOT as
+   an apology for the absence of a contrast. See the POOLED LEAN
+   section in your persona for the framing rules.
+   HEADLINE SHAPE: a sentence that names the finding AND acknowledges
+   the structural subtlety in the same breath. For POOLED LEAN, the
+   "structural subtlety" being acknowledged is that both target sides
+   share the same association — that's the finding.
+   Example (WEAK TWO-WAY): "Hierarchical roles align with angular
+   shapes, egalitarian roles with round shapes — though individual
+   links are weak."
+   Example (POOLED LEAN): "Both high status terms and low status terms
+   cluster with mind terms in this corpus, indicating that status
+   vocabulary as a whole is framed in cognitive terms."
+
+**3. question** — for genuinely exploratory tests.
+   PRECONDITION: has_prior was set to false in the Phase 1 proposal.
+   The contrast had no common-sense prior; the test is honest inquiry.
+   HEADLINE SHAPE: a question that names what was being asked.
+   Example: "Do retrieval and encoding actions differ in their
+   relationship to motion versus touch verbs?"
+   The question format is honest about not knowing. Do NOT use it when
+   you had a prior — that would be a post-hoc hedge.
+
+**4. puzzle** — for findings that contradict the stated prior.
+   PRECONDITION: has_prior was true in Phase 1 AND the observed
+   direction goes against the prior. This is rare; most tests either
+   confirm the prior or produce a null that neither confirms nor
+   contradicts.
+   HEADLINE SHAPE: a question that expresses the surprise.
+   Example: "Why would retrieval actions cluster with touch verbs
+   rather than motion verbs?"
+   Use this format only when there's a genuine tension between what
+   was expected and what was found. Do not force puzzle framing onto
+   ordinary findings.
+
+**5. neutral_label** — for genuine null findings.
+   PRECONDITION: verdict pattern is WEAK ON BOTH SIDES. All three
+   p-values are non-significant, and no meaningful directional claim
+   is supported by the data.
+   HEADLINE SHAPE: a plain structural label naming the contrast axes,
+   in Title Case. Do not force narrative framing on a null.
+   Example: "Retrieval Actions vs Encoding Actions — Motion Verbs vs
+   Touch Verbs"
+   The neutral label lets null findings sit with honest dignity. A
+   null is a real finding; it does not need to be dressed up as a
+   question or a claim.
+
+THE HONESTY RULE FOR FORMAT SELECTION:
+
+Pick the format that matches the epistemic status of the finding,
+not the format that makes the card feel most interesting. A null
+finding should get a neutral_label; do not dress it up as a question
+just because "null label" feels underwhelming. A strong finding
+should get a declarative_claim; do not hedge it as a question just
+because declarative claims feel overconfident. The format reflects
+what the data say, not what you wish they said.
+
+THE OBSERVATION PARAGRAPH (CRITICAL):
+
+The observation paragraph is where Charlesworth-register rigor lives.
+This is NOT the place for narrative or speculation. It reports the
+numbers with precision.
+
+Required elements of the observation paragraph:
+
+1. The Cohen's d magnitude of the relative WEAT, named explicitly
+   using standard categories: negligible (|d| < 0.2), small
+   (0.2 <= |d| < 0.5), medium (0.5 <= |d| < 0.8), large (|d| >= 0.8).
+   Never use a different vocabulary. Never describe a d=0.92 as
+   "small" or "subtle". Never describe a d=0.3 as "large".
+
+2. The exact WEAT D value and p-value, in the first sentence,
+   in parentheses: (D = ±X.XX, p = .XX).
+
+3. If the relative WEAT is significant, describe the direction using
+   the X, Y, A, B labels verbatim.
+
+4. A sentence about the single-association decomposition: name each
+   SC-WEAT with its D value and p-value, and characterize whether each
+   single association is significant or not.
+
+5. A closing sentence that summarizes the structural texture of the
+   finding — whether the signal comes from one side, from both sides,
+   from the relative comparison, or not at all.
+
+Use passive or semi-passive voice where natural ("a significant
+effect emerged," "both sides were associated with," "neither single
+association reached significance"). Avoid active-voice narration
+("hierarchical roles lean toward..."). The Charlesworth register
+treats the finding as the subject of the sentence, not the words.
+
+GOOD observation (large significant finding):
+"A significant and large relative WEAT effect emerged (D = -0.92,
+p = .025), with hierarchical roles associated with angular objects
+and egalitarian roles associated with round objects. Neither single
+association reached significance on its own (hierarchical-angular
+SC-WEAT = -0.19, p = .64; egalitarian-round SC-WEAT = +0.11, p = .76),
+so the contrast is carried by the relative comparison between the
+two sides rather than by either side clustering strongly on its own."
+
+GOOD observation (null finding):
+"No significant relative WEAT effect was found (D = +0.19, p = .63).
+Both single associations were also small and non-significant
+(retrieval-touch SC-WEAT = -0.14, p = .70; encoding-touch SC-WEAT
+= -0.22, p = .53). Both target sides show small leans toward touch
+verbs rather than motion verbs, but the leans are too weak to
+distinguish the two sides."
+
+GOOD observation (pooled lean):
+"A significant and large single-association pattern emerged: both
+creative workers (SC-WEAT = +0.92, p = .019) and analytical workers
+(SC-WEAT = +1.00, p = .016) were strongly associated with body parts.
+The relative WEAT between the two target sets was small and
+non-significant (D = -0.28, p = .62), indicating that the signal is
+a pooled lean of both target types toward body part vocabulary rather
+than a distinction between them."
+
+BAD observation (current v11 register — do not write like this):
+"Both creative workers and analytical workers cluster with body parts
+in this corpus, but analytical workers do so more strongly than
+creative workers." (Active voice, no Cohen's d label, no exact values,
+narrative register — REJECTED.)
+
+THE EXPECTATION PARAGRAPH:
+
+The expectation paragraph sits between the headline and the
+observation. It is where you explain WHY this test is worth running.
+Length: 2-3 sentences, plain language, hedged.
+
+The expectation paragraph's content depends on has_prior:
+
+- If has_prior was true in Phase 1: state the common-sense prior as
+  plain intuition that a non-researcher would recognize. Use hedged
+  language: "there's a loose intuition that...", "a common-sense
+  association holds that...", "one might expect...". Do NOT name
+  theories, authors, frameworks, or published findings. Do NOT
+  retroactively adjust the prior to match what the data showed —
+  write it as if you were committing to it before seeing the result.
+
+- If has_prior was false in Phase 1: explain why the test is
+  genuinely open rather than claiming a prior. "There is no obvious
+  common-sense intuition about...", "the contrast is genuinely
+  exploratory because...", "we are curious but have no clear
+  expectation...".
+
+In both cases, end the expectation paragraph with a sentence that
+orients the reader toward the observation: "If that intuition shows
+up in how these categories are written about, we should see...", or
+"The test is whether the corpus distinguishes these categories
+along this axis at all."
+
+DO NOT speculate about causes or mechanisms in the expectation
+paragraph beyond the loose common-sense prior. Deep speculation
+does not belong here.
+
+THE FINDING LINE:
+
+The finding line is the final beat. It is ONE sentence that resolves
+the headline and captures the card's takeaway.
+
+Rules by headline_format:
+
+- declarative_claim: the finding line summarizes the structural
+  texture of the finding in one short sentence. Example: "The asymmetry
+  is real and the direction matches common expectation." Or: "The
+  contrast is strong and both sides are individually significant."
+
+- hedged_claim: the finding line names the nuance that the headline
+  already acknowledged, in a way that crystallizes the methodological
+  texture. Example: "The individual links are weak; the relative
+  contrast is strong." Or: "The signal is in the pool, not in the
+  contrast."
+
+- question: the finding line answers the question with Yes, No, or
+  Yes-but/No-but. Example: "Yes — and the signal is in the contrast,
+  not in either side alone." Or: "No — the corpus does not
+  distinguish these categories along this axis."
+
+- puzzle: the finding line resolves or deepens the puzzle. Example:
+  "The data confirm the pattern but do not explain it." Or: "The
+  direction is opposite to what a naive reading would predict."
+
+- neutral_label: the finding line is an italicized null statement,
+  written as: "_No significant effect at this sample size._"
+  (Include the underscores — they render as italics in the frontend.)
+  This is the ONLY format where the finding_line may be omitted or
+  stylized; for all other formats, write a full sentence.
+
+VARY THE OPENING OF THE FINDING LINE ACROSS CARDS. Do not start your
+finding_line with the same phrase as recent cards. In particular, do
+NOT default to "The signal is..." — this opener has been overused in
+prior batches. Reach for variety: direct yes/no answers, declarative
+observations ("Both sides cluster with X."), descriptive phrases
+("A non-directional pattern."), or short claims ("Real, large, and
+asymmetric."). Stylistic uniformity across cards dulls the landscape;
+each finding line should sound like its own sentence, not like a
+template applied to a different test. If you find yourself reaching
+for "The signal is..." or "The pattern is...", stop and write a
+different opener.
+
+WHICH P-VALUE TO TRUST WHEN:
+
+- For GENUINE TWO-WAY CONTRAST, MAGNITUDE DIFFERENCE, and WEAK TWO-WAY
+  patterns, the relative WEAT p-value is the right "is this real"
+  indicator.
+- For POOLED LEAN, DRIVEN BY X, and DRIVEN BY Y patterns, the SC-WEAT
+  p-values are the right "is this real" indicator.
+- For WEAK ON BOTH SIDES, all three p-values agree: nothing is real.
+
+NON-SIGNIFICANCE POLICY:
+
+When a p-value is non-significant (p >= .05), you must acknowledge
+it, but you are NOT required to dismiss the effect entirely. The
+practice this project adopts is that non-significant effects with
+meaningful magnitude (|d| >= 0.5) may be interpreted descriptively,
+alongside the observation that they did not reach conventional
+significance. Small non-significant effects (|d| < 0.5) should just
+be called null.
+
+Examples:
+
+GOOD (non-significant but medium-magnitude): "A medium-sized effect
+was suggested but did not reach significance (D = +0.62, p = .13).
+The direction is consistent with [prior]; the sample size is too
+small to statistically confirm it."
+
+GOOD (non-significant and small): "No meaningful effect was detected
+(D = +0.15, p = .71). Both target sets show near-zero association
+with either attribute pool."
+
+BAD: "There is a small but statistically detectable contrast..."
+(Does not name the Cohen's d magnitude. Ambiguous.)
+
+BAD: "X is slightly more associated with A than Y is."
+(No mention of significance level at all.)
+
+ABSOLUTE RULES (no exceptions):
+  - Name the Cohen's d magnitude of the relative WEAT explicitly in
+    the observation paragraph using the standard categories.
+  - Include exact D and p values in parentheses in the observation.
+  - Use the X, Y, A, B labels verbatim.
+  - Honor has_prior: if true, the prior was articulated in Phase 1;
+    write the expectation paragraph consistently with it. If false,
+    use question format or acknowledge open exploration.
+  - Honor the verdict pattern in your format selection (see the
+    format menu preconditions).
+  - For significant findings, do not add "non-significant" hedges
+    that contradict the p-value.
+  - For non-significant findings, acknowledge the significance level
+    but do not dismiss medium-magnitude effects entirely.
+  - NO author names, theory names, paper titles, framework names,
+    or named traditions in any beat.
+  - Plain-language description in the expectation paragraph.
+    Charlesworth-register rigor in the observation paragraph.
+  - If you find yourself writing "this is consistent with the X
+    literature," rewrite in plain English what the X literature would
+    say, without naming it.
+"""
+
+
+# ─── data classes ─────────────────────────────────────────────────────
+
+@dataclass
+class Proposal:
+    domain: str
+    contrast_label: str
+    X_label: str
+    Y_label: str
+    A_label: str
+    B_label: str
+    X: list[str]
+    Y: list[str]
+    A: list[str]
+    B: list[str]
+    has_prior: bool              # v12: whether contrast has common-sense prior
+    prior_statement: str         # v12: 1-2 sentence prior (or why test is open)
+    raw: str
+
+    def to_dict(self) -> dict[str, Any]:
+        d = self.__dict__.copy()
+        d.pop("raw", None)
+        return d
+
+
+@dataclass
+class Interpretation:
+    headline_format: str         # v12: one of declarative_claim, question, puzzle,
+                                  #      hedged_claim, neutral_label
+    headline_text: str           # v12: the headline sentence/phrase
+    expectation: str             # v12: 2-3 sentence framing paragraph
+    observation: str             # v12: rigorous Charlesworth-register paragraph
+    finding_line: str            # v12: one-sentence finding (may be "" for neutral_label)
+    direction: str               # "two-way" | "one-sided-A" | "one-sided-B" | "ambiguous"
+    verdict_pattern: str         # v12: GENUINE_TWO_WAY | POOLED_LEAN | MAGNITUDE_DIFFERENCE |
+                                  #      DRIVEN_BY_X | DRIVEN_BY_Y | WEAK_TWO_WAY |
+                                  #      WEAK_POOLED_LEAN | WEAK_ON_BOTH_SIDES
+    cohens_d_category: str       # v12: negligible | small | medium | large
+    direction_matches_prior: bool | None  # v12: true/false/None (None if no prior)
+    x_mean_s: float
+    y_mean_s: float
+    raw: str
+
+    def to_dict(self) -> dict[str, Any]:
+        d = self.__dict__.copy()
+        d.pop("raw", None)
+        return d
+
+
+# ─── proposer class ───────────────────────────────────────────────────
+
+class OllamaProposer:
+    """LLM proposer for AutoWEAT (inductive, two-phase, direction-checked)."""
+
+    GPT_OSS_EFFORTS = ("low", "medium", "high")
+
+    def __init__(
+        self,
+        model: str,
+        persona_path: str,
+        host: str = "http://localhost:11434",
+        sampling: dict | None = None,
+        thinking_style: str = "none",
+        thinking_effort: str | None = None,
+        max_json_retries: int = 3,
+        request_timeout: int = 1800,
+    ):
+        import requests
+        self.requests = requests
+        self.model = model
+        self.host = host.rstrip("/")
+        self.sampling = sampling or {}
+        self.persona = Path(persona_path).expanduser().read_text()
+        self.max_json_retries = max(1, max_json_retries)
+        self.request_timeout = request_timeout
+
+        if thinking_style not in ("gpt-oss", "qwen3", "gemma4", "none"):
+            raise ValueError(
+                f"thinking_style must be one of gpt-oss/qwen3/gemma4/none, "
+                f"got {thinking_style!r}"
+            )
+        self.thinking_style = thinking_style
+
+        if thinking_style == "gpt-oss":
+            if thinking_effort is not None and thinking_effort not in self.GPT_OSS_EFFORTS:
+                raise ValueError(
+                    f"For thinking_style=gpt-oss, thinking_effort must be one of "
+                    f"{self.GPT_OSS_EFFORTS}, got {thinking_effort!r}"
+                )
+        self.thinking_effort = thinking_effort
+
+    @staticmethod
+    def _is_thinking_on(effort: str | None) -> bool:
+        if effort is None:
+            return True
+        return str(effort).lower() not in ("off", "false", "no", "none", "0", "")
+
+    def _thinking_prefix(self) -> str:
+        if self.thinking_style == "gpt-oss" and self.thinking_effort:
+            return f"Reasoning: {self.thinking_effort}\n\n"
+        if self.thinking_style == "gemma4" and self._is_thinking_on(self.thinking_effort):
+            return "<|think|>\n\n"
+        return ""
+
+    def _qwen3_think_flag(self) -> bool:
+        return self._is_thinking_on(self.thinking_effort)
+
+    def _format_history_block(
+        self, history: list[dict], include_words: bool
+    ) -> str:
+        """Format past tests as a compact memory block."""
+        if not history:
+            return ""
+        lines = [
+            "Previous WEAT tests you have already proposed in this run "
+            "(newest first):"
+        ]
+        for i, t in enumerate(history, start=1):
+            labels = t.get("labels", {}) or {}
+            X = labels.get("X", "?")
+            Y = labels.get("Y", "?")
+            A = labels.get("A", "?")
+            B = labels.get("B", "?")
+            d = float(t.get("effect_size", 0.0))
+            p = float(t.get("p_value", 1.0))
+            domain = t.get("domain", "?")
+            descr = (t.get("observation") or t.get("hypothesis") or "").strip()
+            if len(descr) > 110:
+                descr = descr[:107] + "..."
+            line = (
+                f"{i:2d}. [{domain}] {X} vs {Y}  |  {A} vs {B}  "
+                f"d={d:+.2f} p={p:.3f}"
+            )
+            if descr:
+                line += f"\n    \u201c{descr}\u201d"
+            if include_words:
+                words = t.get("words", {}) or {}
+                xs = " ".join((words.get("X_used") or [])[:8])
+                ys = " ".join((words.get("Y_used") or [])[:8])
+                line += f"\n    X: {xs}\n    Y: {ys}"
+            lines.append(line)
+        lines.append(
+            "\nDo NOT repeat any of the contrasts above. Pick something "
+            "you are genuinely uncertain about. Prior nulls and surprises "
+            "are the most informative entries — use them to choose a more "
+            "informative next contrast."
+        )
+        return "\n".join(lines) + "\n\n---\n\n"
+
+    def _propose_system_prompt(
+        self,
+        recent_domains: list[str],
+        history: list[dict] | None = None,
+        history_include_words: bool = False,
+    ) -> str:
+        prefix = self._thinking_prefix()
+        history_block = self._format_history_block(
+            history or [], history_include_words
+        )
+
+        avoid = ""
+        if recent_domains and not history:
+            avoid = (
+                "\n\nYou have recently proposed tests in these domains: "
+                + ", ".join(recent_domains)
+                + ". Pick a DIFFERENT domain this time."
+            )
+        return (
+            prefix
+            + self.persona
+            + "\n\n---\n\n"
+            + history_block
+            + "You are AutoWEAT's proposer (Phase 1). Your sole output is a "
+            + "JSON proposal for a single Word Embedding Association Test "
+            + "(Caliskan et al. 2017). You are picking a contrast to LOOK AT, "
+            + "not arguing for what you expect to find. No hypothesis, no "
+            + "rationale, no theory."
+            + "\n\nAvailable domains: " + ", ".join(DOMAINS)
+            + avoid
+            + "\n\n" + PROPOSAL_SCHEMA
+        )
+
+    def _interpret_system_prompt(self) -> str:
+        prefix = self._thinking_prefix()
+        return (
+            prefix
+            + "You are AutoWEAT's interpreter (Phase 2). The system has just "
+            + "computed a Word Embedding Association Test (Caliskan et al. 2017) "
+            + "from word lists you proposed in Phase 1. You are now looking at:\n"
+            + "  - the relative WEAT result (the headline d and p)\n"
+            + "  - a pre-computed direction diagnostic (do X and Y mean s scores "
+            + "    have opposite signs, indicating a real two-way contrast, or "
+            + "    the same sign, indicating a one-sided magnitude difference)\n"
+            + "  - the SC-WEAT decomposition (single-category WEAT for each "
+            + "    target word individually, then averaged across X words and "
+            + "    across Y words separately, telling you whether the contrast "
+            + "    is driven by the X side, the Y side, both, or neither)\n"
+            + "  - the per-word association scores"
+            + "\n\n"
+            + "A small p means the result is real in some direction; the "
+            + "direction diagnostic tells you which. Do not describe a strong "
+            + "negative effect as 'null' just because it surprised you."
+            + "\n\n"
+            + "If the SC-WEAT decomposition shows that the relative effect is "
+            + "driven by only one target side (one SC-WEAT mean is large and "
+            + "significant, the other is near zero), say so plainly in your "
+            + "interpretation. This is a meaningful structural finding."
+            + "\n\n"
+            + "Your job is to describe IN PLAIN LANGUAGE what the corpus does, "
+            + "honoring the direction diagnostic AND the SC-WEAT decomposition. "
+            + "Speculate cautiously about why. Do NOT cite any paper, author, "
+            + "theory, or framework by name. Treat this as field notes from a "
+            + "careful empirical observer, not a literature review."
+            + "\n\n" + INTERPRETATION_SCHEMA
+        )
+
+    def _build_payload(self, system: str, user: str, options: dict) -> dict:
+        payload = {
+            "model": self.model,
+            "system": system,
+            "prompt": user,
+            "stream": False,
+            "options": options,
+        }
+        if self.thinking_style == "gpt-oss":
+            payload["think"] = self.thinking_effort or "medium"
+        elif self.thinking_style == "qwen3":
+            payload["think"] = self._qwen3_think_flag()
+        return payload
+
+    def _call_llm(self, payload: dict) -> tuple[str, str]:
+        resp = self.requests.post(
+            f"{self.host}/api/generate",
+            json=payload,
+            timeout=self.request_timeout,
+        )
+        resp.raise_for_status()
+        body = resp.json()
+        return (body.get("response", "") or "", body.get("thinking", "") or "")
+
+    # ─── Phase 1: propose ─────────────────────────────────────────────
+
+    def propose(
+        self,
+        recent_domains: list[str] | None = None,
+        seed: int | None = None,
+        history: list[dict] | None = None,
+        history_include_words: bool = False,
+    ) -> Proposal:
+        options = dict(self.sampling)
+        if seed is not None:
+            options["seed"] = seed
+
+        system = self._propose_system_prompt(
+            recent_domains or [], history=history,
+            history_include_words=history_include_words,
+        )
+        user = "Propose one WEAT test now. Output ONLY a single JSON object, no prose."
+        payload = self._build_payload(system, user, options)
+
+        last_err = None
+        last_raw = ""
+        last_thinking = ""
+        for attempt in range(self.max_json_retries):
+            last_raw, last_thinking = self._call_llm(payload)
+            for source in (last_raw, last_thinking):
+                if not source.strip():
+                    continue
+                try:
+                    data = _parse_json_loose(source)
+                    return Proposal(
+                        domain=str(data.get("domain", "unknown")),
+                        contrast_label=str(data.get("contrast_label", "")),
+                        X_label=str(data.get("X_label", "")),
+                        Y_label=str(data.get("Y_label", "")),
+                        A_label=str(data.get("A_label", "")),
+                        B_label=str(data.get("B_label", "")),
+                        X=[str(w).strip().lower() for w in data.get("X", [])],
+                        Y=[str(w).strip().lower() for w in data.get("Y", [])],
+                        A=[str(w).strip().lower() for w in data.get("A", [])],
+                        B=[str(w).strip().lower() for w in data.get("B", [])],
+                        has_prior=bool(data.get("has_prior", False)),
+                        prior_statement=str(data.get("prior_statement", "")).strip(),
+                        raw=source,
+                    )
+                except (ValueError, KeyError) as e:
+                    last_err = e
+                    continue
+
+        raise ValueError(
+            f"Phase 1 (propose) returned unparseable JSON after "
+            f"{self.max_json_retries} attempts. Last error: {last_err}. "
+            f"response field (first 200 chars): {last_raw[:200]!r}. "
+            f"thinking field (first 200 chars): {last_thinking[:200]!r}."
+        )
+
+    # ─── Phase 2: interpret ───────────────────────────────────────────
+
+    @staticmethod
+    def _direction_diagnostic(
+        x_mean_s: float, y_mean_s: float, A_label: str, B_label: str
+    ) -> tuple[str, str]:
+        """Classify the result as TWO-WAY, ONE-SIDED-A, ONE-SIDED-B, or AMBIGUOUS."""
+        eps = 0.01
+
+        if abs(x_mean_s) < eps and abs(y_mean_s) < eps:
+            return (
+                "ambiguous-both-near-zero",
+                f"DIRECTION DIAGNOSTIC: AMBIGUOUS\n"
+                f"  X mean s = {x_mean_s:+.4f}  (essentially zero)\n"
+                f"  Y mean s = {y_mean_s:+.4f}  (essentially zero)\n"
+                f"  Both target sets are essentially balanced between {A_label} "
+                f"and {B_label}. The d value reflects a tiny relative tilt that "
+                f"may or may not be meaningful. Describe this as a near-null "
+                f"result with no clear directional signal."
+            )
+        if x_mean_s * y_mean_s < 0:
+            x_side = A_label if x_mean_s > 0 else B_label
+            y_side = A_label if y_mean_s > 0 else B_label
+            return (
+                "two-way",
+                f"DIRECTION DIAGNOSTIC: TWO-WAY (real contrast)\n"
+                f"  X mean s = {x_mean_s:+.4f}  (clusters with {x_side})\n"
+                f"  Y mean s = {y_mean_s:+.4f}  (clusters with {y_side})\n"
+                f"  X and Y genuinely pull toward different attribute pools. "
+                f"You MAY describe this as a two-way contrast: 'X clusters with "
+                f"{x_side}, Y clusters with {y_side}.'"
+            )
+        dominant = A_label if x_mean_s > 0 else B_label
+        recessive = B_label if x_mean_s > 0 else A_label
+        if abs(x_mean_s) > abs(y_mean_s):
+            stronger, weaker = "X", "Y"
+        else:
+            stronger, weaker = "Y", "X"
+        return (
+            f"one-sided-{'A' if x_mean_s > 0 else 'B'}",
+            f"DIRECTION DIAGNOSTIC: ONE-SIDED (magnitude difference, NOT a two-way contrast)\n"
+            f"  X mean s = {x_mean_s:+.4f}\n"
+            f"  Y mean s = {y_mean_s:+.4f}\n"
+            f"  Both X and Y target sets cluster with {dominant} rather than "
+            f"with {recessive}. Neither set genuinely pulls toward {recessive}. "
+            f"The d value is reporting that {stronger} clusters with {dominant} "
+            f"MORE STRONGLY than {weaker} does — it is a magnitude difference, "
+            f"not a directional pull.\n"
+            f"\n"
+            f"You MUST NOT write 'X clusters with {A_label} while Y clusters "
+            f"with {B_label}' or any sentence that implies a two-way contrast.\n"
+            f"\n"
+            f"You MUST write a sentence of the form: 'Both X and Y cluster "
+            f"with {dominant} in this corpus, but {stronger} does so more "
+            f"strongly than {weaker}.'\n"
+            f"\n"
+            f"Your interpretation should also speculate that {dominant} may "
+            f"simply be a denser, more common vocabulary register that "
+            f"pulls almost everything toward it, so the test is partly "
+            f"reflecting attribute-pool base-rate asymmetry rather than a "
+            f"clean directional contrast."
+        )
+
+    def interpret(self, proposal: Proposal, result_dict: dict) -> Interpretation:
+        """Given the proposal and the WEAT result, return an inductive
+        interpretation. Citation-free, plain language, cautious, and
+        direction-honest.
+
+        result_dict should include effect_size, p_value (two-sided),
+        sc_weat_x_mean, sc_p_x, sc_weat_y_mean, sc_p_y, per_word_s, and words.
+        """
+        d = float(result_dict.get("effect_size", 0.0))
+        p_two = float(result_dict.get("p_value", 1.0))
+        sc_x_mean = float(result_dict.get("sc_weat_x_mean", 0.0))
+        sc_p_x = float(result_dict.get("sc_p_x", 1.0))
+        sc_y_mean = float(result_dict.get("sc_weat_y_mean", 0.0))
+        sc_p_y = float(result_dict.get("sc_p_y", 1.0))
+        words = result_dict.get("words", {}) or {}
+        per_word_s = result_dict.get("per_word_s", {}) or {}
+
+        X_used = words.get("X_used", []) or []
+        Y_used = words.get("Y_used", []) or []
+        A_used = words.get("A_used", []) or []
+        B_used = words.get("B_used", []) or []
+
+        # Compute the per-set means and the direction diagnostic in Python.
+        x_scores = [per_word_s.get(w, 0.0) for w in X_used]
+        y_scores = [per_word_s.get(w, 0.0) for w in Y_used]
+        x_mean_s = sum(x_scores) / len(x_scores) if x_scores else 0.0
+        y_mean_s = sum(y_scores) / len(y_scores) if y_scores else 0.0
+        direction_label, direction_block = self._direction_diagnostic(
+            x_mean_s, y_mean_s, proposal.A_label, proposal.B_label
+        )
+
+        # Build the SC-WEAT decomposition block, using the corrected
+        # Caliskan formula. SC-WEAT(X) is the average per-word effect
+        # size across X target words: it tells you how strongly the
+        # AVERAGE X word leans toward attribute pool A versus B. Same
+        # for SC-WEAT(Y).
+        #
+        # The contrast between SC-WEAT(X) and SC-WEAT(Y) is what the
+        # relative WEAT measures. We classify:
+        #   - opposite signs, both large → genuine two-way contrast
+        #   - same sign, both large → magnitude difference (both lean
+        #     toward the same pool, but at different strengths)
+        #   - one large, one small → that side is driving the contrast
+        #   - both small → weak overall
+        def _sc_weat_verdict() -> tuple[str, str]:
+            """Return (pattern_name, prose_verdict).
+
+            pattern_name is a machine-readable code used for storage and
+            frontend rendering. prose_verdict is the long explanatory
+            text shown to the LLM inside the result block.
+            """
+            big_x = abs(sc_x_mean) > 0.3
+            big_y = abs(sc_y_mean) > 0.3
+            sig_x = sc_p_x < 0.05
+            sig_y = sc_p_y < 0.05
+            weat_sig = p_two < 0.05
+            same_sign = (sc_x_mean * sc_y_mean) > 0
+            x_label = proposal.X_label
+            y_label = proposal.Y_label
+            a_label = proposal.A_label
+            b_label = proposal.B_label
+
+            if big_x and big_y:
+                if not same_sign:
+                    x_pool = a_label if sc_x_mean > 0 else b_label
+                    y_pool = a_label if sc_y_mean > 0 else b_label
+                    prose = (
+                        f"GENUINE TWO-WAY CONTRAST: {x_label} target words lean "
+                        f"toward {x_pool} (SC-WEAT = {sc_x_mean:+.2f}), and "
+                        f"{y_label} target words lean toward {y_pool} "
+                        f"(SC-WEAT = {sc_y_mean:+.2f}). The two sides pull in "
+                        f"opposite directions — this is the strongest form of "
+                        f"a real WEAT effect. Use headline_format: declarative_claim."
+                    )
+                    return ("GENUINE_TWO_WAY", prose)
+                if sig_x and sig_y and not weat_sig:
+                    shared = a_label if sc_x_mean > 0 else b_label
+                    other = b_label if sc_x_mean > 0 else a_label
+                    prose = (
+                        f"POOLED LEAN: both {x_label} and {y_label} individually "
+                        f"and significantly lean toward {shared} "
+                        f"(SC-WEAT(X)={sc_x_mean:+.2f}, p={sc_p_x:.3f}; "
+                        f"SC-WEAT(Y)={sc_y_mean:+.2f}, p={sc_p_y:.3f}). The "
+                        f"relative WEAT (D={d:+.2f}, p={p_two:.3f}) is null "
+                        f"because the two sides cluster with the same pool at "
+                        f"comparable strength. THIS IS A REAL FINDING about how "
+                        f"the broader vocabulary category is structured in this "
+                        f"corpus, not an artifact. Frame it as a substantive "
+                        f"observation: '{shared}' vocabulary saturates this "
+                        f"semantic field regardless of the {x_label} versus "
+                        f"{y_label} distinction. The headline should report the "
+                        f"pooled lean directly, e.g., 'Both {x_label} and "
+                        f"{y_label} cluster with {shared} in this corpus'. The "
+                        f"finding line should state the non-directional pattern "
+                        f"as an observation, NOT apologize for the absence of a "
+                        f"two-way contrast. Do NOT use language like 'base-rate "
+                        f"asymmetry', 'artifact', 'methodological problem', or "
+                        f"'the test failed'. Use headline_format: hedged_claim."
+                    )
+                    return ("POOLED_LEAN", prose)
+                shared = a_label if sc_x_mean > 0 else b_label
+                stronger = x_label if abs(sc_x_mean) > abs(sc_y_mean) else y_label
+                weaker = y_label if abs(sc_x_mean) > abs(sc_y_mean) else x_label
+                prose = (
+                    f"MAGNITUDE DIFFERENCE: both {x_label} and {y_label} lean "
+                    f"toward {shared}, but {stronger} does so more strongly "
+                    f"than {weaker}. The relative WEAT (D={d:+.2f}, p={p_two:.3f}) "
+                    f"reflects this asymmetry. The contrast is not directionally "
+                    f"two-way — both target sides are pulled toward the same "
+                    f"attribute pool. Use headline_format: declarative_claim."
+                )
+                return ("MAGNITUDE_DIFFERENCE", prose)
+            elif big_x and not big_y:
+                x_pool = a_label if sc_x_mean > 0 else b_label
+                # Recommend declarative_claim for strong significant findings
+                # even when only one side carries the effect — the asymmetry
+                # is prose texture, not an epistemic downgrade. Hedged_claim
+                # is reserved for marginal or non-significant cases.
+                if weat_sig and abs(d) >= 0.5:
+                    rec_format = "declarative_claim"
+                    format_note = (
+                        f"Use headline_format: declarative_claim. The relative "
+                        f"WEAT is significant and large; this is a real strong "
+                        f"finding even though only the {x_label} side individually "
+                        f"shows a strong association. Report the asymmetry in the "
+                        f"observation paragraph (which side carries the effect), "
+                        f"not by hedging the headline."
+                    )
+                else:
+                    rec_format = "hedged_claim"
+                    format_note = (
+                        f"Use headline_format: hedged_claim. The relative WEAT is "
+                        f"marginal or |d| is small, and only one side carries the "
+                        f"effect — both nuances belong in the headline."
+                    )
+                prose = (
+                    f"DRIVEN BY X ({x_label}): only the {x_label} target words "
+                    f"lean strongly (toward {x_pool}, SC-WEAT = {sc_x_mean:+.2f}, "
+                    f"p={sc_p_x:.3f}). The {y_label} words individually do not "
+                    f"lean toward either pool (SC-WEAT = {sc_y_mean:+.2f}, "
+                    f"p={sc_p_y:.3f}). The WEAT effect (D={d:+.2f}, p={p_two:.3f}) "
+                    f"is single-side-driven by the {x_label} side. {format_note}"
+                )
+                return ("DRIVEN_BY_X", prose)
+            elif big_y and not big_x:
+                y_pool = a_label if sc_y_mean > 0 else b_label
+                if weat_sig and abs(d) >= 0.5:
+                    rec_format = "declarative_claim"
+                    format_note = (
+                        f"Use headline_format: declarative_claim. The relative "
+                        f"WEAT is significant and large; this is a real strong "
+                        f"finding even though only the {y_label} side individually "
+                        f"shows a strong association. Report the asymmetry in the "
+                        f"observation paragraph (which side carries the effect), "
+                        f"not by hedging the headline."
+                    )
+                else:
+                    rec_format = "hedged_claim"
+                    format_note = (
+                        f"Use headline_format: hedged_claim. The relative WEAT is "
+                        f"marginal or |d| is small, and only one side carries the "
+                        f"effect — both nuances belong in the headline."
+                    )
+                prose = (
+                    f"DRIVEN BY Y ({y_label}): only the {y_label} target words "
+                    f"lean strongly (toward {y_pool}, SC-WEAT = {sc_y_mean:+.2f}, "
+                    f"p={sc_p_y:.3f}). The {x_label} words individually do not "
+                    f"lean toward either pool (SC-WEAT = {sc_x_mean:+.2f}, "
+                    f"p={sc_p_x:.3f}). The WEAT effect (D={d:+.2f}, p={p_two:.3f}) "
+                    f"is single-side-driven by the {y_label} side. {format_note}"
+                )
+                return ("DRIVEN_BY_Y", prose)
+            else:
+                if weat_sig and not same_sign:
+                    x_pool = a_label if sc_x_mean > 0 else b_label
+                    y_pool = a_label if sc_y_mean > 0 else b_label
+                    prose = (
+                        f"WEAK TWO-WAY: individual SC-WEATs are small "
+                        f"(SC-WEAT(X)={sc_x_mean:+.2f}, p={sc_p_x:.3f}; "
+                        f"SC-WEAT(Y)={sc_y_mean:+.2f}, p={sc_p_y:.3f}), but they "
+                        f"point in OPPOSITE directions and the relative WEAT is "
+                        f"statistically significant (D={d:+.2f}, p={p_two:.3f}). "
+                        f"This is a real finding carried by the relative "
+                        f"comparison between the two target sides. {x_label} "
+                        f"leans toward {x_pool} and {y_label} leans toward "
+                        f"{y_pool}, but neither side individually clusters "
+                        f"strongly with either pool. The Cohen's d of the "
+                        f"relative WEAT may be LARGE despite the small individual "
+                        f"leans — name the Cohen's d category based on |d|, not "
+                        f"on the SC-WEAT magnitudes. Use headline_format: "
+                        f"hedged_claim."
+                    )
+                    return ("WEAK_TWO_WAY", prose)
+                if weat_sig and same_sign:
+                    shared = a_label if sc_x_mean > 0 else b_label
+                    prose = (
+                        f"WEAK POOLED LEAN (rare): individual SC-WEATs are small "
+                        f"and same-signed (SC-WEAT(X)={sc_x_mean:+.2f}, "
+                        f"p={sc_p_x:.3f}; SC-WEAT(Y)={sc_y_mean:+.2f}, "
+                        f"p={sc_p_y:.3f}), but the relative WEAT reaches "
+                        f"significance (D={d:+.2f}, p={p_two:.3f}). Both target "
+                        f"sides weakly but consistently lean toward {shared}. "
+                        f"Use headline_format: hedged_claim."
+                    )
+                    return ("WEAK_POOLED_LEAN", prose)
+                prose = (
+                    f"WEAK ON BOTH SIDES: neither target side leans strongly "
+                    f"toward either attribute pool (SC-WEAT(X)={sc_x_mean:+.2f}, "
+                    f"p={sc_p_x:.3f}; SC-WEAT(Y)={sc_y_mean:+.2f}, "
+                    f"p={sc_p_y:.3f}), and the relative WEAT is also not "
+                    f"significant (D={d:+.2f}, p={p_two:.3f}). The contrast is "
+                    f"genuinely null. Use headline_format: neutral_label."
+                )
+                return ("WEAK_ON_BOTH_SIDES", prose)
+
+        verdict_pattern, verdict_prose = _sc_weat_verdict()
+
+        sc_weat_block = (
+            f"SC-WEAT DECOMPOSITION (per-target-side, Caliskan formula):\n"
+            f"  SC-WEAT mean across {proposal.X_label} targets: "
+            f"d = {sc_x_mean:+.3f}, p = {sc_p_x:.3f}\n"
+            f"  SC-WEAT mean across {proposal.Y_label} targets: "
+            f"d = {sc_y_mean:+.3f}, p = {sc_p_y:.3f}\n"
+            f"\n"
+            f"  Each SC-WEAT is the standardized strength of association between\n"
+            f"  a single target word and the {proposal.A_label} pool versus the\n"
+            f"  {proposal.B_label} pool, averaged across the words on that side.\n"
+            f"  Positive = leans toward {proposal.A_label}, negative = leans\n"
+            f"  toward {proposal.B_label}.\n"
+            f"\n"
+            f"  Verdict pattern: {verdict_pattern}\n"
+            f"  Verdict: {verdict_prose}"
+        )
+
+        # Top contributors on each side, with explicit signs
+        x_with_s = sorted(
+            ((w, per_word_s.get(w, 0.0)) for w in X_used),
+            key=lambda t: -t[1],
+        )
+        y_with_s = sorted(
+            ((w, per_word_s.get(w, 0.0)) for w in Y_used),
+            key=lambda t: -t[1],
+        )
+        x_lines = "\n".join(f"    {w}: {s:+.3f}" for w, s in x_with_s)
+        y_lines = "\n".join(f"    {w}: {s:+.3f}" for w, s in y_with_s)
+
+        # Direction language for the headline result
+        if abs(d) < 0.2:
+            result_summary = (
+                f"essentially null (d = {d:+.3f}, p = {p_two:.3f})"
+            )
+        else:
+            sig = "statistically significant" if p_two < 0.05 else "marginal"
+            sign = "positive" if d > 0 else "negative"
+            result_summary = (
+                f"a {sig} {sign} effect (d = {d:+.3f}, p = {p_two:.3f})"
+            )
+
+        # Cohen's d category for the relative WEAT, using standard cutoffs:
+        # negligible < 0.2, small 0.2-0.5, medium 0.5-0.8, large >= 0.8
+        abs_d = abs(d)
+        if abs_d < 0.2:
+            cohens_d_category = "negligible"
+        elif abs_d < 0.5:
+            cohens_d_category = "small"
+        elif abs_d < 0.8:
+            cohens_d_category = "medium"
+        else:
+            cohens_d_category = "large"
+
+        # Build the prior block. Tells the LLM whether the proposer
+        # committed to a common-sense prior in phase 1 and, if so, what
+        # it was. Phase 2 has to write the expectation paragraph
+        # consistently with what was committed.
+        if proposal.has_prior and proposal.prior_statement:
+            prior_block = (
+                f"PRIOR (set in Phase 1): has_prior = true\n"
+                f"  prior_statement: {proposal.prior_statement}\n"
+                f"\n"
+                f"  The expectation paragraph you write must be consistent\n"
+                f"  with this prior. Do not retroactively adjust the prior\n"
+                f"  to match the result. Write the expectation as if you\n"
+                f"  had committed to it before seeing the data."
+            )
+        else:
+            prior_block = (
+                f"PRIOR (set in Phase 1): has_prior = false\n"
+                f"  prior_statement: {proposal.prior_statement or '(open exploration)'}\n"
+                f"\n"
+                f"  The test was flagged as genuinely exploratory. Your\n"
+                f"  headline_format SHOULD be 'question' unless the verdict\n"
+                f"  pattern is WEAK_ON_BOTH_SIDES (in which case use\n"
+                f"  neutral_label). Write the expectation paragraph to\n"
+                f"  explain why the test is open rather than claiming a\n"
+                f"  prior."
+            )
+
+        result_block = f"""
+Test you proposed:
+  Targets:    X = {proposal.X_label} ({len(X_used)} words)
+              Y = {proposal.Y_label} ({len(Y_used)} words)
+  Attributes: A = {proposal.A_label} ({len(A_used)} words)
+              B = {proposal.B_label} ({len(B_used)} words)
+  Domain:     {proposal.domain}
+
+{prior_block}
+
+Result: {result_summary}
+  Cohen's d category: {cohens_d_category} (|d|={abs_d:.3f}, standard cutoffs: negligible<0.2, small<0.5, medium<0.8, large>=0.8)
+  You MUST name this Cohen's d category in your observation paragraph.
+
+{direction_block}
+
+{sc_weat_block}
+
+Per-word s(w, A, B) for X words (sorted high to low):
+{x_lines}
+
+Per-word s(w, A, B) for Y words (sorted high to low):
+{y_lines}
+
+Full word lists used:
+  X: {', '.join(X_used)}
+  Y: {', '.join(Y_used)}
+  A: {', '.join(A_used)}
+  B: {', '.join(B_used)}
+""".strip()
+
+        system = self._interpret_system_prompt()
+        user = (
+            "Here is the result of the test you proposed. The direction "
+            "diagnostic and the verdict pattern have been pre-computed "
+            "for you and are non-negotiable. Honor them. Write the "
+            "four-beat card as JSON.\n\n"
+            + result_block
+        )
+
+        options = dict(self.sampling)
+        payload = self._build_payload(system, user, options)
+
+        # Valid headline formats, used to validate LLM output
+        VALID_FORMATS = {
+            "declarative_claim", "hedged_claim", "question",
+            "puzzle", "neutral_label",
+        }
+
+        last_err = None
+        last_raw = ""
+        last_thinking = ""
+        for attempt in range(self.max_json_retries):
+            last_raw, last_thinking = self._call_llm(payload)
+            for source in (last_raw, last_thinking):
+                if not source.strip():
+                    continue
+                try:
+                    data = _parse_json_loose(source)
+                    headline_format = str(data.get("headline_format", "")).strip().lower()
+                    headline_text = str(data.get("headline_text", "")).strip()
+                    expectation = str(data.get("expectation", "")).strip()
+                    observation = str(data.get("observation", "")).strip()
+                    finding_line = str(data.get("finding_line", "")).strip()
+
+                    # Back-compat: some models still emit old "observation" +
+                    # "interpretation" schema. Upgrade on the fly.
+                    if not headline_text and not expectation:
+                        old_interp = str(data.get("interpretation", "")).strip()
+                        if observation and old_interp:
+                            headline_format = "declarative_claim"
+                            headline_text = observation
+                            expectation = old_interp
+                            finding_line = ""
+
+                    if headline_format not in VALID_FORMATS:
+                        last_err = ValueError(
+                            f"invalid headline_format: {headline_format!r} "
+                            f"(must be one of {sorted(VALID_FORMATS)})"
+                        )
+                        continue
+
+                    if not headline_text or not observation:
+                        last_err = ValueError(
+                            "interpretation JSON missing required fields "
+                            "(headline_text, observation)"
+                        )
+                        continue
+
+                    # Direction-matches-prior: None if no prior, else
+                    # True/False based on whether the Cohen's d direction
+                    # matches what the prior expressed. We can't
+                    # automatically detect agreement with arbitrary
+                    # prose priors, so this is a simple heuristic:
+                    # present = True if has_prior, else None. The LLM
+                    # gets the prior in the result block and handles
+                    # the "puzzle" format when direction contradicts.
+                    direction_matches_prior: bool | None
+                    if proposal.has_prior:
+                        # Heuristic: if the chosen format is "puzzle",
+                        # the LLM is flagging a contradiction. Otherwise
+                        # assume the prior and the direction are
+                        # compatible.
+                        direction_matches_prior = (headline_format != "puzzle")
+                    else:
+                        direction_matches_prior = None
+
+                    return Interpretation(
+                        headline_format=headline_format,
+                        headline_text=headline_text,
+                        expectation=expectation,
+                        observation=observation,
+                        finding_line=finding_line,
+                        direction=direction_label,
+                        verdict_pattern=verdict_pattern,
+                        cohens_d_category=cohens_d_category,
+                        direction_matches_prior=direction_matches_prior,
+                        x_mean_s=x_mean_s,
+                        y_mean_s=y_mean_s,
+                        raw=source,
+                    )
+                except (ValueError, KeyError) as e:
+                    last_err = e
+                    continue
+
+        return Interpretation(
+            headline_format="neutral_label",
+            headline_text=(
+                f"[interpretation generation failed after "
+                f"{self.max_json_retries} attempts]"
+            ),
+            expectation="",
+            observation=f"[error: {last_err}]",
+            finding_line="",
+            direction=direction_label,
+            verdict_pattern=verdict_pattern,
+            cohens_d_category=cohens_d_category,
+            direction_matches_prior=None,
+            x_mean_s=x_mean_s,
+            y_mean_s=y_mean_s,
+            raw=last_raw or last_thinking,
+        )
+
+
+def _parse_json_loose(text: str) -> dict:
+    """Parse JSON from an LLM response, tolerating prose and code fences."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text)
+        text = re.sub(r"\s*```$", "", text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if match:
+        return json.loads(match.group(0))
+    raise ValueError(f"Could not parse JSON from LLM response: {text[:200]}...")

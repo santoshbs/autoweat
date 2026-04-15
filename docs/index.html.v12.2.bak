@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoWEAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink-1: #111;
+    --ink-2: #444;
+    --ink-3: #8a8a8a;
+    --ink-4: #c8c8c8;
+    --bg: #fafafa;
+    --card-bg: #ffffff;
+    --border: #ebebeb;
+    --hover: #f3f3f3;
+    --accent: #0b2a4a;
+
+    /* Verdict pattern colors for the expand-button pill and stat cells */
+    --sig-bg: #0b2a4a;
+    --sig-fg: #ffffff;
+    --hedged-bg: #c9b89a;
+    --hedged-fg: #3d2f1d;
+    --nonsig-bg: #e6e6e6;
+    --nonsig-fg: #666;
+    --question-bg: #e8ddf0;
+    --question-fg: #4a2d6b;
+  }
+
+  * { box-sizing: border-box; }
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: "Source Serif 4", Georgia, serif;
+    line-height: 1.55;
+  }
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+  }
+
+  /* ─── Site header ─────────────────────────────────────────────────── */
+  .site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .site-title {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink-1);
+    margin: 0;
+  }
+  .site-title em { font-style: italic; font-weight: 500; }
+  .site-meta {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: right;
+  }
+  .site-meta a { color: inherit; text-decoration: underline; }
+  .site-meta .count { font-weight: 500; color: var(--ink-2); }
+  .site-header-body {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 8px 0 0;
+    max-width: 620px;
+  }
+
+  /* ─── Controls (sort/filter/search) ──────────────────────────────── */
+  .controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 12px;
+  }
+  .controls label {
+    color: var(--ink-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 4px;
+  }
+  .controls select, .controls input[type="search"] {
+    font-family: inherit;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: var(--ink-1);
+  }
+  .controls input[type="search"] {
+    flex: 1;
+    min-width: 140px;
+  }
+  .controls select:focus, .controls input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  /* ─── Featured card (expanded at top) ────────────────────────────── */
+  .featured-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 36px 40px 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  /* ─── Kickers above the headline ─────────────────────────────────── */
+  .kicker {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 11px;
+    color: var(--ink-3);
+    margin: 0 0 3px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+  .kicker.domain { text-transform: lowercase; }
+  .kicker.corpus { color: var(--ink-4); font-family: "JetBrains Mono", monospace; font-size: 10px; }
+
+  /* Structural label highlight — Julian-style inline highlight block.
+     Monospace, snug padding, soft pastel background. The background
+     color reflects the verdict pattern at a glance:
+       - significant findings → soft yellow-tan
+       - hedged/subtle findings → soft pink-coral
+       - null findings → soft grey
+       - exploratory questions/puzzles → soft lavender
+     This gives the reader a visual signal of what they're looking at
+     before they read the headline. */
+  .structural-pill {
+    display: inline-block;
+    background: #f0f0f0;
+    color: var(--ink-1);
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+    line-height: 1.5;
+    margin: 8px 0 18px;
+  }
+  .structural-pill.sig    { background: #fef3a8; }   /* soft yellow */
+  .structural-pill.hedged { background: #fcd7c3; }   /* soft coral */
+  .structural-pill.nonsig { background: #e6e6e6; }   /* soft grey */
+  .structural-pill.question { background: #e0d4f0; } /* soft lavender */
+  .structural-pill .emdash { color: var(--ink-3); }
+
+  /* When the structural pill sits inside a list row (compressed view),
+     it should not have the top/bottom margin used in the expanded
+     card, and it should sit flush left in its grid cell with no
+     stretch. justify-self: start prevents it from being centered
+     or stretched by the grid. */
+  .list-row .structural-pill {
+    margin: 0;
+    justify-self: start;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ─── Headline (uniform across all formats) ───────────────────────
+     All headline formats now render in the same roman style — same
+     font, same color, same size, same weight. No italic. No special
+     puzzle/question/neutral-label typography. The structural-pill
+     highlight color above is what tells the reader the verdict
+     category; the headline sentence itself reads as plain prose. */
+  .headline {
+    color: var(--ink-1);
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0 0 20px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    font-style: normal;
+  }
+  .headline strong {
+    font-weight: inherit;
+    font-style: normal;
+    color: inherit;
+  }
+  .headline em {
+    font-weight: inherit;
+    font-style: normal;
+    color: inherit;
+  }
+
+  /* ─── Expectation paragraph ──────────────────────────────────────── */
+  .expectation {
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 18px;
+  }
+
+  /* ─── Observation paragraph (rigorous Charlesworth register) ─────── */
+  .observation {
+    color: var(--ink-1);
+    font-size: 15px;
+    line-height: 1.62;
+    margin: 0 0 18px;
+  }
+
+  /* ─── Finding line (closing beat) ────────────────────────────────── */
+  .finding-line {
+    color: var(--ink-1);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0 0 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ─── Stats table ────────────────────────────────────────────────── */
+  .stats-table {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 4px 16px;
+    align-items: center;
+    color: var(--ink-3);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+  }
+  .stats-row { display: contents; }
+  .stats-row .row-label {
+    color: var(--ink-3);
+    text-align: left;
+    padding-right: 4px;
+  }
+  .stats-row .d-cell {
+    color: var(--ink-1);
+    font-weight: 500;
+    text-align: right;
+    min-width: 56px;
+  }
+  .stats-row .p-cell { text-align: left; }
+  .stats-row .n-cell {
+    color: var(--ink-3);
+    text-align: left;
+    min-width: 36px;
+  }
+  .p-pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .p-pill.sig { background: var(--sig-bg); color: var(--sig-fg); }
+  .p-pill.nonsig { background: var(--nonsig-bg); color: var(--nonsig-fg); }
+
+  /* ─── Compressed list ────────────────────────────────────────────── */
+  .list-section {
+    margin-top: 16px;
+  }
+  .list-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .list-title {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin: 0;
+  }
+  .list-count {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  .list-row {
+    display: grid;
+    grid-template-columns: 110px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .list-row:hover { background: var(--hover); }
+  .list-row.expanded {
+    background: var(--card-bg);
+    cursor: default;
+    padding-top: 20px;
+    padding-bottom: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 10px 0;
+    display: block;
+  }
+  .list-row.expanded:hover { background: var(--card-bg); }
+
+  .list-time {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .list-headline {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 14px;
+    color: var(--ink-1);
+    line-height: 1.45;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-style: normal;
+  }
+  .list-headline strong { font-weight: inherit; font-style: normal; color: inherit; }
+  .list-headline em { font-weight: inherit; font-style: normal; color: inherit; }
+
+  /* The expand button — color reflects verdict pattern */
+  .expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--ink-2);
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s;
+    padding: 0;
+    line-height: 1;
+  }
+  .expand-btn:hover {
+    background: var(--hover);
+    color: var(--ink-1);
+  }
+
+  /* When the list row is expanded, render the full card inline. The
+     inline card reuses the featured-card typography. */
+  .inline-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .inline-card-time {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .inline-card .collapse-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .inline-card .collapse-btn:hover { color: var(--ink-1); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-3);
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 24px 16px 80px; }
+    .featured-card { padding: 24px 20px 20px; }
+    .headline { font-size: 19px; }
+    .list-row { grid-template-columns: 90px 1fr auto; gap: 10px; }
+    .list-time { font-size: 10px; }
+    .list-headline { font-size: 13px; }
+    .site-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .site-meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="site-header">
+  <div>
+    <h1 class="site-title">Auto<em>WEAT</em></h1>
+    <p class="site-header-body">A local language model proposes word-embedding bias tests. A locked Python script computes them. The model then writes a four-beat research card describing what the corpus actually does.</p>
+  </div>
+  <div class="site-meta">
+    <span class="count" id="count">—</span><br>
+    <a href="https://github.com/santoshbs/autoweat" target="_blank">source</a>
+  </div>
+</header>
+
+<div class="controls">
+  <label for="sort-by">Sort</label>
+  <select id="sort-by">
+    <option value="date-desc">newest first</option>
+    <option value="date-asc">oldest first</option>
+    <option value="d-desc">largest |d|</option>
+    <option value="p-asc">lowest p</option>
+  </select>
+  <label for="filter-pattern">Pattern</label>
+  <select id="filter-pattern">
+    <option value="all">all</option>
+    <option value="significant">significant only</option>
+    <option value="null">null only</option>
+    <option value="GENUINE_TWO_WAY">genuine two-way</option>
+    <option value="MAGNITUDE_DIFFERENCE">magnitude difference</option>
+    <option value="POOLED_LEAN">pooled lean</option>
+    <option value="DRIVEN_BY_X">driven by X</option>
+    <option value="DRIVEN_BY_Y">driven by Y</option>
+    <option value="WEAK_TWO_WAY">weak two-way</option>
+    <option value="WEAK_POOLED_LEAN">weak pooled lean</option>
+    <option value="WEAK_ON_BOTH_SIDES">null</option>
+  </select>
+  <input type="search" id="search" placeholder="search labels, headlines, domains…" />
+</div>
+
+<main id="app">
+  <div class="empty-state">Loading feed…</div>
+</main>
+
+</div>
+
+<script>
+/* ─── AutoWEAT v12 frontend ────────────────────────────────────────── */
+
+const STATE = {
+  tests: [],
+  featured: null,
+  expandedIds: new Set(),
+  sortBy: "date-desc",
+  filter: "all",
+  search: "",
+};
+
+/* ─── Formatting helpers ──────────────────────────────────────────── */
+
+function titleCase(s) {
+  if (!s) return "";
+  return s.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
+}
+function fmtD(v) {
+  if (v == null || isNaN(v)) return "—";
+  return (v >= 0 ? "+" : "") + v.toFixed(3);
+}
+function fmtP(v) {
+  if (v == null || isNaN(v)) return "—";
+  if (v < 0.001) return "<.001";
+  return v.toFixed(3).replace(/^0\./, ".");
+}
+function fmtTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const day = d.getDate().toString().padStart(2, "0");
+  const mo = d.toLocaleString("en-US", {month: "short"});
+  const hr = d.getHours().toString().padStart(2, "0");
+  const mn = d.getMinutes().toString().padStart(2, "0");
+  return `${mo} ${day}, ${hr}:${mn}`;
+}
+function escapeHtml(s) {
+  if (s == null) return "";
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* Bold the X, Y, A, B labels wherever they appear in a text string. */
+function boldLabels(text, labels) {
+  if (!text) return "";
+  const out = escapeHtml(text);
+  if (!labels) return out;
+  const toBold = [labels.X, labels.Y, labels.A, labels.B].filter(Boolean);
+  toBold.sort((a, b) => b.length - a.length);
+  let result = out;
+  for (const label of toBold) {
+    if (!label) continue;
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp("(" + escaped + ")", "gi");
+    result = result.replace(re, "<strong>$1</strong>");
+  }
+  return result;
+}
+
+/* Render italicized segments like _No significant effect._ as <em>. */
+function renderItalics(text) {
+  if (!text) return "";
+  return text.replace(/_([^_]+)_/g, "<em>$1</em>");
+}
+
+/* ─── Pattern → pill class mapping ────────────────────────────────── */
+
+function pillClassForTest(t) {
+  /* Visual color scheme for the structural-pill highlight on each card.
+     The color encodes the epistemic strength of the finding along two
+     orthogonal dimensions:
+
+       (1) Did the proposer have a prior going in?
+           - has_prior = false → exploratory → lavender ("question" class)
+
+       (2) For prior-having tests, how strong is the finding in the data?
+           - Significant relative WEAT AND |d| >= 0.5 → "sig" (yellow)
+           - Some p-value significant somewhere but either |d| < 0.5
+             on the relative WEAT, or the relative WEAT is not
+             significant (e.g. POOLED_LEAN with sig SC-WEATs but null
+             relative WEAT) → "hedged" (coral)
+           - Nothing significant anywhere → "nonsig" (grey)
+
+     IMPORTANT: this rule deliberately does NOT downgrade DRIVEN_BY_X
+     or DRIVEN_BY_Y to coral. A card where one side carries a strong
+     significant relative effect (e.g. WEAT D = +1.33, p < .001) is a
+     real, large finding regardless of which side does the work — the
+     asymmetry is a TEXTURAL detail to report in prose, not an
+     epistemic downgrade. The earlier rule conflated "is the finding
+     real?" with "is the structure symmetric?" and that was wrong. */
+
+  const fmt = t.headline_format || "";
+  if (fmt === "question" || fmt === "puzzle") return "question";
+
+  const wp = t.p_value;
+  const wd = Math.abs(t.effect_size || 0);
+  const scXp = t.sc_p_x;
+  const scYp = t.sc_p_y;
+
+  const weatSig = (wp != null && wp < 0.05);
+  const scXSig = (scXp != null && scXp < 0.05);
+  const scYSig = (scYp != null && scYp < 0.05);
+  const anySig = weatSig || scXSig || scYSig;
+
+  // Nothing reaches significance anywhere → genuine null.
+  if (!anySig) return "nonsig";
+
+  // Relative WEAT is significant AND magnitude is medium-or-larger:
+  // unambiguously a real, strong finding regardless of asymmetry
+  // between the two target sides.
+  if (weatSig && wd >= 0.5) return "sig";
+
+  // Otherwise: real signal exists somewhere (e.g. POOLED_LEAN where
+  // SC-WEATs are significant but the relative WEAT is null, or a
+  // small significant relative effect with |d| < 0.5). These are
+  // findings that warrant interpretive caution at the magnitude
+  // level — coral.
+  return "hedged";
+}
+
+function pillClassForP(p) {
+  return (p != null && p < 0.05) ? "sig" : "nonsig";
+}
+
+/* ─── Card rendering (featured or inline expanded) ────────────────── */
+
+function renderCardBody(t) {
+  const labels = t.labels || {};
+  const xLabelTC = titleCase(labels.X || "");
+  const yLabelTC = titleCase(labels.Y || "");
+  const aLabelTC = titleCase(labels.A || "");
+  const bLabelTC = titleCase(labels.B || "");
+
+  /* Kickers */
+  const modelName = (t.config && t.config.proposer_model) || "";
+  const corpusLine = modelName
+    ? `corpus embedding · dolma 2024 · 300d &nbsp;·&nbsp; model · ${escapeHtml(modelName)}`
+    : `corpus embedding · dolma 2024 · 300d`;
+
+  /* Pattern class for the structural pill background color.
+     Reuses pillClassForTest, which already maps verdict patterns to
+     sig / hedged / nonsig / question buckets. */
+  const pillClass = pillClassForTest(t);
+
+  const kickers = `
+    <p class="kicker domain">${escapeHtml(t.domain || "")}</p>
+    <p class="kicker corpus">${corpusLine}</p>
+    <span class="structural-pill ${pillClass}">
+      ${escapeHtml(xLabelTC)} vs ${escapeHtml(yLabelTC)}
+      <span class="emdash">—</span>
+      ${escapeHtml(aLabelTC)} vs ${escapeHtml(bLabelTC)}
+    </span>
+  `;
+
+  /* Headline — uniform across all formats now. The structural-pill
+     background color above carries the visual signal for verdict
+     category. The headline sentence itself is plain roman prose. */
+  const headlineHtml = boldLabels(t.headline_text || "", labels);
+
+  /* Expectation paragraph — plain prose, no bold/italic */
+  const expectationHtml = t.expectation
+    ? `<p class="expectation">${escapeHtml(t.expectation)}</p>`
+    : "";
+
+  /* Observation paragraph — plain prose, no bold/italic */
+  const observationHtml = t.observation
+    ? `<p class="observation">${escapeHtml(t.observation)}</p>`
+    : "";
+
+  /* Finding line — plain prose, no bold/italic */
+  const findingHtml = t.finding_line
+    ? `<p class="finding-line">${escapeHtml(t.finding_line)}</p>`
+    : "";
+
+  /* Stats table */
+  const weatPill = pillClassForP(t.p_value);
+  const scXPill = pillClassForP(t.sc_p_x);
+  const scYPill = pillClassForP(t.sc_p_y);
+  const n = t.n || {};
+  const statsHtml = `
+    <div class="stats-table">
+      <div class="stats-row">
+        <span class="row-label">WEAT</span>
+        <span class="d-cell">${fmtD(t.effect_size)}</span>
+        <span class="p-cell"><span class="p-pill ${weatPill}">${fmtP(t.p_value)}</span></span>
+        <span class="n-cell">n ${n.X || "—"}</span>
+      </div>
+      <div class="stats-row">
+        <span class="row-label">SC-WEAT ${escapeHtml(xLabelTC)}</span>
+        <span class="d-cell">${fmtD(t.sc_weat_x_mean)}</span>
+        <span class="p-cell"><span class="p-pill ${scXPill}">${fmtP(t.sc_p_x)}</span></span>
+        <span class="n-cell">n ${n.X || "—"}</span>
+      </div>
+      <div class="stats-row">
+        <span class="row-label">SC-WEAT ${escapeHtml(yLabelTC)}</span>
+        <span class="d-cell">${fmtD(t.sc_weat_y_mean)}</span>
+        <span class="p-cell"><span class="p-pill ${scYPill}">${fmtP(t.sc_p_y)}</span></span>
+        <span class="n-cell">n ${n.Y || "—"}</span>
+      </div>
+    </div>
+  `;
+
+  return `
+    ${kickers}
+    <h2 class="headline">${headlineHtml}</h2>
+    ${expectationHtml}
+    ${observationHtml}
+    ${findingHtml}
+    ${statsHtml}
+  `;
+}
+
+function renderFeaturedCard(t) {
+  return `<article class="featured-card" data-id="${t.id}">${renderCardBody(t)}</article>`;
+}
+
+/* ─── Compressed list row ────────────────────────────────────────── */
+
+function renderListRow(t) {
+  const expanded = STATE.expandedIds.has(t.id);
+  const pillClass = pillClassForTest(t);
+  const labels = t.labels || {};
+
+  if (expanded) {
+    return `
+      <article class="list-row expanded inline-card" data-id="${t.id}">
+        <div class="inline-card-header">
+          <span class="inline-card-time">${fmtTime(t.timestamp)}</span>
+          <button class="collapse-btn" data-collapse="${t.id}" aria-label="Collapse">×</button>
+        </div>
+        ${renderCardBody(t)}
+      </article>
+    `;
+  }
+
+  const xLabelTC = titleCase(labels.X || "");
+  const yLabelTC = titleCase(labels.Y || "");
+  const aLabelTC = titleCase(labels.A || "");
+  const bLabelTC = titleCase(labels.B || "");
+
+  return `
+    <div class="list-row" data-id="${t.id}" data-expand="${t.id}">
+      <span class="list-time">${fmtTime(t.timestamp)}</span>
+      <span class="structural-pill ${pillClass}">${escapeHtml(xLabelTC)} vs ${escapeHtml(yLabelTC)} <span class="emdash">—</span> ${escapeHtml(aLabelTC)} vs ${escapeHtml(bLabelTC)}</span>
+      <button class="expand-btn ${pillClass}" data-expand="${t.id}" aria-label="Expand">+</button>
+    </div>
+  `;
+}
+
+/* ─── Main render ─────────────────────────────────────────────────── */
+
+function applyFilters(tests) {
+  let list = tests.slice();
+
+  /* Filter */
+  if (STATE.filter === "significant") {
+    list = list.filter(t => t.p_value != null && t.p_value < 0.05);
+  } else if (STATE.filter === "null") {
+    list = list.filter(t => !(t.p_value != null && t.p_value < 0.05));
+  } else if (STATE.filter !== "all") {
+    list = list.filter(t => t.verdict_pattern === STATE.filter);
+  }
+
+  /* Search */
+  if (STATE.search.trim()) {
+    const q = STATE.search.toLowerCase();
+    list = list.filter(t => {
+      const hay = [
+        t.domain, t.contrast_label, t.headline_text,
+        (t.labels || {}).X, (t.labels || {}).Y,
+        (t.labels || {}).A, (t.labels || {}).B,
+      ].filter(Boolean).join(" ").toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  /* Sort */
+  list.sort((a, b) => {
+    if (STATE.sortBy === "date-desc") {
+      return (b.timestamp || "").localeCompare(a.timestamp || "");
+    }
+    if (STATE.sortBy === "date-asc") {
+      return (a.timestamp || "").localeCompare(b.timestamp || "");
+    }
+    if (STATE.sortBy === "d-desc") {
+      return Math.abs(b.effect_size || 0) - Math.abs(a.effect_size || 0);
+    }
+    if (STATE.sortBy === "p-asc") {
+      return (a.p_value || 1) - (b.p_value || 1);
+    }
+    return 0;
+  });
+
+  return list;
+}
+
+function render() {
+  const app = document.getElementById("app");
+  const visible = applyFilters(STATE.tests);
+  document.getElementById("count").textContent =
+    `${visible.length}${visible.length !== STATE.tests.length ? " / " + STATE.tests.length : ""} tests`;
+
+  if (visible.length === 0) {
+    app.innerHTML = `<div class="empty-state">No tests match the current filters.</div>`;
+    return;
+  }
+
+  /* All cards render as compressed list rows by default. Click a row's
+     expand button to inline-expand it. There is no featured/auto-expanded
+     card at the top. */
+  const rowsHtml = visible.map(renderListRow).join("");
+  app.innerHTML = `
+    <section class="list-section">
+      <div class="list-header">
+        <p class="list-title">All tests</p>
+        <span class="list-count">${visible.length}</span>
+      </div>
+      ${rowsHtml}
+    </section>
+  `;
+}
+
+/* ─── Event handling ──────────────────────────────────────────────── */
+
+document.addEventListener("click", (e) => {
+  const expandId = e.target.closest("[data-expand]")?.getAttribute("data-expand");
+  if (expandId) {
+    STATE.expandedIds.add(expandId);
+    render();
+    return;
+  }
+  const collapseId = e.target.closest("[data-collapse]")?.getAttribute("data-collapse");
+  if (collapseId) {
+    STATE.expandedIds.delete(collapseId);
+    render();
+    return;
+  }
+});
+
+document.getElementById("sort-by").addEventListener("change", (e) => {
+  STATE.sortBy = e.target.value;
+  render();
+});
+document.getElementById("filter-pattern").addEventListener("change", (e) => {
+  STATE.filter = e.target.value;
+  render();
+});
+document.getElementById("search").addEventListener("input", (e) => {
+  STATE.search = e.target.value;
+  render();
+});
+
+/* ─── Load feed ───────────────────────────────────────────────────── */
+
+fetch("feed.json?cache=" + Date.now())
+  .then(r => r.json())
+  .then(data => {
+    STATE.tests = (data || []).filter(t =>
+      t.schema_version === "inductive.v6"
+    );
+    render();
+  })
+  .catch(err => {
+    document.getElementById("app").innerHTML =
+      `<div class="empty-state">Failed to load feed.json: ${escapeHtml(String(err))}</div>`;
+  });
+</script>
+
+</body>
+</html>

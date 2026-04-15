@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoWEAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink-1: #1a1a1a;
+    --ink-2: #5a5a5a;
+    --ink-3: #9a9a9a;
+    --ink-4: #c8c8c8;
+    /* p-value pill colors */
+    --sig-bg: #1e3a5f;       /* deep navy for p < .05 */
+    --sig-fg: #ffffff;
+    --nonsig-bg: #ededed;    /* light grey for p >= .05 */
+    --nonsig-fg: #6a6a6a;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    /* Scroll-snap container — each test fills the viewport */
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  /* ─── Card (one test) ──────────────────────────────────────── */
+  .card {
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 120px 24px 0;  /* top padding reserves space for fixed header */
+    position: relative;
+  }
+  .card-inner {
+    max-width: 560px;
+    width: 100%;
+  }
+
+  /* All content uses the base 16px font-size from html.
+     Hierarchy comes from weight, color, and whitespace. */
+
+  /* Top kickers: discipline, corpus embedding, structural labels.
+     Three small grey lines stacked above the headline. */
+  .kicker {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin: 0 0 4px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  /* The last kicker (structural labels) is styled as a pill:
+     inline-block, subtle background, padding, rounded corners. This
+     makes it visually distinct from the other two kickers above and
+     signals that it's structured metadata (the four axes of the test)
+     rather than free-form framing. */
+  .kicker.structural-labels {
+    display: inline-block;
+    background: #f0f0f0;
+    color: var(--ink-2);
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-top: 2px;
+    margin-bottom: 18px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+  .structural-labels .emdash {
+    color: var(--ink-3);
+  }
+  /* The observation IS the headline of the card. The X/Y/A/B labels
+     within it are rendered in bold by the JS render function. */
+  .headline {
+    color: var(--ink-1);
+    font-weight: 500;
+    font-size: 19px;
+    margin: 0 0 24px;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+  }
+  .headline strong {
+    font-weight: 700;
+    color: var(--ink-1);
+  }
+  .interpretation {
+    color: var(--ink-2);
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0 0 28px;
+    line-height: 1.6;
+  }
+
+  /* ─── Fixed header (AutoWEAT title + description) ─────────── */
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+    padding: 14px 24px 14px;
+  }
+  .site-header-inner {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .site-header-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+  .site-header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink-1);
+    letter-spacing: 0.01em;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .site-header-title em {
+    font-style: italic;
+    font-weight: 400;
+  }
+  .site-header-meta {
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 400;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .site-header-meta a {
+    color: var(--ink-3);
+    text-decoration: none;
+  }
+  .site-header-meta a:hover { color: var(--ink-1); }
+  .site-header-meta .pos {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+  .site-header-body {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 0;
+    text-align: left;
+  }
+
+  /* ─── Stats table (3 rows: WEAT, SC-WEAT A, SC-WEAT B) ──── */
+  .stats-table {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 4px 16px;
+    align-items: center;
+    color: var(--ink-3);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 14px;
+  }
+  .stats-row {
+    display: contents;
+  }
+  .stats-row .row-label {
+    color: var(--ink-3);
+    text-align: left;
+    padding-right: 4px;
+  }
+  .stats-row .d-cell {
+    color: var(--ink-1);
+    font-weight: 500;
+    text-align: right;
+    min-width: 56px;
+  }
+  .stats-row .p-cell {
+    text-align: left;
+  }
+  .stats-row .n-cell {
+    color: var(--ink-3);
+    text-align: left;
+    min-width: 36px;
+  }
+  /* p-value pill — navy for significant, light grey for not */
+  .p-pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .p-pill.sig {
+    background: var(--sig-bg);
+    color: var(--sig-fg);
+  }
+  .p-pill.nonsig {
+    background: var(--nonsig-bg);
+    color: var(--nonsig-fg);
+  }
+  .legacy-mark {
+    margin-left: 10px;
+    color: var(--ink-4);
+    font-weight: 400;
+  }
+
+  /* ─── Chevron / nav at bottom ──────────────────────────────── */
+  .chevron {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--ink-4);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-family: inherit;
+  }
+  .chevron:hover {
+    color: var(--ink-2);
+    transform: translateX(-50%) translateY(2px);
+  }
+  .chevron:disabled {
+    color: var(--ink-4);
+    opacity: 0.3;
+    cursor: default;
+  }
+  .chevron:disabled:hover {
+    transform: translateX(-50%);
+  }
+
+  /* ─── Loading / error states ───────────────────────────────── */
+  .state {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* ─── Mobile ───────────────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .card { padding: 110px 20px 0; }
+    .card-inner { max-width: 100%; }
+    .headline { font-size: 17px; margin-bottom: 20px; }
+    .chevron { bottom: 18px; }
+    .site-header { padding: 12px 16px 12px; }
+    .site-header-title { font-size: 14px; }
+    .site-header-body { font-size: 12px; }
+    .site-header-meta { font-size: 10px; gap: 10px; }
+  }
+
+  /* ─── Print ────────────────────────────────────────────────── */
+  @media print {
+    body { height: auto; overflow: visible; scroll-snap-type: none; }
+    .card { height: auto; page-break-after: always; padding: 1.5cm; }
+    .site-header, .chevron { display: none; }
+    .p-pill.sig { background: #000 !important; color: #fff !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="site-header-row">
+      <h1 class="site-header-title">Auto<em>WEAT</em></h1>
+      <div class="site-header-meta">
+        <span><span id="m-count">—</span> tests</span>
+        <span class="pos" id="m-pos">—</span>
+        <a href="https://github.com/santoshbs/autoweat">source</a>
+      </div>
+    </div>
+    <p class="site-header-body">A local language model proposes word-embedding bias tests. A locked Python script computes them. The model then describes what the corpus actually does, in plain language, without citing any literature.</p>
+  </div>
+</header>
+
+<div id="root">
+  <div class="state">Loading…</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const fmtD = d => (d >= 0 ? "+" : "") + d.toFixed(3);
+const fmtP = p => p < 0.001 ? "<.001" : p.toFixed(3);
+const isSig = p => p < 0.05;
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+// Bold the four target/attribute labels wherever they appear in the
+// observation text. The labels are matched case-insensitively as whole
+// word sequences — we use \b word boundaries on each end to prevent
+// short labels from accidentally matching inside other words (e.g.
+// label "y" should NOT bold the y in "way"). Multi-word labels work
+// because \b only checks the boundaries, not the inner spaces.
+//
+// The text is escaped FIRST, then label substrings are replaced with
+// <strong>...</strong>. We sort labels longest-first so that nested
+// labels (X="manual labor jobs", Y="labor jobs") get matched in the
+// right order. We use the global flag so ALL occurrences of each label
+// are bolded — visual consistency for repeat mentions.
+//
+// We then add markers around already-bolded text to prevent later
+// label searches from matching inside an existing <strong> tag.
+function boldLabels(text, labels) {
+  let html = escapeHtml(text);
+  const labelList = ["X", "Y", "A", "B"]
+    .map(k => (labels && labels[k] ? String(labels[k]).trim() : ""))
+    .filter(s => s.length > 0)
+    .sort((a, b) => b.length - a.length);
+
+  // Use a placeholder for already-bolded segments so subsequent label
+  // searches can't accidentally match inside them.
+  const placeholders = [];
+  for (const lbl of labelList) {
+    const escapedLbl = escapeHtml(lbl).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Word boundary on each end. The pattern matches the label as a
+    // whole-word sequence, case-insensitive, all occurrences.
+    const re = new RegExp('\\b' + escapedLbl + '\\b', 'gi');
+    html = html.replace(re, match => {
+      const token = `\u0000PH${placeholders.length}\u0000`;
+      placeholders.push(`<strong>${match}</strong>`);
+      return token;
+    });
+  }
+
+  // Restore placeholders
+  for (let i = 0; i < placeholders.length; i++) {
+    html = html.replace(`\u0000PH${i}\u0000`, placeholders[i]);
+  }
+  return html;
+}
+
+// Title-case a label string. Capitalizes the first letter of every
+// word, leaving the rest of each word unchanged. Used for the X/Y/A/B
+// label words in the structural label line and the SC-WEAT row labels.
+// "nonprofit organizations" -> "Nonprofit Organizations"
+// "for profit corporations" -> "For Profit Corporations"
+function titleCase(s) {
+  return String(s ?? "").replace(/\b([a-z])/g, c => c.toUpperCase());
+}
+
+let FEED = [];
+
+fetch("./feed.json")
+  .then(r => r.json())
+  .then(feed => {
+    FEED = feed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("m-count").textContent = FEED.length;
+    if (!FEED.length) {
+      $("root").innerHTML = '<div class="state">No tests yet. Start the daemon with <code>python run.py</code>.</div>';
+      return;
+    }
+    renderCards();
+    setupScrollObserver();
+  })
+  .catch(err => {
+    $("root").innerHTML = `<div class="state">Failed to load feed.json: ${err.message}<br>Are you serving via http? Try <code>python -m http.server 8000</code> from this directory.</div>`;
+  });
+
+function prettifyEmbedding(backend) {
+  // Take strings like "gensim:dolma.2024.300d.kv" and turn them into
+  // "dolma 2024 · 300d" for human display.
+  if (!backend) return "";
+  let s = String(backend);
+  // strip "gensim:" or other backend prefix
+  s = s.replace(/^[a-z]+:/i, "");
+  // strip ".kv" or ".bin" suffix
+  s = s.replace(/\.(kv|bin|vec|txt)$/i, "");
+  // turn "dolma.2024.300d" into "dolma 2024 · 300d"
+  const parts = s.split(".");
+  if (parts.length >= 3) {
+    return parts.slice(0, -1).join(" ") + " · " + parts[parts.length - 1];
+  }
+  return s.replace(/\./g, " ");
+}
+
+function renderCards() {
+  const root = $("root");
+  root.innerHTML = "";
+
+  // ─── Cards 0..N-1: One per test ─────────────────────────────────
+  // The intro is now rendered as a fixed sticky header outside this loop.
+  FEED.forEach((t, i) => {
+    const cardIdx = i;
+    const observation = t.observation || t.hypothesis || "";
+    const interpretation = t.interpretation || t.rationale || "";
+    const isLegacy = !t.observation;
+    const isLast = i === FEED.length - 1;
+
+    // Three p-values, three pills. Legacy entries may not have SC-WEAT
+    // fields — in that case, only the WEAT row is shown.
+    const hasScWeat = (t.sc_weat_x_mean !== undefined && t.sc_weat_y_mean !== undefined);
+
+    const weatPill = isSig(t.p_value) ? "sig" : "nonsig";
+    const xPillClass = hasScWeat && isSig(t.sc_p_x) ? "sig" : "nonsig";
+    const yPillClass = hasScWeat && isSig(t.sc_p_y) ? "sig" : "nonsig";
+
+    // Title-cased label strings for display in the structural labels
+    // line and the SC-WEAT row labels. Bolding in the headline still
+    // uses the original-case labels (case-insensitive matching).
+    const xLabel = escapeHtml(t.labels.X);
+    const yLabel = escapeHtml(t.labels.Y);
+    const aLabel = escapeHtml(t.labels.A);
+    const bLabel = escapeHtml(t.labels.B);
+    const xLabelTC = titleCase(xLabel);
+    const yLabelTC = titleCase(yLabel);
+    const aLabelTC = titleCase(aLabel);
+    const bLabelTC = titleCase(bLabel);
+
+    const scWeatRows = hasScWeat ? `
+      <div class="stats-row">
+        <span class="row-label">SC-WEAT ${xLabelTC}</span>
+        <span class="d-cell">${fmtD(t.sc_weat_x_mean)}</span>
+        <span class="p-cell"><span class="p-pill ${xPillClass}">${fmtP(t.sc_p_x)}</span></span>
+        <span class="n-cell">n ${t.n.X}</span>
+      </div>
+      <div class="stats-row">
+        <span class="row-label">SC-WEAT ${yLabelTC}</span>
+        <span class="d-cell">${fmtD(t.sc_weat_y_mean)}</span>
+        <span class="p-cell"><span class="p-pill ${yPillClass}">${fmtP(t.sc_p_y)}</span></span>
+        <span class="n-cell">n ${t.n.Y}</span>
+      </div>
+    ` : "";
+
+    const embeddingName = prettifyEmbedding(t.config?.embedding_backend);
+    const embeddingKicker = embeddingName
+      ? `<p class="kicker">corpus embedding · ${escapeHtml(embeddingName)}</p>`
+      : "";
+
+    // Structural labels: target pair and attribute pair, separated by a
+    // proper em dash. Title Case for the label words. Sits at the top
+    // of the card with the other kickers, framing what the test is
+    // looking at before the headline reports the finding.
+    const structuralLabels = `
+      <p class="kicker structural-labels">
+        ${xLabelTC} vs ${yLabelTC}<span class="emdash"> — </span>${aLabelTC} vs ${bLabelTC}
+      </p>
+    `;
+
+    const card = document.createElement("section");
+    card.className = "card";
+    card.id = `card-${cardIdx}`;
+    card.innerHTML = `
+      <div class="card-inner">
+        <p class="kicker">${escapeHtml(t.domain)}${isLegacy ? '<span class="legacy-mark">· legacy</span>' : ''}</p>
+        ${embeddingKicker}
+        ${structuralLabels}
+        <h1 class="headline">${boldLabels(observation, t.labels)}</h1>
+        ${interpretation ? `<p class="interpretation">${escapeHtml(interpretation)}</p>` : ""}
+        <div class="stats-table">
+          <div class="stats-row">
+            <span class="row-label">WEAT</span>
+            <span class="d-cell">${fmtD(t.effect_size)}</span>
+            <span class="p-cell"><span class="p-pill ${weatPill}">${fmtP(t.p_value)}</span></span>
+            <span class="n-cell">n ${t.n.X}</span>
+          </div>
+          ${scWeatRows}
+        </div>
+      </div>
+      <button class="chevron" data-target="${cardIdx + 1}" ${isLast ? 'disabled' : ''} aria-label="Next test">↓</button>
+    `;
+    root.appendChild(card);
+  });
+
+  // Hook up chevron clicks
+  document.querySelectorAll(".chevron").forEach(btn => {
+    btn.onclick = () => {
+      const target = parseInt(btn.dataset.target);
+      const next = $(`card-${target}`);
+      if (next) next.scrollIntoView({ behavior: "smooth" });
+    };
+  });
+}
+
+// Watch which card is in view and update the position indicator
+function setupScrollObserver() {
+  const cards = document.querySelectorAll(".card");
+  const observer = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting && e.intersectionRatio > 0.5) {
+        const idx = parseInt(e.target.id.split("-")[1]);
+        // Cards are 0..N-1, position indicator shows "i of N" (1-based for humans)
+        $("m-pos").textContent = `${idx + 1} of ${FEED.length}`;
+      }
+    }
+  }, { threshold: [0.5] });
+
+  cards.forEach(c => observer.observe(c));
+}
+
+// Arrow key navigation. Cards are indexed 0..FEED.length-1.
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") {
+    e.preventDefault();
+    const current = currentCardIndex();
+    if (current < FEED.length - 1) {
+      $(`card-${current + 1}`).scrollIntoView({ behavior: "smooth" });
+    }
+  } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+    e.preventDefault();
+    const current = currentCardIndex();
+    if (current > 0) {
+      $(`card-${current - 1}`).scrollIntoView({ behavior: "smooth" });
+    }
+  } else if (e.key === "Home") {
+    e.preventDefault();
+    $("card-0")?.scrollIntoView({ behavior: "smooth" });
+  } else if (e.key === "End") {
+    e.preventDefault();
+    $(`card-${FEED.length - 1}`)?.scrollIntoView({ behavior: "smooth" });
+  }
+});
+
+function currentCardIndex() {
+  const cards = document.querySelectorAll(".card");
+  let best = 0;
+  let bestRatio = 0;
+  cards.forEach((c, i) => {
+    const r = c.getBoundingClientRect();
+    const visible = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+    const ratio = visible / window.innerHeight;
+    if (ratio > bestRatio) {
+      bestRatio = ratio;
+      best = i;
+    }
+  });
+  return best;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoWEAT — log</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --ink-1: #1c1c1c;
+    --ink-2: #4a4a4a;
+    --ink-3: #8a8a8a;
+    --rule: #d6cdb8;
+    --accent: #5d2018;
+    --pos: #6b4226;
+    --neg: #2c4858;
+    --null: #8a8a8a;
+    --font-serif: "Source Serif 4", Georgia, serif;
+    --font-mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 28px 96px;
+  }
+  header {
+    margin-bottom: 56px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 32px;
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px;
+  }
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 56px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+  }
+  h1 em { font-style: italic; font-weight: 400; }
+  .lede {
+    font-size: 19px;
+    color: var(--ink-2);
+    font-style: italic;
+    margin: 0 0 20px;
+    max-width: 580px;
+  }
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .meta span { margin-right: 24px; }
+  .meta strong { color: var(--ink-1); font-weight: 600; }
+
+  .entry {
+    border-top: 1px solid var(--rule);
+    padding: 40px 0;
+  }
+  .entry:last-child { border-bottom: 1px solid var(--rule); }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+    gap: 16px;
+  }
+  .entry-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .entry-stats {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .entry-stats .d { color: var(--ink-1); font-weight: 600; font-size: 13px; }
+  .entry-stats .d.pos { color: var(--pos); }
+  .entry-stats .d.neg { color: var(--neg); }
+  .entry-stats .d.null { color: var(--null); }
+  .entry-stats .sep { color: var(--rule); padding: 0 6px; }
+
+  .entry-domain {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .entry-contrast {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-bottom: 16px;
+  }
+  .entry-contrast .vs { color: var(--ink-3); }
+
+  .entry-observation {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--ink-1);
+    margin: 0 0 16px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .entry-interpretation {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin: 0 0 18px;
+    font-style: italic;
+  }
+  .entry-words {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    line-height: 1.7;
+    border-left: 2px solid var(--rule);
+    padding: 4px 0 4px 12px;
+  }
+  .entry-words div { margin: 1px 0; }
+  .entry-words .label {
+    display: inline-block;
+    width: 18px;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  .legacy-note {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-top: 8px;
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 36px 20px 64px; }
+    h1 { font-size: 40px; }
+    .entry-observation { font-size: 19px; }
+    .entry-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">An Autonomous Research Observatory</p>
+    <h1>Auto<em>WEAT</em></h1>
+    <p class="lede">A local language model proposes word-embedding bias tests. A locked script computes them. Below, in reverse chronological order, every test that has been run.</p>
+    <div class="meta">
+      <span><strong id="m-count">—</strong> tests</span>
+      <span>last update <strong id="m-when">—</strong></span>
+      <span>embedding <strong>dolma 2024 · 220B tokens</strong></span>
+    </div>
+  </header>
+
+  <main id="entries"></main>
+
+  <footer>
+    <a href="https://github.com/santoshbs/autoweat" style="color: inherit; text-decoration: none;">source</a>
+    &middot;
+    <a href="#" id="about-link" style="color: inherit; text-decoration: none;">about</a>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const fmtD = d => (d >= 0 ? "+" : "") + d.toFixed(3);
+const fmtP = p => p < 0.001 ? "<.001" : p.toFixed(3);
+const dClass = d => Math.abs(d) < 0.2 ? "null" : (d > 0 ? "pos" : "neg");
+
+function relDate(iso) {
+  const t = new Date(iso);
+  return t.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+function relTime(iso) {
+  const t = new Date(iso);
+  return t.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+fetch("./feed.json")
+  .then(r => r.json())
+  .then(feed => {
+    feed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("m-count").textContent = feed.length;
+    $("m-when").textContent = feed.length ? relDate(feed[0].timestamp) : "—";
+
+    const root = $("entries");
+    if (!feed.length) {
+      root.innerHTML = '<p style="color: var(--ink-3); font-style: italic; padding: 40px 0;">No tests yet. Start the daemon with <code>python run.py</code>.</p>';
+      return;
+    }
+
+    for (const t of feed) {
+      const headline = t.observation || t.hypothesis || "";
+      const body = t.interpretation || t.rationale || "";
+      const isLegacy = !t.observation;
+      const xUsed = (t.words?.X_used || []).join(" · ");
+      const yUsed = (t.words?.Y_used || []).join(" · ");
+
+      const div = document.createElement("article");
+      div.className = "entry";
+      div.innerHTML = `
+        <div class="entry-head">
+          <span class="entry-time">${relTime(t.timestamp)}</span>
+          <span class="entry-stats">
+            <span class="d ${dClass(t.effect_size)}">d&nbsp;=&nbsp;${fmtD(t.effect_size)}</span>
+            <span class="sep">·</span>
+            p&nbsp;=&nbsp;${fmtP(t.p_value)}
+            <span class="sep">·</span>
+            n&nbsp;=&nbsp;${t.n.X}
+          </span>
+        </div>
+        <div class="entry-domain">${escapeHtml(t.domain)}</div>
+        <div class="entry-contrast">
+          ${escapeHtml(t.labels.X)} <span class="vs">vs</span> ${escapeHtml(t.labels.Y)}
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          ${escapeHtml(t.labels.A)} <span class="vs">vs</span> ${escapeHtml(t.labels.B)}
+        </div>
+        <p class="entry-observation">${escapeHtml(headline)}</p>
+        ${body ? `<p class="entry-interpretation">${escapeHtml(body)}</p>` : ""}
+        <div class="entry-words">
+          <div><span class="label">X</span> ${escapeHtml(xUsed)}</div>
+          <div><span class="label">Y</span> ${escapeHtml(yUsed)}</div>
+        </div>
+        ${isLegacy ? '<div class="legacy-note">Legacy entry · deductive framing · pre-2026-04-11</div>' : ""}
+      `;
+      root.appendChild(div);
+    }
+  })
+  .catch(err => {
+    $("entries").innerHTML = `<p style="color: var(--accent);">Failed to load feed.json: ${err.message}<br><br>Are you serving via http? Try <code>python -m http.server 8000</code> from this directory.</p>`;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,777 @@
+"""
+proposer.py — LLM-driven WEAT proposal loop (inductive, two-phase).
+
+AUTOWEAT_PROPOSER_VERSION = "2026-04-11-headline"
+(grep for AUTOWEAT_PROPOSER_VERSION to confirm this file is in place.)
+
+The LLM operates in two phases per iteration:
+
+  Phase 1 (propose):  Pick a contrast and supply word lists. No hypothesis,
+                      no rationale, no theory citations. The model is choosing
+                      what to look at, not arguing for what it expects.
+
+  Phase 2 (interpret): After the locked WEAT computer produces d and p, the
+                      model is shown its own word lists, the per-word association
+                      scores, AND a pre-computed direction diagnostic that tells
+                      it whether the effect is a real two-way contrast or a
+                      one-sided magnitude difference. It returns a citation-free,
+                      direction-honest description.
+
+The p-value is two-sided: it answers "is the result real in some direction?"
+The direction (sign of d, plus the per-word means) answers "which direction?"
+Those two pieces of information together are everything the LLM needs to
+write an honest description.
+"""
+
+from __future__ import annotations
+
+import json
+import random
+import re
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+
+AUTOWEAT_PROPOSER_VERSION = "2026-04-11-headline"
+
+
+# The social-science domains AutoWEAT rotates through. Edit freely.
+DOMAINS = [
+    "management",
+    "sociology",
+    "social psychology",
+    "cognitive psychology",
+    "economics",
+    "political science",
+    "anthropology",
+    "organizational behavior",
+    "science and technology studies",
+    "cultural sociology",
+]
+
+
+# ─── Phase 1: proposal schema ─────────────────────────────────────────
+
+PROPOSAL_SCHEMA = """
+Return a SINGLE JSON object and nothing else. No prose before or after.
+No markdown fences. No commentary.
+
+Schema:
+
+{
+  "domain": "<one of the domains listed in the system prompt>",
+  "contrast_label": "<short plain-English description of what you're looking at, e.g. 'startup vs incumbent firms with animal vs machine attributes'>",
+  "X_label": "<short noun phrase naming the first target concept>",
+  "Y_label": "<short noun phrase naming the contrasting target concept>",
+  "A_label": "<short noun phrase naming the first attribute>",
+  "B_label": "<short noun phrase naming the contrasting attribute>",
+  "X": ["word1", "word2", ...],   // 10-15 single-token common English words
+  "Y": ["word1", "word2", ...],   // 10-15 single-token common English words
+  "A": ["word1", "word2", ...],   // 10-15 single-token common English words
+  "B": ["word1", "word2", ...]    // 10-15 single-token common English words
+}
+
+Rules for the word lists:
+  - Single common English words, lowercase, no phrases, no hyphens, no punctuation.
+  - Words must be plausible members of pretrained word2vec / GloVe vocabulary.
+  - X and Y must be CONTRASTING categories (e.g. "startups" vs "incumbents").
+  - A and B must be CONTRASTING attributes (e.g. "animals" vs "machines").
+  - The attribute pools (A, B) must come from a SEMANTICALLY DIFFERENT register
+    than the targets (X, Y). If A is a near-synonym of X, the test is rigged.
+  - The two attribute pools (A and B) must be drawn from registers of
+    ROUGHLY EQUAL everyday-English frequency. Do NOT pair a dense common
+    register (colors, body parts, materials, household items) with a rare
+    register (geometric shapes, fruits, sounds, weather phenomena). When
+    one pool is much more common than the other, almost every target word
+    will cluster with the dense pool, and the test will report a "magnitude
+    difference" rather than a real two-way contrast. See the persona's
+    base-rate balancing section.
+  - Avoid proper nouns unless the contrast is explicitly about them.
+  - Do not repeat any contrast from the prior tests shown in the history.
+
+CRITICAL: Do NOT include a hypothesis, rationale, theory, citation,
+author name, or framework name. The proposal is about WHAT to look at,
+not WHY. The interpretation comes later, after the result is known.
+"""
+
+
+# ─── Phase 2: interpretation prompt template ──────────────────────────
+
+INTERPRETATION_SCHEMA = """
+Return a SINGLE JSON object and nothing else. No prose before or after.
+
+Schema:
+
+{
+  "observation": "<ONE sentence in plain English describing what the corpus actually does. The sentence MUST match the direction diagnostic (see below). If the diagnostic says ONE-SIDED, your sentence must describe a magnitude difference, not a two-way contrast. CRITICAL: The sentence MUST contain the X label, the Y label, and the relevant attribute label(s), spelled exactly as given to you, so the site can render them in bold. Do not paraphrase the labels. If the X label is 'manual labor jobs', write 'manual labor jobs' verbatim, not 'blue-collar work' or 'physical jobs'.>",
+  "interpretation": "<2-3 sentences of CAUTIOUS speculation about why this pattern might exist. Use hedged language: 'one reading is', 'this might reflect', 'possibly because', 'a plausible explanation'. Do NOT cite any specific paper, author, theory, framework, or named tradition. Describe the phenomenon in plain words a non-academic could follow.>"
+}
+
+LABEL VERBATIM RULE (CRITICAL — read every time):
+
+Your observation sentence is the headline of the card and the labels in
+it will be rendered in bold. For this to work, the sentence MUST contain
+the X label and Y label EXACTLY as given to you, character-for-character
+(case-insensitive is fine, but the words must be the same). The same
+applies to whichever attribute label (A or B) the targets cluster with.
+
+Examples (assume X="manual labor jobs", Y="knowledge work jobs",
+A="animals", B="machines"):
+
+  GOOD (one-sided result, both cluster with B):
+    "Both manual labor jobs and knowledge work jobs cluster with machines
+     in this corpus, but manual labor jobs do so more strongly than
+     knowledge work jobs."
+    → contains "manual labor jobs", "knowledge work jobs", "machines"
+
+  GOOD (two-way result):
+    "manual labor jobs cluster with machines while knowledge work jobs
+     cluster with animals."
+
+  BAD (paraphrased — labels missing):
+    "Blue-collar work shows a stronger pull toward mechanical objects
+     than office work does."
+    → "manual labor jobs" missing, "machines" missing — REJECTED
+
+  BAD (only one label appears):
+    "Manual labor jobs lean toward machines."
+    → missing "knowledge work jobs" — REJECTED
+
+Use the labels verbatim. The bold rendering depends on it.
+
+P-VALUE NOTE:
+
+A small p (p < .05) means the corpus shows a real difference between the
+two target sets — but it does NOT tell you which direction. The DIRECTION
+DIAGNOSTIC below tells you that. The p answers "is it real?", the diagnostic
+answers "which way?". A negative d with a small p is a real, strong finding
+in the unexpected direction; do not call such a result "null".
+
+DIRECTION-CHECKING DISCIPLINE (CRITICAL — read every time):
+
+The system has computed the direction diagnostic for you and shown it
+in the result block. It will say either ONE-SIDED or TWO-WAY.
+
+  - **TWO-WAY**: X words and Y words have OPPOSITE average signs. One
+    set genuinely clusters with A, the other genuinely clusters with B.
+    You may describe this as: "X clusters with A; Y clusters with B."
+
+  - **ONE-SIDED**: X words and Y words have the SAME average sign. Both
+    sets cluster with the same pool (either A or B), just at different
+    magnitudes. You MUST NOT describe this as a two-way contrast. The d
+    value is reporting a magnitude difference, not a directional pull.
+    Write: "Both X and Y cluster with [dominant pool], but [stronger] does
+    so more than [weaker]."
+
+If the diagnostic says ONE-SIDED, your interpretation should also acknowledge
+the asymmetry: speculate that one of the attribute pools might be dense common
+vocabulary that pulls almost everything toward it, and the d is largely
+reflecting which target is *less* pulled toward the dominant pool.
+
+ABSOLUTE RULES (no exceptions):
+  - Honor the direction diagnostic. If it says ONE-SIDED, do not write
+    a two-way contrast sentence under any circumstances.
+  - Use the X, Y, A, B labels VERBATIM in your observation sentence (see
+    LABEL VERBATIM RULE above).
+  - NO author names (no "Smith 2020", no "Bourdieu", no "Lakoff", no anyone)
+  - NO theory names (no "embodied cognition", no "institutional logics",
+    no "stereotype content model", no "dual-process theory", no anything
+    that has a Wikipedia page about it)
+  - NO paper titles or journal names
+  - NO framework names
+  - If you find yourself wanting to write "this is consistent with the
+    X literature", REWRITE in plain English what the X literature would say,
+    without naming it
+  - Plain-language description only. Imagine explaining the result to a
+    smart friend who doesn't read academic papers.
+  - Be explicit about uncertainty. If the result is null, say so plainly.
+  - If the result goes against what you might have predicted, say that
+    plainly. "I might have expected the opposite" is a fine sentence.
+"""
+
+
+# ─── data classes ─────────────────────────────────────────────────────
+
+@dataclass
+class Proposal:
+    domain: str
+    contrast_label: str
+    X_label: str
+    Y_label: str
+    A_label: str
+    B_label: str
+    X: list[str]
+    Y: list[str]
+    A: list[str]
+    B: list[str]
+    raw: str
+
+    def to_dict(self) -> dict[str, Any]:
+        d = self.__dict__.copy()
+        d.pop("raw", None)
+        return d
+
+
+@dataclass
+class Interpretation:
+    observation: str
+    interpretation: str
+    direction: str          # "two-way" | "one-sided-A" | "one-sided-B" | "ambiguous"
+    x_mean_s: float
+    y_mean_s: float
+    raw: str
+
+    def to_dict(self) -> dict[str, Any]:
+        d = self.__dict__.copy()
+        d.pop("raw", None)
+        return d
+
+
+# ─── proposer class ───────────────────────────────────────────────────
+
+class OllamaProposer:
+    """LLM proposer for AutoWEAT (inductive, two-phase, direction-checked)."""
+
+    GPT_OSS_EFFORTS = ("low", "medium", "high")
+
+    def __init__(
+        self,
+        model: str,
+        persona_path: str,
+        host: str = "http://localhost:11434",
+        sampling: dict | None = None,
+        thinking_style: str = "none",
+        thinking_effort: str | None = None,
+        max_json_retries: int = 3,
+        request_timeout: int = 1800,
+    ):
+        import requests
+        self.requests = requests
+        self.model = model
+        self.host = host.rstrip("/")
+        self.sampling = sampling or {}
+        self.persona = Path(persona_path).expanduser().read_text()
+        self.max_json_retries = max(1, max_json_retries)
+        self.request_timeout = request_timeout
+
+        if thinking_style not in ("gpt-oss", "qwen3", "gemma4", "none"):
+            raise ValueError(
+                f"thinking_style must be one of gpt-oss/qwen3/gemma4/none, "
+                f"got {thinking_style!r}"
+            )
+        self.thinking_style = thinking_style
+
+        if thinking_style == "gpt-oss":
+            if thinking_effort is not None and thinking_effort not in self.GPT_OSS_EFFORTS:
+                raise ValueError(
+                    f"For thinking_style=gpt-oss, thinking_effort must be one of "
+                    f"{self.GPT_OSS_EFFORTS}, got {thinking_effort!r}"
+                )
+        self.thinking_effort = thinking_effort
+
+    @staticmethod
+    def _is_thinking_on(effort: str | None) -> bool:
+        if effort is None:
+            return True
+        return str(effort).lower() not in ("off", "false", "no", "none", "0", "")
+
+    def _thinking_prefix(self) -> str:
+        if self.thinking_style == "gpt-oss" and self.thinking_effort:
+            return f"Reasoning: {self.thinking_effort}\n\n"
+        if self.thinking_style == "gemma4" and self._is_thinking_on(self.thinking_effort):
+            return "<|think|>\n\n"
+        return ""
+
+    def _qwen3_think_flag(self) -> bool:
+        return self._is_thinking_on(self.thinking_effort)
+
+    def _format_history_block(
+        self, history: list[dict], include_words: bool
+    ) -> str:
+        """Format past tests as a compact memory block."""
+        if not history:
+            return ""
+        lines = [
+            "Previous WEAT tests you have already proposed in this run "
+            "(newest first):"
+        ]
+        for i, t in enumerate(history, start=1):
+            labels = t.get("labels", {}) or {}
+            X = labels.get("X", "?")
+            Y = labels.get("Y", "?")
+            A = labels.get("A", "?")
+            B = labels.get("B", "?")
+            d = float(t.get("effect_size", 0.0))
+            p = float(t.get("p_value", 1.0))
+            domain = t.get("domain", "?")
+            descr = (t.get("observation") or t.get("hypothesis") or "").strip()
+            if len(descr) > 110:
+                descr = descr[:107] + "..."
+            line = (
+                f"{i:2d}. [{domain}] {X} vs {Y}  |  {A} vs {B}  "
+                f"d={d:+.2f} p={p:.3f}"
+            )
+            if descr:
+                line += f"\n    \u201c{descr}\u201d"
+            if include_words:
+                words = t.get("words", {}) or {}
+                xs = " ".join((words.get("X_used") or [])[:8])
+                ys = " ".join((words.get("Y_used") or [])[:8])
+                line += f"\n    X: {xs}\n    Y: {ys}"
+            lines.append(line)
+        lines.append(
+            "\nDo NOT repeat any of the contrasts above. Pick something "
+            "you are genuinely uncertain about. Prior nulls and surprises "
+            "are the most informative entries — use them to choose a more "
+            "informative next contrast."
+        )
+        return "\n".join(lines) + "\n\n---\n\n"
+
+    def _propose_system_prompt(
+        self,
+        recent_domains: list[str],
+        history: list[dict] | None = None,
+        history_include_words: bool = False,
+    ) -> str:
+        prefix = self._thinking_prefix()
+        history_block = self._format_history_block(
+            history or [], history_include_words
+        )
+
+        avoid = ""
+        if recent_domains and not history:
+            avoid = (
+                "\n\nYou have recently proposed tests in these domains: "
+                + ", ".join(recent_domains)
+                + ". Pick a DIFFERENT domain this time."
+            )
+        return (
+            prefix
+            + self.persona
+            + "\n\n---\n\n"
+            + history_block
+            + "You are AutoWEAT's proposer (Phase 1). Your sole output is a "
+            + "JSON proposal for a single Word Embedding Association Test "
+            + "(Caliskan et al. 2017). You are picking a contrast to LOOK AT, "
+            + "not arguing for what you expect to find. No hypothesis, no "
+            + "rationale, no theory."
+            + "\n\nAvailable domains: " + ", ".join(DOMAINS)
+            + avoid
+            + "\n\n" + PROPOSAL_SCHEMA
+        )
+
+    def _interpret_system_prompt(self) -> str:
+        prefix = self._thinking_prefix()
+        return (
+            prefix
+            + "You are AutoWEAT's interpreter (Phase 2). The system has just "
+            + "computed a Word Embedding Association Test (Caliskan et al. 2017) "
+            + "from word lists you proposed in Phase 1. You are now looking at:\n"
+            + "  - the relative WEAT result (the headline d and p)\n"
+            + "  - a pre-computed direction diagnostic (do X and Y mean s scores "
+            + "    have opposite signs, indicating a real two-way contrast, or "
+            + "    the same sign, indicating a one-sided magnitude difference)\n"
+            + "  - the SC-WEAT decomposition (single-category WEAT for each "
+            + "    target word individually, then averaged across X words and "
+            + "    across Y words separately, telling you whether the contrast "
+            + "    is driven by the X side, the Y side, both, or neither)\n"
+            + "  - the per-word association scores"
+            + "\n\n"
+            + "A small p means the result is real in some direction; the "
+            + "direction diagnostic tells you which. Do not describe a strong "
+            + "negative effect as 'null' just because it surprised you."
+            + "\n\n"
+            + "If the SC-WEAT decomposition shows that the relative effect is "
+            + "driven by only one target side (one SC-WEAT mean is large and "
+            + "significant, the other is near zero), say so plainly in your "
+            + "interpretation. This is a meaningful structural finding."
+            + "\n\n"
+            + "Your job is to describe IN PLAIN LANGUAGE what the corpus does, "
+            + "honoring the direction diagnostic AND the SC-WEAT decomposition. "
+            + "Speculate cautiously about why. Do NOT cite any paper, author, "
+            + "theory, or framework by name. Treat this as field notes from a "
+            + "careful empirical observer, not a literature review."
+            + "\n\n" + INTERPRETATION_SCHEMA
+        )
+
+    def _build_payload(self, system: str, user: str, options: dict) -> dict:
+        payload = {
+            "model": self.model,
+            "system": system,
+            "prompt": user,
+            "stream": False,
+            "options": options,
+        }
+        if self.thinking_style == "gpt-oss":
+            payload["think"] = self.thinking_effort or "medium"
+        elif self.thinking_style == "qwen3":
+            payload["think"] = self._qwen3_think_flag()
+        return payload
+
+    def _call_llm(self, payload: dict) -> tuple[str, str]:
+        resp = self.requests.post(
+            f"{self.host}/api/generate",
+            json=payload,
+            timeout=self.request_timeout,
+        )
+        resp.raise_for_status()
+        body = resp.json()
+        return (body.get("response", "") or "", body.get("thinking", "") or "")
+
+    # ─── Phase 1: propose ─────────────────────────────────────────────
+
+    def propose(
+        self,
+        recent_domains: list[str] | None = None,
+        seed: int | None = None,
+        history: list[dict] | None = None,
+        history_include_words: bool = False,
+    ) -> Proposal:
+        options = dict(self.sampling)
+        if seed is not None:
+            options["seed"] = seed
+
+        system = self._propose_system_prompt(
+            recent_domains or [], history=history,
+            history_include_words=history_include_words,
+        )
+        user = "Propose one WEAT test now. Output ONLY a single JSON object, no prose."
+        payload = self._build_payload(system, user, options)
+
+        last_err = None
+        last_raw = ""
+        last_thinking = ""
+        for attempt in range(self.max_json_retries):
+            last_raw, last_thinking = self._call_llm(payload)
+            for source in (last_raw, last_thinking):
+                if not source.strip():
+                    continue
+                try:
+                    data = _parse_json_loose(source)
+                    return Proposal(
+                        domain=str(data.get("domain", "unknown")),
+                        contrast_label=str(data.get("contrast_label", "")),
+                        X_label=str(data.get("X_label", "")),
+                        Y_label=str(data.get("Y_label", "")),
+                        A_label=str(data.get("A_label", "")),
+                        B_label=str(data.get("B_label", "")),
+                        X=[str(w).strip().lower() for w in data.get("X", [])],
+                        Y=[str(w).strip().lower() for w in data.get("Y", [])],
+                        A=[str(w).strip().lower() for w in data.get("A", [])],
+                        B=[str(w).strip().lower() for w in data.get("B", [])],
+                        raw=source,
+                    )
+                except (ValueError, KeyError) as e:
+                    last_err = e
+                    continue
+
+        raise ValueError(
+            f"Phase 1 (propose) returned unparseable JSON after "
+            f"{self.max_json_retries} attempts. Last error: {last_err}. "
+            f"response field (first 200 chars): {last_raw[:200]!r}. "
+            f"thinking field (first 200 chars): {last_thinking[:200]!r}."
+        )
+
+    # ─── Phase 2: interpret ───────────────────────────────────────────
+
+    @staticmethod
+    def _direction_diagnostic(
+        x_mean_s: float, y_mean_s: float, A_label: str, B_label: str
+    ) -> tuple[str, str]:
+        """Classify the result as TWO-WAY, ONE-SIDED-A, ONE-SIDED-B, or AMBIGUOUS."""
+        eps = 0.01
+
+        if abs(x_mean_s) < eps and abs(y_mean_s) < eps:
+            return (
+                "ambiguous-both-near-zero",
+                f"DIRECTION DIAGNOSTIC: AMBIGUOUS\n"
+                f"  X mean s = {x_mean_s:+.4f}  (essentially zero)\n"
+                f"  Y mean s = {y_mean_s:+.4f}  (essentially zero)\n"
+                f"  Both target sets are essentially balanced between {A_label} "
+                f"and {B_label}. The d value reflects a tiny relative tilt that "
+                f"may or may not be meaningful. Describe this as a near-null "
+                f"result with no clear directional signal."
+            )
+        if x_mean_s * y_mean_s < 0:
+            x_side = A_label if x_mean_s > 0 else B_label
+            y_side = A_label if y_mean_s > 0 else B_label
+            return (
+                "two-way",
+                f"DIRECTION DIAGNOSTIC: TWO-WAY (real contrast)\n"
+                f"  X mean s = {x_mean_s:+.4f}  (clusters with {x_side})\n"
+                f"  Y mean s = {y_mean_s:+.4f}  (clusters with {y_side})\n"
+                f"  X and Y genuinely pull toward different attribute pools. "
+                f"You MAY describe this as a two-way contrast: 'X clusters with "
+                f"{x_side}, Y clusters with {y_side}.'"
+            )
+        dominant = A_label if x_mean_s > 0 else B_label
+        recessive = B_label if x_mean_s > 0 else A_label
+        if abs(x_mean_s) > abs(y_mean_s):
+            stronger, weaker = "X", "Y"
+        else:
+            stronger, weaker = "Y", "X"
+        return (
+            f"one-sided-{'A' if x_mean_s > 0 else 'B'}",
+            f"DIRECTION DIAGNOSTIC: ONE-SIDED (magnitude difference, NOT a two-way contrast)\n"
+            f"  X mean s = {x_mean_s:+.4f}\n"
+            f"  Y mean s = {y_mean_s:+.4f}\n"
+            f"  Both X and Y target sets cluster with {dominant} rather than "
+            f"with {recessive}. Neither set genuinely pulls toward {recessive}. "
+            f"The d value is reporting that {stronger} clusters with {dominant} "
+            f"MORE STRONGLY than {weaker} does — it is a magnitude difference, "
+            f"not a directional pull.\n"
+            f"\n"
+            f"You MUST NOT write 'X clusters with {A_label} while Y clusters "
+            f"with {B_label}' or any sentence that implies a two-way contrast.\n"
+            f"\n"
+            f"You MUST write a sentence of the form: 'Both X and Y cluster "
+            f"with {dominant} in this corpus, but {stronger} does so more "
+            f"strongly than {weaker}.'\n"
+            f"\n"
+            f"Your interpretation should also speculate that {dominant} may "
+            f"simply be a denser, more common vocabulary register that "
+            f"pulls almost everything toward it, so the test is partly "
+            f"reflecting attribute-pool base-rate asymmetry rather than a "
+            f"clean directional contrast."
+        )
+
+    def interpret(self, proposal: Proposal, result_dict: dict) -> Interpretation:
+        """Given the proposal and the WEAT result, return an inductive
+        interpretation. Citation-free, plain language, cautious, and
+        direction-honest.
+
+        result_dict should include effect_size, p_value (two-sided),
+        sc_weat_x_mean, sc_p_x, sc_weat_y_mean, sc_p_y, per_word_s, and words.
+        """
+        d = float(result_dict.get("effect_size", 0.0))
+        p_two = float(result_dict.get("p_value", 1.0))
+        sc_x_mean = float(result_dict.get("sc_weat_x_mean", 0.0))
+        sc_p_x = float(result_dict.get("sc_p_x", 1.0))
+        sc_y_mean = float(result_dict.get("sc_weat_y_mean", 0.0))
+        sc_p_y = float(result_dict.get("sc_p_y", 1.0))
+        words = result_dict.get("words", {}) or {}
+        per_word_s = result_dict.get("per_word_s", {}) or {}
+
+        X_used = words.get("X_used", []) or []
+        Y_used = words.get("Y_used", []) or []
+        A_used = words.get("A_used", []) or []
+        B_used = words.get("B_used", []) or []
+
+        # Compute the per-set means and the direction diagnostic in Python.
+        x_scores = [per_word_s.get(w, 0.0) for w in X_used]
+        y_scores = [per_word_s.get(w, 0.0) for w in Y_used]
+        x_mean_s = sum(x_scores) / len(x_scores) if x_scores else 0.0
+        y_mean_s = sum(y_scores) / len(y_scores) if y_scores else 0.0
+        direction_label, direction_block = self._direction_diagnostic(
+            x_mean_s, y_mean_s, proposal.A_label, proposal.B_label
+        )
+
+        # Build the SC-WEAT decomposition block, using the corrected
+        # Caliskan formula. SC-WEAT(X) is the average per-word effect
+        # size across X target words: it tells you how strongly the
+        # AVERAGE X word leans toward attribute pool A versus B. Same
+        # for SC-WEAT(Y).
+        #
+        # The contrast between SC-WEAT(X) and SC-WEAT(Y) is what the
+        # relative WEAT measures. We classify:
+        #   - opposite signs, both large → genuine two-way contrast
+        #   - same sign, both large → magnitude difference (both lean
+        #     toward the same pool, but at different strengths)
+        #   - one large, one small → that side is driving the contrast
+        #   - both small → weak overall
+        def _sc_weat_verdict():
+            big_x = abs(sc_x_mean) > 0.3
+            big_y = abs(sc_y_mean) > 0.3
+            sig_x = sc_p_x < 0.05
+            sig_y = sc_p_y < 0.05
+            same_sign = (sc_x_mean * sc_y_mean) > 0
+            x_label = proposal.X_label
+            y_label = proposal.Y_label
+            a_label = proposal.A_label
+            b_label = proposal.B_label
+
+            if big_x and big_y:
+                if not same_sign:
+                    x_pool = a_label if sc_x_mean > 0 else b_label
+                    y_pool = a_label if sc_y_mean > 0 else b_label
+                    return (
+                        f"GENUINE TWO-WAY CONTRAST: {x_label} target words lean "
+                        f"toward {x_pool} (SC-WEAT = {sc_x_mean:+.2f}), and "
+                        f"{y_label} target words lean toward {y_pool} "
+                        f"(SC-WEAT = {sc_y_mean:+.2f}). The two sides pull in "
+                        f"opposite directions — this is the strongest form of "
+                        f"a real WEAT effect."
+                    )
+                else:
+                    shared = a_label if sc_x_mean > 0 else b_label
+                    stronger = x_label if abs(sc_x_mean) > abs(sc_y_mean) else y_label
+                    weaker = y_label if abs(sc_x_mean) > abs(sc_y_mean) else x_label
+                    return (
+                        f"MAGNITUDE DIFFERENCE: both {x_label} and {y_label} lean "
+                        f"toward {shared}, but {stronger} does so more strongly "
+                        f"than {weaker}. The WEAT d reflects this asymmetry, but "
+                        f"the contrast is not directionally two-way — both target "
+                        f"sides are pulled toward the same attribute pool."
+                    )
+            elif big_x and not big_y:
+                x_pool = a_label if sc_x_mean > 0 else b_label
+                return (
+                    f"DRIVEN BY {x_label.upper()}: only the {x_label} target words "
+                    f"lean strongly (toward {x_pool}, SC-WEAT = {sc_x_mean:+.2f}). "
+                    f"The {y_label} words individually do not lean toward either "
+                    f"pool (SC-WEAT = {sc_y_mean:+.2f}). The WEAT effect is "
+                    f"single-side-driven by the {x_label} side."
+                )
+            elif big_y and not big_x:
+                y_pool = a_label if sc_y_mean > 0 else b_label
+                return (
+                    f"DRIVEN BY {y_label.upper()}: only the {y_label} target words "
+                    f"lean strongly (toward {y_pool}, SC-WEAT = {sc_y_mean:+.2f}). "
+                    f"The {x_label} words individually do not lean toward either "
+                    f"pool (SC-WEAT = {sc_x_mean:+.2f}). The WEAT effect is "
+                    f"single-side-driven by the {y_label} side."
+                )
+            else:
+                return (
+                    f"WEAK ON BOTH SIDES: neither target side leans strongly toward "
+                    f"either attribute pool (SC-WEAT(X)={sc_x_mean:+.2f}, "
+                    f"SC-WEAT(Y)={sc_y_mean:+.2f}). The relative WEAT effect, if "
+                    f"any, is small and the contrast is weak overall."
+                )
+
+        sc_weat_block = (
+            f"SC-WEAT DECOMPOSITION (per-target-side, Caliskan formula):\n"
+            f"  SC-WEAT mean across {proposal.X_label} targets: "
+            f"d = {sc_x_mean:+.3f}, p = {sc_p_x:.3f}\n"
+            f"  SC-WEAT mean across {proposal.Y_label} targets: "
+            f"d = {sc_y_mean:+.3f}, p = {sc_p_y:.3f}\n"
+            f"\n"
+            f"  Each SC-WEAT is the standardized strength of association between\n"
+            f"  a single target word and the {proposal.A_label} pool versus the\n"
+            f"  {proposal.B_label} pool, averaged across the words on that side.\n"
+            f"  Positive = leans toward {proposal.A_label}, negative = leans\n"
+            f"  toward {proposal.B_label}.\n"
+            f"\n"
+            f"  Verdict: {_sc_weat_verdict()}"
+        )
+
+        # Top contributors on each side, with explicit signs
+        x_with_s = sorted(
+            ((w, per_word_s.get(w, 0.0)) for w in X_used),
+            key=lambda t: -t[1],
+        )
+        y_with_s = sorted(
+            ((w, per_word_s.get(w, 0.0)) for w in Y_used),
+            key=lambda t: -t[1],
+        )
+        x_lines = "\n".join(f"    {w}: {s:+.3f}" for w, s in x_with_s)
+        y_lines = "\n".join(f"    {w}: {s:+.3f}" for w, s in y_with_s)
+
+        # Direction language for the headline result
+        if abs(d) < 0.2:
+            result_summary = (
+                f"essentially null (d = {d:+.3f}, p = {p_two:.3f})"
+            )
+        else:
+            sig = "statistically significant" if p_two < 0.05 else "marginal"
+            sign = "positive" if d > 0 else "negative"
+            result_summary = (
+                f"a {sig} {sign} effect (d = {d:+.3f}, p = {p_two:.3f})"
+            )
+
+        result_block = f"""
+Test you proposed:
+  Targets:    X = {proposal.X_label} ({len(X_used)} words)
+              Y = {proposal.Y_label} ({len(Y_used)} words)
+  Attributes: A = {proposal.A_label} ({len(A_used)} words)
+              B = {proposal.B_label} ({len(B_used)} words)
+  Domain:     {proposal.domain}
+
+Result: {result_summary}
+
+{direction_block}
+
+{sc_weat_block}
+
+Per-word s(w, A, B) for X words (sorted high to low):
+{x_lines}
+
+Per-word s(w, A, B) for Y words (sorted high to low):
+{y_lines}
+
+Full word lists used:
+  X: {', '.join(X_used)}
+  Y: {', '.join(Y_used)}
+  A: {', '.join(A_used)}
+  B: {', '.join(B_used)}
+""".strip()
+
+        system = self._interpret_system_prompt()
+        user = (
+            "Here is the result of the test you proposed. The direction "
+            "diagnostic has been pre-computed for you and is non-negotiable. "
+            "Honor it. Write the observation and interpretation as JSON.\n\n"
+            + result_block
+        )
+
+        options = dict(self.sampling)
+        payload = self._build_payload(system, user, options)
+
+        last_err = None
+        last_raw = ""
+        last_thinking = ""
+        for attempt in range(self.max_json_retries):
+            last_raw, last_thinking = self._call_llm(payload)
+            for source in (last_raw, last_thinking):
+                if not source.strip():
+                    continue
+                try:
+                    data = _parse_json_loose(source)
+                    obs = str(data.get("observation", "")).strip()
+                    interp = str(data.get("interpretation", "")).strip()
+                    if not obs or not interp:
+                        last_err = ValueError(
+                            "interpretation JSON missing observation or interpretation field"
+                        )
+                        continue
+                    return Interpretation(
+                        observation=obs,
+                        interpretation=interp,
+                        direction=direction_label,
+                        x_mean_s=x_mean_s,
+                        y_mean_s=y_mean_s,
+                        raw=source,
+                    )
+                except (ValueError, KeyError) as e:
+                    last_err = e
+                    continue
+
+        return Interpretation(
+            observation=(
+                f"[interpretation generation failed after "
+                f"{self.max_json_retries} attempts: {last_err}]"
+            ),
+            interpretation="",
+            direction=direction_label,
+            x_mean_s=x_mean_s,
+            y_mean_s=y_mean_s,
+            raw=last_raw or last_thinking,
+        )
+
+
+def _parse_json_loose(text: str) -> dict:
+    """Parse JSON from an LLM response, tolerating prose and code fences."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text)
+        text = re.sub(r"\s*```$", "", text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if match:
+        return json.loads(match.group(0))
+    raise ValueError(f"Could not parse JSON from LLM response: {text[:200]}...")

@@ -1,0 +1,8 @@
+# ──────────────────────────────────────────────────────────────────
+# Replace the existing `weat:` block in ~/autoweat/config.yaml with
+# this. If there is no `weat:` block, add it at the top level.
+# ──────────────────────────────────────────────────────────────────
+weat:
+  exact_threshold: 12      # bumped from 10
+  max_permutations: 100000
+  min_pool_size: 12        # NEW — rejects proposals with <12 vocab-present words per pool

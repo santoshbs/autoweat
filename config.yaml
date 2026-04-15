@@ -1,0 +1,211 @@
+# ============================================================================
+# AutoWEAT config
+# Every knob in one place. Edit freely and restart the daemon.
+# ============================================================================
+
+# Deterministic seed for the RNG that controls target downsampling + sampled
+# permutations. Proposal determinism is controlled by proposer.sampling.seed.
+seed: 20260410
+
+# How often to propose a new test, in seconds.
+interval_seconds: 0
+
+# Hard cap on iterations. Set to 0 or omit to run forever.
+max_iterations: 10
+
+# ---------- LLM proposer ----------
+#
+# Three thinking-mode idioms are supported. Pick ONE preset below by leaving
+# its block uncommented and commenting the others. All three were verified
+# against current model documentation as of April 2026.
+#
+# `thinking_style` tells AutoWEAT which mechanism the model uses:
+#   gpt-oss → "Reasoning: <effort>" injected as the first line of the system prompt
+#   qwen3   → Ollama's top-level `think: true|false` API field
+#   gemma4  → "<|think|>" control token injected as the first line of the system prompt
+#   none    → no thinking control; defaults apply (llama3, mistral, etc.)
+#
+# `thinking_effort` interpretation:
+#   gpt-oss style: must be "low", "medium", or "high"
+#   qwen3 style:   any truthy value → think=true; "off"/"false"/"no" → think=false
+#   gemma4 style:  same truthy logic as qwen3; truthy → token included
+#   none style:    ignored
+#
+# `max_json_retries` is global — Qwen3.5 in particular sometimes returns
+# malformed JSON on the first try and succeeds on the second.
+
+# ─── PRESET A: gpt-oss:120b on reasoning=high (DEFAULT) ────────────────────
+#proposer:
+#  model: "gpt-oss:20b" #"gpt-oss:120b"
+#  host: "http://localhost:11434"
+#  persona_path: "persona.md"
+#  thinking_style: "gpt-oss"
+#  thinking_effort: "high"
+#  max_json_retries: 3
+#  # OpenAI's official recommendation for gpt-oss:
+#  #   https://github.com/openai/gpt-oss#recommended-sampling-parameters
+#  # Ollama's default top_p is 0.9 — must override to 1.0 explicitly.
+#  # top_k=0 disables top-k truncation (HF transformers default of 50
+#  # silently degrades gpt-oss output if left unspecified).
+#  sampling:
+#    temperature: 1.0
+#    top_p: 1.0
+#    top_k: 0
+#    num_ctx: 32768
+#    repeat_penalty: 1.0
+
+# ─── PRESET B: qwen3:32b with thinking on ─────────────────────────────────
+# Qwen3 (April 2025 release). To use, comment out the gpt-oss preset above
+# and uncomment this whole block.
+#
+# proposer:
+#   model: "qwen3:32b"
+#   host: "http://localhost:11434"
+#   persona_path: "persona.md"
+#   thinking_style: "qwen3"
+#   thinking_effort: "high"        # any truthy value enables Ollama's `think: true`
+#   max_json_retries: 3
+#   # Qwen3 thinking-mode recommendations (Qwen team, April 2025):
+#   sampling:
+#     temperature: 0.6
+#     top_p: 0.95
+#     top_k: 20
+#     min_p: 0.0
+#     num_ctx: 32768               # qwen3 supports 32k natively, more with rope
+#     repeat_penalty: 1.0          # disable; presence_penalty does the work
+#     presence_penalty: 1.5
+
+# ─── PRESET C: qwen3.5:35b with thinking on ───────────────────────────────
+# Qwen3.5 (late-2025 hybrid Gated-Delta-Net + MoE). Uses different defaults
+# from Qwen3 — temperature is HIGHER for thinking mode, not lower.
+# IMPORTANT: do not switch AutoWEAT to /api/chat for this model — it hangs
+# when a system role message is included. /api/generate (which is what
+# AutoWEAT already uses) avoids the hang.
+#
+proposer:
+   model: "qwen3.5:27b"
+   host: "http://localhost:11434"
+   persona_path: "persona.md"
+   thinking_style: "qwen3"        # same Ollama `think` field as qwen3
+   thinking_effort: "high"
+   max_json_retries: 3
+   # Qwen3.5 thinking-mode recommendations (Qwen team, late 2025):
+   sampling:
+     temperature: 1.0
+     top_p: 0.95
+     top_k: 20
+     min_p: 0.0
+     num_ctx: 32768
+     repeat_penalty: 1.0
+     presence_penalty: 1.5
+
+# ─── PRESET D: gemma4:31b with thinking on ────────────────────────────────
+# Gemma 4 (Google DeepMind, April 2026). 31B dense or 26b-a4b MoE.
+# Built from Gemini 3 research, Apache 2.0, native system prompt support,
+# 256k context. Currently #3 on Arena AI for open models. Comment out the
+# gpt-oss preset above and uncomment this whole block.
+#
+# Gemma 4 has its OWN thinking idiom: a literal "<|think|>" control token
+# at the start of the system prompt enables reasoning. No "Reasoning:"
+# line, no API `think` field — just the token. AutoWEAT handles this when
+# thinking_style: gemma4.
+#
+#proposer:
+#   model: "gemma4:31b-it-q8_0"            # or "gemma4:26b" for the faster MoE
+#   host: "http://localhost:11434"
+#   persona_path: "persona.md"
+#   thinking_style: "gemma4"
+#   thinking_effort: "on"          # any truthy value enables <|think|>; "off" disables
+#   max_json_retries: 3
+#   # Recommended Gemma 4 sampling (Unsloth + Google AI for Developers):
+#   sampling:
+#     temperature: 1.0
+#     top_p: 0.95
+#     top_k: 64                    # NOTE: 64, not 0 or 20 — Gemma-specific
+#     num_ctx: 32768               # 256k available; 32k is plenty for AutoWEAT
+#     repeat_penalty: 1.0
+
+# ─── PRESET E: llama3.1:8b (no thinking, fast baseline) ───────────────────
+# Useful for comparing proposal quality between a small non-reasoning model
+# and the bigger thinkers.
+#
+# proposer:
+#   model: "llama3.1:8b"
+#   host: "http://localhost:11434"
+#   persona_path: "persona.md"
+#   thinking_style: "none"
+#   max_json_retries: 3
+#   sampling:
+#     temperature: 0.9
+#     top_p: 0.95
+#     top_k: 40
+#     num_ctx: 8192
+#     repeat_penalty: 1.1
+
+# ─── PRESET F: nemotron-cascade-2:30b (NVIDIA, March 2026) ────────────────
+# 30B MoE with 3B active params, hybrid Mamba-2 + Transformer architecture
+# from NVIDIA. Strong reasoning, IMO/IOI gold medal performance. Uses
+# Ollama's `think: true` field (qwen3 thinking_style). 256K context
+# native, but we use 32K to keep VRAM footprint sane.
+#
+# To use, comment out whichever preset is currently active above and
+# uncomment this whole block. First time, run on the Ubuntu box:
+#   ollama pull nemotron-cascade-2:30b
+#
+# Source recommendations:
+#   - HuggingFace model card: temperature=1.0, top_p=0.95
+#   - Ollama params block: {"temperature": 1, "top_p": 0.95}
+#   - arXiv 2603.19220: temperature=1.0, top_p in {0.95, 1.0}
+#   - Chat template: ChatML, thinking wrapped in <think>...</think>
+#
+#proposer:
+#  model: "nemotron-cascade-2:latest"
+#  host: "http://localhost:11434"
+#  persona_path: "persona.md"
+#  thinking_style: "qwen3"        # Ollama's `think: true` field — same as qwen3.x
+#  thinking_effort: "high"        # any truthy value enables think=true; "off" disables
+#  max_json_retries: 3
+#  # NVIDIA's recommended sampling (HuggingFace + Ollama defaults):
+#  sampling:
+#    temperature: 1.0
+#    top_p: 0.95
+#    top_k: 0                     # NVIDIA does not specify; 0 = no truncation (matches gpt-oss style)
+#    num_ctx: 32768               # 256k available; 32k is plenty for AutoWEAT
+#    repeat_penalty: 1.0          # NVIDIA does not specify; disable
+
+
+# ---------- embedding backend ----------
+# Default: gensim (Caliskan-faithful). Switch to ollama for LLM embeddings.
+embedding:
+  backend: "gensim"     # "gensim" or "ollama"
+
+  # --- gensim options ---
+  # Path to a word2vec-format file. GloVe: download the .txt and convert once,
+  # or point directly at a .vec / .bin. Examples:
+  #   ~/embeddings/GoogleNews-vectors-negative300.bin        (Caliskan 2017 original)
+  #   ~/embeddings/glove.840B.300d.w2v.txt
+  path: "/home/santoshbs/_embeddings/dolma.2024.300d.kv"
+  #  binary: false          # auto-detected from extension if omitted
+  # limit: 500000       # cap vocab size to speed up loading
+
+  # --- ollama options (used when backend == "ollama") ---
+  # model: "nomic-embed-text"
+  # host: "http://localhost:11434"
+  # cache_path: "data/ollama_embed_cache.json"
+
+# ---------- WEAT computer ----------
+weat:
+  # For |X|=|Y| <= this, enumerate all C(2n, n) partitions exactly.
+  # Caliskan et al. used exact for the smaller tests, sampled for the larger.
+  exact_threshold: 12
+  # Monte Carlo sample size when |X|=|Y| > exact_threshold.
+  max_permutations: 100000
+  min_pool_size: 12
+  min_pool_size: 12
+
+# ---------- site metadata ----------
+site:
+  title: "AutoWEAT"
+  subtitle: "An autonomous bias landscape"
+  author: "Santosh B. Srinivas"
+  github_url: "https://github.com/santoshbs/autoweat"

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoWEAT — landscape</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --ink-1: #1c1c1c;
+    --ink-2: #4a4a4a;
+    --ink-3: #8a8a8a;
+    --rule: #d6cdb8;
+    --accent: #5d2018;
+    --pos: #6b4226;
+    --neg: #2c4858;
+    --null: #b8a98a;
+    --font-serif: "Source Serif 4", Georgia, serif;
+    --font-mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .frame {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 48px 24px;
+  }
+  header {
+    flex-shrink: 0;
+    margin-bottom: 24px;
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 6px;
+  }
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 38px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    display: inline;
+  }
+  h1 em { font-style: italic; font-weight: 400; }
+  .lede {
+    display: inline;
+    margin-left: 16px;
+    font-size: 15px;
+    color: var(--ink-3);
+    font-style: italic;
+  }
+  #scatter-wrap {
+    flex: 1;
+    position: relative;
+    min-height: 400px;
+  }
+  svg { width: 100%; height: 100%; display: block; }
+  .axis text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--ink-3);
+  }
+  .axis line, .axis path { stroke: var(--rule); }
+  .axis-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: var(--ink-2);
+  }
+  .point {
+    cursor: pointer;
+    transition: r 0.15s ease;
+  }
+  .point:hover { r: 9; }
+  .threshold {
+    stroke: var(--rule);
+    stroke-width: 1;
+    stroke-dasharray: 3,3;
+  }
+  .threshold-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--ink-3);
+    letter-spacing: 0.05em;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    background: #fdfaf2;
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    padding: 18px 22px;
+    max-width: 380px;
+    font-family: var(--font-serif);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    z-index: 100;
+  }
+  .tooltip.visible { opacity: 1; }
+  .tooltip .tt-domain {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .tooltip .tt-stats {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+  .tooltip .tt-stats strong { color: var(--ink-1); font-weight: 600; }
+  .tooltip .tt-obs {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-1);
+    margin: 0 0 8px;
+    font-weight: 500;
+  }
+  .tooltip .tt-contrast {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+
+  footer {
+    flex-shrink: 0;
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    display: flex;
+    justify-content: space-between;
+  }
+  footer a { color: inherit; text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .frame { padding: 24px 20px 16px; }
+    h1 { font-size: 28px; display: block; }
+    .lede { display: block; margin: 4px 0 0; }
+    footer { flex-direction: column; gap: 8px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <header>
+    <p class="kicker">An Autonomous Research Observatory</p>
+    <h1>Auto<em>WEAT</em></h1>
+    <span class="lede">Each dot is a word-embedding bias test. Hover to read.</span>
+  </header>
+
+  <div id="scatter-wrap">
+    <svg id="scatter"></svg>
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <footer>
+    <span><span id="m-count">—</span> tests · last update <span id="m-when">—</span> · embedding dolma 2024</span>
+    <span><a href="https://github.com/santoshbs/autoweat">source</a></span>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmtD = d => (d >= 0 ? "+" : "") + d.toFixed(3);
+const fmtP = p => p < 0.001 ? "<.001" : p.toFixed(3);
+
+function relDate(iso) {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+fetch("./feed.json")
+  .then(r => r.json())
+  .then(feed => {
+    feed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("m-count").textContent = feed.length;
+    $("m-when").textContent = feed.length ? relDate(feed[0].timestamp) : "—";
+
+    if (!feed.length) return;
+
+    const wrap = $("scatter-wrap");
+    const W = wrap.clientWidth;
+    const H = wrap.clientHeight;
+    const margin = { top: 20, right: 36, bottom: 56, left: 56 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+
+    const svg = d3.select("#scatter").attr("viewBox", `0 0 ${W} ${H}`);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Scales: x = effect size (-2 to +2), y = -log10(p)
+    const x = d3.scaleLinear().domain([-2, 2]).range([0, innerW]);
+    const yMax = Math.max(4, d3.max(feed, d => -Math.log10(Math.max(d.p_value, 1e-10))));
+    const y = d3.scaleLinear().domain([0, yMax * 1.05]).range([innerH, 0]);
+
+    // Axes
+    g.append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${innerH})`)
+      .call(d3.axisBottom(x).ticks(9).tickFormat(d3.format("+.1f")));
+    g.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y).ticks(5));
+
+    // Axis labels
+    g.append("text")
+      .attr("class", "axis-label")
+      .attr("x", innerW / 2)
+      .attr("y", innerH + 42)
+      .attr("text-anchor", "middle")
+      .text("EFFECT SIZE  d");
+    g.append("text")
+      .attr("class", "axis-label")
+      .attr("transform", `translate(-42,${innerH/2}) rotate(-90)`)
+      .attr("text-anchor", "middle")
+      .text("−log₁₀ p");
+
+    // p = 0.05 threshold line
+    const pThresh = -Math.log10(0.05);
+    g.append("line")
+      .attr("class", "threshold")
+      .attr("x1", 0).attr("x2", innerW)
+      .attr("y1", y(pThresh)).attr("y2", y(pThresh));
+    g.append("text")
+      .attr("class", "threshold-label")
+      .attr("x", innerW - 4)
+      .attr("y", y(pThresh) - 4)
+      .attr("text-anchor", "end")
+      .text("p = 0.05");
+
+    // d = 0 vertical line
+    g.append("line")
+      .attr("class", "threshold")
+      .attr("x1", x(0)).attr("x2", x(0))
+      .attr("y1", 0).attr("y2", innerH);
+
+    // Points
+    const dColor = d => Math.abs(d) < 0.2 ? "#b8a98a" : (d > 0 ? "#6b4226" : "#2c4858");
+
+    g.selectAll(".point")
+      .data(feed)
+      .enter()
+      .append("circle")
+      .attr("class", "point")
+      .attr("cx", d => x(Math.max(-2, Math.min(2, d.effect_size))))
+      .attr("cy", d => y(-Math.log10(Math.max(d.p_value, 1e-10))))
+      .attr("r", 6)
+      .attr("fill", d => dColor(d.effect_size))
+      .attr("fill-opacity", 0.85)
+      .attr("stroke", "#1c1c1c")
+      .attr("stroke-width", 0.5)
+      .on("mouseenter", (event, t) => showTooltip(event, t))
+      .on("mouseleave", hideTooltip);
+
+    function showTooltip(event, t) {
+      const tt = $("tooltip");
+      const headline = t.observation || t.hypothesis || "";
+      const dStr = fmtD(t.effect_size);
+      const pStr = fmtP(t.p_value);
+      tt.innerHTML = `
+        <div class="tt-domain">${escapeHtml(t.domain)}</div>
+        <div class="tt-stats">d = <strong>${dStr}</strong> · p = <strong>${pStr}</strong> · n = <strong>${t.n.X}</strong></div>
+        <p class="tt-obs">${escapeHtml(headline)}</p>
+        <div class="tt-contrast">${escapeHtml(t.labels.X)} vs ${escapeHtml(t.labels.Y)} · ${escapeHtml(t.labels.A)} vs ${escapeHtml(t.labels.B)}</div>
+      `;
+      tt.classList.add("visible");
+      const rect = wrap.getBoundingClientRect();
+      const ttRect = tt.getBoundingClientRect();
+      let left = event.clientX - rect.left + 14;
+      let top = event.clientY - rect.top + 14;
+      if (left + ttRect.width > wrap.clientWidth) left = event.clientX - rect.left - ttRect.width - 14;
+      if (top + ttRect.height > wrap.clientHeight) top = event.clientY - rect.top - ttRect.height - 14;
+      tt.style.left = left + "px";
+      tt.style.top = top + "px";
+    }
+    function hideTooltip() {
+      $("tooltip").classList.remove("visible");
+    }
+  })
+  .catch(err => {
+    $("scatter-wrap").innerHTML = `<p style="padding: 40px; color: var(--accent); font-family: var(--font-serif);">Failed to load feed.json: ${err.message}<br><br>Are you serving via http? Try <code>python -m http.server 8000</code> from this directory.</p>`;
+  });
+</script>
+</body>
+</html>

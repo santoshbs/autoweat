@@ -1,0 +1,674 @@
+[
+  {
+    "id": "a3fa51138e2f",
+    "timestamp": "2026-04-10T16:14:20.798623+00:00",
+    "domain": "organizational behavior",
+    "hypothesis": "Corporate text corpora embed stronger associations between market-oriented organizational forms and efficiency-related attributes than with solidarity-related attributes, while community-oriented forms show the reverse pattern.",
+    "rationale": "Drawing on Friedland & Alford's (1991) institutional logics framework, this tests whether language models encode distinct evaluative schemas for market vs community logics. Market logic emphasizes private interests and competition; community logic emphasizes public interest and participation. If pretrained embeddings reflect corporate discourse, market terms should align with growth/efficiency lexicons rather than solidarity lexicons.",
+    "labels": {
+      "X": "market forms",
+      "Y": "community forms",
+      "A": "efficiency attributes",
+      "B": "solidarity attributes"
+    },
+    "effect_size": 1.7008176184978063,
+    "p_value": 0.0,
+    "test_statistic": 1.316733870328346,
+    "n": {
+      "X": 10,
+      "Y": 10,
+      "A": 10,
+      "B": 10
+    },
+    "n_permutations": 184756,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "profit",
+        "capital",
+        "stock",
+        "share",
+        "dividend",
+        "equity",
+        "venture",
+        "market",
+        "revenue",
+        "trade"
+      ],
+      "Y_used": [
+        "community",
+        "welfare",
+        "charity",
+        "public",
+        "service",
+        "mission",
+        "volunteer",
+        "member",
+        "donation",
+        "fund"
+      ],
+      "A_used": [
+        "efficiency",
+        "growth",
+        "scale",
+        "yield",
+        "return",
+        "output",
+        "value",
+        "speed",
+        "productivity",
+        "wealth"
+      ],
+      "B_used": [
+        "trust",
+        "care",
+        "support",
+        "sharing",
+        "mutual",
+        "collective",
+        "safety",
+        "fairness",
+        "justice",
+        "belong"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "per_word_s": {
+      "profit": 0.06050543054032176,
+      "capital": 0.030796273808530117,
+      "stock": 0.0863132204861653,
+      "share": -0.032534399358821964,
+      "dividend": 0.08263544779190612,
+      "equity": -0.002742780351604135,
+      "venture": -0.013000200188874489,
+      "market": 0.0791316300687237,
+      "revenue": 0.09554278816953032,
+      "trade": 0.016529651967893244,
+      "community": -0.12649670644203392,
+      "welfare": -0.09166274128470553,
+      "charity": -0.1323109026409885,
+      "public": -0.10060585316675974,
+      "service": -0.04604393673155582,
+      "mission": -0.05512977605531644,
+      "volunteer": -0.1299950419590074,
+      "member": -0.1334319532467978,
+      "donation": -0.06350753153780897,
+      "fund": -0.03437236432960178
+    },
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:122b",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 0,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
+  },
+  {
+    "id": "80b80daa3233",
+    "timestamp": "2026-04-10T16:26:49.972157+00:00",
+    "domain": "science and technology studies",
+    "hypothesis": "Scientific concepts are embedded closer to knowledge-seeking attributes, whereas engineering terms are embedded closer to functional utility attributes.",
+    "rationale": "Grounded in the STS distinction between the logic of scientific discovery (explaining nature) and technological design (intervening in nature). This tests if this epistemic divide is reflected in general language associations found in pre-trained vectors.",
+    "labels": {
+      "X": "Scientific concepts",
+      "Y": "Engineering objects",
+      "A": "Knowledge seeking",
+      "B": "Functional utility"
+    },
+    "effect_size": 1.4429591250246534,
+    "p_value": 0.0004330035289787612,
+    "test_statistic": 0.4798503713146053,
+    "n": {
+      "X": 10,
+      "Y": 10,
+      "A": 10,
+      "B": 10
+    },
+    "n_permutations": 184756,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "atom",
+        "force",
+        "gene",
+        "cell",
+        "element",
+        "energy",
+        "wave",
+        "mass",
+        "light",
+        "heat"
+      ],
+      "Y_used": [
+        "machine",
+        "motor",
+        "engine",
+        "gear",
+        "part",
+        "pipe",
+        "box",
+        "wire",
+        "unit",
+        "chip"
+      ],
+      "A_used": [
+        "know",
+        "learn",
+        "study",
+        "think",
+        "truth",
+        "fact",
+        "idea",
+        "sense",
+        "mind",
+        "reason"
+      ],
+      "B_used": [
+        "build",
+        "fix",
+        "make",
+        "use",
+        "solve",
+        "run",
+        "drive",
+        "help",
+        "act",
+        "serve"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "per_word_s": {
+      "atom": 0.019673157648166628,
+      "force": 0.013404200732448635,
+      "gene": 0.04801633766365915,
+      "cell": 0.0010486927624274722,
+      "element": 0.028588916924106478,
+      "energy": 0.01085243847558992,
+      "wave": 0.02839536520027064,
+      "mass": 0.030112073893548863,
+      "light": 0.030729258068287524,
+      "heat": -0.01724203372042421,
+      "machine": -0.03609882555128885,
+      "motor": -0.04480469458275871,
+      "engine": -0.044151129387164034,
+      "gear": -0.020715311335166575,
+      "part": 0.05136850279385419,
+      "pipe": -0.04250898901388356,
+      "box": -0.03122019212792404,
+      "wire": -0.03954627370789465,
+      "unit": -0.04260871703452229,
+      "chip": -0.035986333719775665
+    },
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:122b",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 1,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
+  },
+  {
+    "id": "17234c785742",
+    "timestamp": "2026-04-10T16:33:27.754151+00:00",
+    "domain": "social psychology",
+    "hypothesis": "High-status decision-making roles are embedded closer to competence-related attributes, whereas caregiving roles are embedded closer to warmth-related attributes in word embeddings.",
+    "rationale": "This test operationalizes role congruity theory (Eagly & Karau, 2002) and status characteristics theory (Berger et al., 1977). The hypothesis predicts that organizational positions emphasizing authority and control will associate with competence-adjacent words in pretrained vectors, while roles centering interpersonal care will associate with warmth-adjacent words. A null result would challenge the universality of these implicit status attributions.",
+    "labels": {
+      "X": "decision-making roles",
+      "Y": "caregiving roles",
+      "A": "competence attributes",
+      "B": "warmth attributes"
+    },
+    "effect_size": 1.4223547819457976,
+    "p_value": 0.00024356448505055315,
+    "test_statistic": 0.7289738152078201,
+    "n": {
+      "X": 10,
+      "Y": 10,
+      "A": 10,
+      "B": 10
+    },
+    "n_permutations": 184756,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "chief",
+        "director",
+        "manager",
+        "executive",
+        "leader",
+        "head",
+        "boss",
+        "supervisor",
+        "officer",
+        "president"
+      ],
+      "Y_used": [
+        "nurse",
+        "teacher",
+        "aide",
+        "helper",
+        "assistant",
+        "caretaker",
+        "counselor",
+        "therapist",
+        "attendant",
+        "coach"
+      ],
+      "A_used": [
+        "capable",
+        "skilled",
+        "competent",
+        "smart",
+        "strong",
+        "rational",
+        "logical",
+        "efficient",
+        "driven",
+        "ambitious"
+      ],
+      "B_used": [
+        "kind",
+        "warm",
+        "gentle",
+        "caring",
+        "empathetic",
+        "compassionate",
+        "sympathetic",
+        "tender",
+        "nurturing",
+        "supportive"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "per_word_s": {
+      "chief": 0.08653253544986483,
+      "director": 0.06912908176283211,
+      "manager": 0.10855868596905027,
+      "executive": 0.0976065133086933,
+      "leader": 0.10776439380523595,
+      "head": 0.04337866905789134,
+      "boss": 0.07030929397793184,
+      "supervisor": 0.06347614257781942,
+      "officer": 0.08165705769672543,
+      "president": 0.06438118186872188,
+      "nurse": -0.036669828600689736,
+      "teacher": 0.01926784937976289,
+      "aide": 0.013585443872733027,
+      "helper": 0.06274559190731699,
+      "assistant": 0.07936866373262652,
+      "caretaker": -0.02754123481881332,
+      "counselor": -0.03521531740105538,
+      "therapist": -0.07284182240011361,
+      "attendant": 0.007596331715379712,
+      "coach": 0.05352406287979927
+    },
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:122b",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 2,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
+  },
+  {
+    "id": "3aa15bbf0164",
+    "timestamp": "2026-04-10T16:44:21.867813+00:00",
+    "domain": "sociology",
+    "hypothesis": "Luxury material terms embed closer to exclusivity attributes than to utility attributes, reflecting Veblenian conspicuous consumption rather than functional value.",
+    "rationale": "Grounded in Thorstein Veblen's theory of conspicuous consumption and Bourdieu's concept of distinction. This tests whether semantic representations prioritize social signaling over physical utility when encoding material culture.",
+    "labels": {
+      "X": "Luxury materials",
+      "Y": "Utility materials",
+      "A": "Exclusivity attributes",
+      "B": "Utility attributes"
+    },
+    "effect_size": 1.7916620670420778,
+    "p_value": 0.0,
+    "test_statistic": 0.737287706290265,
+    "n": {
+      "X": 8,
+      "Y": 8,
+      "A": 8,
+      "B": 8
+    },
+    "n_permutations": 12870,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "gold",
+        "silver",
+        "silk",
+        "pearl",
+        "jade",
+        "bronze",
+        "marble",
+        "crystal"
+      ],
+      "Y_used": [
+        "iron",
+        "steel",
+        "wood",
+        "stone",
+        "clay",
+        "wool",
+        "cotton",
+        "paper"
+      ],
+      "A_used": [
+        "elite",
+        "luxury",
+        "rare",
+        "exclusive",
+        "premium",
+        "prized",
+        "fancy",
+        "unique"
+      ],
+      "B_used": [
+        "sturdy",
+        "plain",
+        "common",
+        "simple",
+        "useful",
+        "basic",
+        "solid",
+        "daily"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "per_word_s": {
+      "gold": 0.04328720130999231,
+      "silver": 0.040668170190781616,
+      "silk": 0.027029551434698984,
+      "pearl": 0.06400694586133693,
+      "jade": 0.04920086969904591,
+      "bronze": 0.03229627887324482,
+      "marble": 0.02016560253701738,
+      "crystal": 0.012235662089569721,
+      "iron": -0.06947916307007251,
+      "steel": -0.04886432910925431,
+      "wood": -0.054083354353990476,
+      "stone": -0.03911039200848632,
+      "clay": -0.0625673677552499,
+      "wool": -0.019248253302618035,
+      "cotton": -0.035238823745936676,
+      "paper": -0.11980574094896901
+    },
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:122b",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 3,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
+  },
+  {
+    "id": "ef7efbcd81b8",
+    "timestamp": "2026-04-10T16:51:08.000288+00:00",
+    "domain": "sociology",
+    "hypothesis": "Organizational domains associated with market exchange embed closer to profit-oriented attributes than to civic-duty attributes, whereas social service domains show the opposite pattern, reflecting institutional logics embedded in discourse.",
+    "rationale": "Based on Friedland & Alford's (1991) theory of institutional logics—distinct belief systems that organize practices across different societal spheres. Market logic emphasizes exchange value and profit; civic/association logic emphasizes collective welfare and service obligation. Semantic associations should reflect these embedded logics in pretrained text corpora.",
+    "labels": {
+      "X": "commercial domains",
+      "Y": "civic domains",
+      "A": "market attributes",
+      "B": "service attributes"
+    },
+    "effect_size": 1.7798762365112615,
+    "p_value": 0.0,
+    "test_statistic": 1.4918994368319638,
+    "n": {
+      "X": 10,
+      "Y": 10,
+      "A": 10,
+      "B": 10
+    },
+    "n_permutations": 184756,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "business",
+        "trade",
+        "shop",
+        "firm",
+        "industry",
+        "vendor",
+        "store",
+        "merchant",
+        "company",
+        "enterprise"
+      ],
+      "Y_used": [
+        "charity",
+        "union",
+        "club",
+        "collective",
+        "cooperative",
+        "association",
+        "foundation",
+        "advocacy",
+        "solidarity",
+        "service"
+      ],
+      "A_used": [
+        "profit",
+        "revenue",
+        "growth",
+        "efficiency",
+        "scale",
+        "market",
+        "competitive",
+        "aggressive",
+        "investment",
+        "value"
+      ],
+      "B_used": [
+        "duty",
+        "mission",
+        "cause",
+        "welfare",
+        "community",
+        "solidarity",
+        "advocacy",
+        "service",
+        "commitment",
+        "collective"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "per_word_s": {
+      "business": 0.06420805897287396,
+      "trade": 0.09451368363079315,
+      "shop": 0.018382695151796802,
+      "firm": 0.07484356114485713,
+      "industry": 0.10128296753567845,
+      "vendor": 0.06764228879900602,
+      "store": 0.048642998770252466,
+      "merchant": 0.04448806735225308,
+      "company": 0.07923395358371921,
+      "enterprise": 0.055347921995488214,
+      "charity": -0.09514648247404178,
+      "union": -0.09304877185184168,
+      "club": -0.03764511679130478,
+      "collective": -0.0848717889496109,
+      "cooperative": -0.039134967830729894,
+      "association": -0.06464645836394767,
+      "foundation": -0.07409794095535926,
+      "advocacy": -0.14323021727449492,
+      "solidarity": -0.19085138274298097,
+      "service": -0.020640112660933463
+    },
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:122b",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 4,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
+  },
+  {
+    "id": "7d314aafa867",
+    "timestamp": "2026-04-10T17:01:19.056774+00:00",
+    "domain": "organizational behavior",
+    "hypothesis": "Terms denoting exploratory organizational activities associate with uncertainty and change attributes, while terms denoting exploitative activities associate with stability and safety attributes, reflecting the exploration-exploitation tension.",
+    "rationale": "Based on March's (1991) theory of organizational learning, organizations balance exploitation (refining existing competencies) with exploration (searching for new possibilities). This test probes whether pretrained embeddings capture this fundamental structural tension in the semantic space of work terms.",
+    "labels": {
+      "X": "exploitative tasks",
+      "Y": "exploratory tasks",
+      "A": "stability attributes",
+      "B": "change attributes"
+    },
+    "effect_size": 1.6545139831414293,
+    "p_value": 0.0,
+    "test_statistic": 0.5339248622161044,
+    "n": {
+      "X": 8,
+      "Y": 8,
+      "A": 8,
+      "B": 8
+    },
+    "n_permutations": 12870,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "routine",
+        "standard",
+        "protocol",
+        "manual",
+        "procedure",
+        "task",
+        "shift",
+        "clerical"
+      ],
+      "Y_used": [
+        "innovation",
+        "design",
+        "strategy",
+        "vision",
+        "creative",
+        "experiment",
+        "research",
+        "invention"
+      ],
+      "A_used": [
+        "predictable",
+        "stable",
+        "fixed",
+        "safe",
+        "regular",
+        "steady",
+        "certain",
+        "solid"
+      ],
+      "B_used": [
+        "risky",
+        "novel",
+        "dynamic",
+        "uncertain",
+        "open",
+        "shifting",
+        "new",
+        "bold"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "per_word_s": {
+      "routine": 0.09679750687717936,
+      "standard": 0.09509500730062126,
+      "protocol": 0.04274229976100896,
+      "manual": 0.051942184282818604,
+      "procedure": 0.058432342781567614,
+      "task": 0.023696662068235508,
+      "shift": 0.03652963924797781,
+      "clerical": 0.040042490792624064,
+      "innovation": -0.035943343396155236,
+      "design": 0.004213578202293511,
+      "strategy": 0.005626028358844626,
+      "vision": -0.018112951132834065,
+      "creative": -0.0454465038742069,
+      "experiment": 0.00448688725439661,
+      "research": -0.015371294439197047,
+      "invention": 0.011900869922787383
+    },
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:122b",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 5,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
+  }
+]

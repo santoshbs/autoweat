@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoWEAT</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --ink-1: #1c1c1c;
+    --ink-2: #4a4a4a;
+    --ink-3: #8a8a8a;
+    --rule: #d6cdb8;
+    --accent: #5d2018;
+    --pos: #6b4226;
+    --neg: #2c4858;
+    --null: #b8a98a;
+    --highlight: #fef8d4;
+    --font-serif: "Source Serif 4", Georgia, serif;
+    --font-mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+  }
+  header {
+    margin-bottom: 32px;
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px;
+  }
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+  }
+  h1 em { font-style: italic; font-weight: 400; }
+  .lede {
+    font-size: 18px;
+    color: var(--ink-2);
+    font-style: italic;
+    margin: 0 0 20px;
+    max-width: 580px;
+  }
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .meta span { margin-right: 22px; }
+  .meta strong { color: var(--ink-1); font-weight: 600; }
+
+  /* ─── Scatter ─────────────────────────────────────────── */
+  .scatter-section {
+    margin: 48px 0 56px;
+    padding: 0;
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 8px;
+  }
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    letter-spacing: -0.005em;
+  }
+  .section-sub {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--ink-3);
+    font-style: italic;
+    margin: 0 0 20px;
+  }
+  #scatter-wrap {
+    height: 380px;
+    position: relative;
+  }
+  svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .axis text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--ink-3);
+  }
+  .axis line, .axis path { stroke: var(--rule); }
+  .axis-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: var(--ink-2);
+  }
+  .point {
+    cursor: pointer;
+    transition: r 0.15s ease;
+  }
+  .point:hover { r: 9; }
+  .threshold {
+    stroke: var(--rule);
+    stroke-width: 1;
+    stroke-dasharray: 3,3;
+  }
+  .threshold-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--ink-3);
+  }
+
+  /* ─── Log entries ───────────────────────────────────── */
+  .log-section { margin-top: 24px; }
+  .entry {
+    border-top: 1px solid var(--rule);
+    padding: 36px 0;
+    transition: background-color 1.2s ease;
+  }
+  .entry:last-child { border-bottom: 1px solid var(--rule); }
+  .entry.highlight {
+    background-color: var(--highlight);
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    gap: 16px;
+  }
+  .entry-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .entry-stats {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .entry-stats .d { color: var(--ink-1); font-weight: 600; font-size: 13px; }
+  .entry-stats .d.pos { color: var(--pos); }
+  .entry-stats .d.neg { color: var(--neg); }
+  .entry-stats .d.null { color: var(--null); }
+  .entry-stats .sep { color: var(--rule); padding: 0 6px; }
+
+  .entry-domain {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .entry-contrast {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-bottom: 14px;
+  }
+  .entry-contrast .vs { color: var(--ink-3); }
+
+  .entry-observation {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--ink-1);
+    margin: 0 0 14px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .entry-interpretation {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin: 0 0 16px;
+    font-style: italic;
+  }
+  .entry-words {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    line-height: 1.7;
+    border-left: 2px solid var(--rule);
+    padding: 4px 0 4px 12px;
+  }
+  .entry-words .label {
+    display: inline-block;
+    width: 18px;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .legacy-note {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-top: 8px;
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    text-align: center;
+  }
+  footer a { color: inherit; text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 36px 20px 64px; }
+    h1 { font-size: 38px; }
+    .entry-observation { font-size: 19px; }
+    .entry-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+    #scatter-wrap { height: 300px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">An Autonomous Research Observatory</p>
+    <h1>Auto<em>WEAT</em></h1>
+    <p class="lede">A local language model proposes word-embedding bias tests. A locked script computes them. Below: the landscape so far, and every test as it was run.</p>
+    <div class="meta">
+      <span><strong id="m-count">—</strong> tests</span>
+      <span>last <strong id="m-when">—</strong></span>
+      <span>embedding <strong>dolma 2024</strong></span>
+    </div>
+  </header>
+
+  <section class="scatter-section">
+    <p class="section-label">Fig. 1</p>
+    <h2 class="section-title">The bias landscape</h2>
+    <p class="section-sub">Effect size against statistical significance. Click a point to jump to its entry below.</p>
+    <div id="scatter-wrap">
+      <svg id="scatter"></svg>
+    </div>
+  </section>
+
+  <section class="log-section">
+    <p class="section-label">Log</p>
+    <h2 class="section-title">All tests, newest first</h2>
+    <p class="section-sub">Each entry is one test the proposer ran. Scroll.</p>
+    <div id="entries"></div>
+  </section>
+
+  <footer>
+    <a href="https://github.com/santoshbs/autoweat">source</a> &middot; <a href="#">about</a>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmtD = d => (d >= 0 ? "+" : "") + d.toFixed(3);
+const fmtP = p => p < 0.001 ? "<.001" : p.toFixed(3);
+const dClass = d => Math.abs(d) < 0.2 ? "null" : (d > 0 ? "pos" : "neg");
+const dColor = d => Math.abs(d) < 0.2 ? "#b8a98a" : (d > 0 ? "#6b4226" : "#2c4858");
+
+function relDate(iso) {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+function relTime(iso) {
+  return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+fetch("./feed.json")
+  .then(r => r.json())
+  .then(feed => {
+    feed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("m-count").textContent = feed.length;
+    $("m-when").textContent = feed.length ? relDate(feed[0].timestamp) : "—";
+
+    if (!feed.length) {
+      $("entries").innerHTML = '<p style="color: var(--ink-3); font-style: italic;">No tests yet.</p>';
+      return;
+    }
+
+    renderScatter(feed);
+    renderEntries(feed);
+  })
+  .catch(err => {
+    $("entries").innerHTML = `<p style="color: var(--accent);">Failed to load feed.json: ${err.message}</p>`;
+  });
+
+function renderScatter(feed) {
+  const wrap = $("scatter-wrap");
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+  const margin = { top: 12, right: 24, bottom: 44, left: 48 };
+  const innerW = W - margin.left - margin.right;
+  const innerH = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#scatter").attr("viewBox", `0 0 ${W} ${H}`);
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([-2, 2]).range([0, innerW]);
+  const yMax = Math.max(4, d3.max(feed, d => -Math.log10(Math.max(d.p_value, 1e-10))));
+  const y = d3.scaleLinear().domain([0, yMax * 1.05]).range([innerH, 0]);
+
+  g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerH})`)
+    .call(d3.axisBottom(x).ticks(9).tickFormat(d3.format("+.1f")));
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(5));
+
+  g.append("text").attr("class", "axis-label")
+    .attr("x", innerW / 2).attr("y", innerH + 34).attr("text-anchor", "middle")
+    .text("EFFECT SIZE  d");
+  g.append("text").attr("class", "axis-label")
+    .attr("transform", `translate(-36,${innerH/2}) rotate(-90)`).attr("text-anchor", "middle")
+    .text("−log₁₀ p");
+
+  const pThresh = -Math.log10(0.05);
+  g.append("line").attr("class", "threshold")
+    .attr("x1", 0).attr("x2", innerW)
+    .attr("y1", y(pThresh)).attr("y2", y(pThresh));
+  g.append("text").attr("class", "threshold-label")
+    .attr("x", innerW - 4).attr("y", y(pThresh) - 4).attr("text-anchor", "end")
+    .text("p = 0.05");
+  g.append("line").attr("class", "threshold")
+    .attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", innerH);
+
+  g.selectAll(".point")
+    .data(feed)
+    .enter().append("circle")
+    .attr("class", "point")
+    .attr("cx", d => x(Math.max(-2, Math.min(2, d.effect_size))))
+    .attr("cy", d => y(-Math.log10(Math.max(d.p_value, 1e-10))))
+    .attr("r", 6)
+    .attr("fill", d => dColor(d.effect_size))
+    .attr("fill-opacity", 0.85)
+    .attr("stroke", "#1c1c1c")
+    .attr("stroke-width", 0.5)
+    .on("click", (event, d) => scrollToEntry(d.id));
+}
+
+function renderEntries(feed) {
+  const root = $("entries");
+  for (const t of feed) {
+    const headline = t.observation || t.hypothesis || "";
+    const body = t.interpretation || t.rationale || "";
+    const isLegacy = !t.observation;
+    const xUsed = (t.words?.X_used || []).join(" · ");
+    const yUsed = (t.words?.Y_used || []).join(" · ");
+
+    const div = document.createElement("article");
+    div.className = "entry";
+    div.id = `entry-${t.id}`;
+    div.innerHTML = `
+      <div class="entry-head">
+        <span class="entry-time">${relTime(t.timestamp)}</span>
+        <span class="entry-stats">
+          <span class="d ${dClass(t.effect_size)}">d&nbsp;=&nbsp;${fmtD(t.effect_size)}</span>
+          <span class="sep">·</span>
+          p&nbsp;=&nbsp;${fmtP(t.p_value)}
+          <span class="sep">·</span>
+          n&nbsp;=&nbsp;${t.n.X}
+        </span>
+      </div>
+      <div class="entry-domain">${escapeHtml(t.domain)}</div>
+      <div class="entry-contrast">
+        ${escapeHtml(t.labels.X)} <span class="vs">vs</span> ${escapeHtml(t.labels.Y)}
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        ${escapeHtml(t.labels.A)} <span class="vs">vs</span> ${escapeHtml(t.labels.B)}
+      </div>
+      <p class="entry-observation">${escapeHtml(headline)}</p>
+      ${body ? `<p class="entry-interpretation">${escapeHtml(body)}</p>` : ""}
+      <div class="entry-words">
+        <div><span class="label">X</span> ${escapeHtml(xUsed)}</div>
+        <div><span class="label">Y</span> ${escapeHtml(yUsed)}</div>
+      </div>
+      ${isLegacy ? '<div class="legacy-note">Legacy entry · deductive framing</div>' : ""}
+    `;
+    root.appendChild(div);
+  }
+}
+
+function scrollToEntry(id) {
+  const el = $(`entry-${id}`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("highlight");
+  setTimeout(() => el.classList.remove("highlight"), 1800);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoWEAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink-1: #1a1a1a;
+    --ink-2: #5a5a5a;
+    --ink-3: #9a9a9a;
+    --ink-4: #c8c8c8;
+    /* p-value pill colors */
+    --sig-bg: #1e3a5f;       /* deep navy for p < .05 */
+    --sig-fg: #ffffff;
+    --nonsig-bg: #ededed;    /* light grey for p >= .05 */
+    --nonsig-fg: #6a6a6a;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    /* Scroll-snap container — each test fills the viewport */
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  /* ─── Card (one test) ──────────────────────────────────────── */
+  .card {
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 24px;
+    position: relative;
+  }
+  .card-inner {
+    max-width: 560px;
+    width: 100%;
+  }
+
+  /* All content uses the base 16px font-size from html.
+     Hierarchy comes from weight, color, and whitespace. */
+
+  .domain {
+    color: var(--ink-3);
+    margin: 0 0 8px;
+    font-weight: 400;
+  }
+  .title {
+    color: var(--ink-1);
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 28px;
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+  .title-line {
+    display: block;
+  }
+  .title .vs { color: var(--ink-3); font-weight: 400; }
+  .title .sep {
+    color: var(--ink-4);
+    font-weight: 400;
+    padding: 0 8px;
+  }
+
+  .observation {
+    color: var(--ink-1);
+    font-weight: 400;
+    margin: 0 0 20px;
+    line-height: 1.55;
+  }
+  .interpretation {
+    color: var(--ink-2);
+    font-weight: 400;
+    margin: 0 0 36px;
+    line-height: 1.6;
+  }
+
+  /* ─── Stats row ────────────────────────────────────────────── */
+  .stats {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    color: var(--ink-3);
+    font-size: 14px;
+  }
+  .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+  }
+  .stat-label {
+    color: var(--ink-3);
+    font-size: 14px;
+  }
+  .stat-value {
+    color: var(--ink-1);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+  }
+  /* p-value pill — navy for significant, light grey for not */
+  .p-pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .p-pill.sig {
+    background: var(--sig-bg);
+    color: var(--sig-fg);
+  }
+  .p-pill.nonsig {
+    background: var(--nonsig-bg);
+    color: var(--nonsig-fg);
+  }
+
+  .legacy-mark {
+    margin-left: 10px;
+    color: var(--ink-4);
+    font-weight: 400;
+  }
+
+  /* ─── Chevron / nav at bottom ──────────────────────────────── */
+  .chevron {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--ink-4);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-family: inherit;
+  }
+  .chevron:hover {
+    color: var(--ink-2);
+    transform: translateX(-50%) translateY(2px);
+  }
+  .chevron:disabled {
+    color: var(--ink-4);
+    opacity: 0.3;
+    cursor: default;
+  }
+  .chevron:disabled:hover {
+    transform: translateX(-50%);
+  }
+
+  /* ─── Tiny meta in top right corner (UI chrome, stays small) ─ */
+  .corner-meta {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 400;
+    z-index: 10;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+  .corner-meta a {
+    color: var(--ink-3);
+    text-decoration: none;
+  }
+  .corner-meta a:hover { color: var(--ink-1); }
+  .corner-meta .pos {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  /* ─── Loading / error states ───────────────────────────────── */
+  .state {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* ─── Mobile ───────────────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .card { padding: 0 24px; }
+    .card-inner { max-width: 100%; }
+    .title { margin-bottom: 22px; }
+    .stats { flex-wrap: wrap; gap: 16px; }
+    .corner-meta { top: 16px; right: 18px; gap: 12px; font-size: 10px; }
+    .chevron { bottom: 18px; }
+  }
+
+  /* ─── Print ────────────────────────────────────────────────── */
+  @media print {
+    body { height: auto; overflow: visible; scroll-snap-type: none; }
+    .card { height: auto; page-break-after: always; padding: 1.5cm; }
+    .corner-meta, .chevron { display: none; }
+    .p-pill.sig { background: #000 !important; color: #fff !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="corner-meta">
+  <span><span id="m-count">—</span> tests</span>
+  <span class="pos" id="m-pos">—</span>
+  <a href="https://github.com/santoshbs/autoweat">source</a>
+</div>
+
+<div id="root">
+  <div class="state">Loading…</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const fmtD = d => (d >= 0 ? "+" : "") + d.toFixed(3);
+const fmtP = p => p < 0.001 ? "<.001" : p.toFixed(3);
+const isSig = p => p < 0.05;
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+let FEED = [];
+
+fetch("./feed.json")
+  .then(r => r.json())
+  .then(feed => {
+    FEED = feed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("m-count").textContent = FEED.length;
+    if (!FEED.length) {
+      $("root").innerHTML = '<div class="state">No tests yet. Start the daemon with <code>python run.py</code>.</div>';
+      return;
+    }
+    renderCards();
+    setupScrollObserver();
+  })
+  .catch(err => {
+    $("root").innerHTML = `<div class="state">Failed to load feed.json: ${err.message}<br>Are you serving via http? Try <code>python -m http.server 8000</code> from this directory.</div>`;
+  });
+
+function renderCards() {
+  const root = $("root");
+  root.innerHTML = "";
+
+  FEED.forEach((t, i) => {
+    const observation = t.observation || t.hypothesis || "";
+    const interpretation = t.interpretation || t.rationale || "";
+    const isLegacy = !t.observation;
+    const isLast = i === FEED.length - 1;
+    const sig = isSig(t.p_value);
+    const pillClass = sig ? "sig" : "nonsig";
+
+    const card = document.createElement("section");
+    card.className = "card";
+    card.id = `card-${i}`;
+    card.innerHTML = `
+      <div class="card-inner">
+        <p class="domain">${escapeHtml(t.domain)}${isLegacy ? '<span class="legacy-mark">· legacy</span>' : ''}</p>
+        <h1 class="title">
+          <span class="title-line">${escapeHtml(t.labels.X)} <span class="vs">vs</span> ${escapeHtml(t.labels.Y)}</span>
+          <span class="title-line">${escapeHtml(t.labels.A)} <span class="vs">vs</span> ${escapeHtml(t.labels.B)}</span>
+        </h1>
+        <p class="observation">${escapeHtml(observation)}</p>
+        ${interpretation ? `<p class="interpretation">${escapeHtml(interpretation)}</p>` : ""}
+        <div class="stats">
+          <span class="stat">
+            <span class="stat-label">d</span>
+            <span class="stat-value">${fmtD(t.effect_size)}</span>
+          </span>
+          <span class="stat">
+            <span class="stat-label">p</span>
+            <span class="p-pill ${pillClass}">${fmtP(t.p_value)}</span>
+          </span>
+          <span class="stat">
+            <span class="stat-label">n</span>
+            <span class="stat-value">${t.n.X}</span>
+          </span>
+        </div>
+      </div>
+      <button class="chevron" data-target="${i + 1}" ${isLast ? 'disabled' : ''} aria-label="Next test">↓</button>
+    `;
+    root.appendChild(card);
+  });
+
+  // Hook up chevron clicks
+  document.querySelectorAll(".chevron").forEach(btn => {
+    btn.onclick = () => {
+      const target = parseInt(btn.dataset.target);
+      const next = $(`card-${target}`);
+      if (next) next.scrollIntoView({ behavior: "smooth" });
+    };
+  });
+}
+
+// Watch which card is in view and update the position indicator
+function setupScrollObserver() {
+  const cards = document.querySelectorAll(".card");
+  const observer = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting && e.intersectionRatio > 0.5) {
+        const idx = parseInt(e.target.id.split("-")[1]);
+        $("m-pos").textContent = `${idx + 1} of ${FEED.length}`;
+      }
+    }
+  }, { threshold: [0.5] });
+
+  cards.forEach(c => observer.observe(c));
+}
+
+// Arrow key navigation
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") {
+    e.preventDefault();
+    const current = currentCardIndex();
+    if (current < FEED.length - 1) {
+      $(`card-${current + 1}`).scrollIntoView({ behavior: "smooth" });
+    }
+  } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+    e.preventDefault();
+    const current = currentCardIndex();
+    if (current > 0) {
+      $(`card-${current - 1}`).scrollIntoView({ behavior: "smooth" });
+    }
+  } else if (e.key === "Home") {
+    e.preventDefault();
+    $("card-0")?.scrollIntoView({ behavior: "smooth" });
+  } else if (e.key === "End") {
+    e.preventDefault();
+    $(`card-${FEED.length - 1}`)?.scrollIntoView({ behavior: "smooth" });
+  }
+});
+
+function currentCardIndex() {
+  const cards = document.querySelectorAll(".card");
+  let best = 0;
+  let bestRatio = 0;
+  cards.forEach((c, i) => {
+    const r = c.getBoundingClientRect();
+    const visible = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+    const ratio = visible / window.innerHeight;
+    if (ratio > bestRatio) {
+      bestRatio = ratio;
+      best = i;
+    }
+  });
+  return best;
+}
+</script>
+</body>
+</html>

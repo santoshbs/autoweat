@@ -1,0 +1,323 @@
+"""
+run.py — the AutoWEAT daemon (inductive, two-phase).
+
+AUTOWEAT_RUN_VERSION = "2026-04-11-sc-weat-correct"
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import random
+import subprocess
+import sys
+import time
+from collections import deque
+from datetime import datetime, timezone
+from pathlib import Path
+
+import yaml
+
+from autoweat.embeddings import load_backend
+from autoweat.proposer import OllamaProposer, Proposal
+from autoweat.weat import compute_weat
+
+
+AUTOWEAT_RUN_VERSION = "2026-04-11-sc-weat-correct"
+
+EFFECT_SIZE_CAP = 2.0   # Caliskan's observed ceiling; reject |d| >= this
+
+
+def load_config(path: str) -> dict:
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+
+def make_test_id(prop: Proposal, cfg: dict) -> str:
+    payload = json.dumps(
+        {
+            "X": sorted(prop.X), "Y": sorted(prop.Y),
+            "A": sorted(prop.A), "B": sorted(prop.B),
+            "backend": cfg["embedding"].get("backend", "gensim"),
+            "model_path": cfg["embedding"].get("path", cfg["embedding"].get("model", "")),
+        },
+        sort_keys=True,
+    )
+    return hashlib.sha1(payload.encode()).hexdigest()[:12]
+
+
+def load_feed(path: Path) -> list[dict]:
+    if path.exists():
+        with path.open() as f:
+            return json.load(f)
+    return []
+
+
+def save_feed(path: Path, feed: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    with tmp.open("w") as f:
+        json.dump(feed, f, indent=2, ensure_ascii=False)
+    tmp.replace(path)
+
+
+def git_push(repo_root: Path, msg: str) -> None:
+    try:
+        subprocess.run(["git", "-C", str(repo_root), "add", "docs/feed.json"], check=True)
+        diff = subprocess.run(
+            ["git", "-C", str(repo_root), "diff", "--cached", "--quiet"],
+        )
+        if diff.returncode == 0:
+            return
+        subprocess.run(
+            ["git", "-C", str(repo_root), "commit", "-m", msg],
+            check=True,
+        )
+        subprocess.run(["git", "-C", str(repo_root), "push"], check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"  [git] skipped: {e}", file=sys.stderr)
+
+
+def build_history_slice(feed: list[dict], history_size: int) -> list[dict]:
+    if history_size == 0 or not feed:
+        return []
+    if history_size < 0:
+        return list(reversed(feed))
+    return list(reversed(feed[-history_size:]))
+
+
+def one_iteration(
+    proposer: OllamaProposer,
+    backend,
+    cfg: dict,
+    rng: random.Random,
+    recent_domains: deque,
+    feed: list[dict],
+    repo_root: Path,
+) -> dict | None:
+    history_size = cfg["proposer"].get("history_size", 30)
+    history_include_words = cfg["proposer"].get("history_include_words", False)
+    history_slice = build_history_slice(feed, history_size)
+
+    print("→ Phase 1: requesting proposal…")
+    print(f"  history shown to LLM: {len(history_slice)} prior tests"
+          f"{' (with word lists)' if history_include_words and history_slice else ''}")
+    try:
+        prop = proposer.propose(
+            recent_domains=list(recent_domains),
+            history=history_slice,
+            history_include_words=history_include_words,
+        )
+    except Exception as e:
+        print(f"  proposal failed: {e}")
+        return None
+
+    print(f"  domain:   {prop.domain}")
+    print(f"  contrast: {prop.contrast_label}")
+    print(f"  X={prop.X_label} ({len(prop.X)})   Y={prop.Y_label} ({len(prop.Y)})")
+    print(f"  A={prop.A_label} ({len(prop.A)})   B={prop.B_label} ({len(prop.B)})")
+
+    if hasattr(backend, "prime_vocab"):
+        backend.prime_vocab(prop.X + prop.Y + prop.A + prop.B)
+
+    try:
+        result = compute_weat(
+            X_words=prop.X,
+            Y_words=prop.Y,
+            A_words=prop.A,
+            B_words=prop.B,
+            embed_fn=backend.embed,
+            vocab=backend.vocab,
+            rng=rng,
+            max_permutations=cfg.get("weat", {}).get("max_permutations", 100_000),
+            exact_threshold=cfg.get("weat", {}).get("exact_threshold", 12),
+            min_pool_size=cfg.get("weat", {}).get("min_pool_size", 12),
+        )
+    except ValueError as e:
+        print(f"  rejected (insufficient vocab): {e}")
+        return None
+
+    d = result.effect_size
+    print(f"  WEAT          d = {d:+.4f}   p = {result.p_value:.4f}   n = {result.n_X}")
+    print(f"  SC-WEAT({prop.X_label[:20]:>20})  d = {result.sc_weat_x_mean:+.4f}   p = {result.sc_p_x:.4f}")
+    print(f"  SC-WEAT({prop.Y_label[:20]:>20})  d = {result.sc_weat_y_mean:+.4f}   p = {result.sc_p_y:.4f}")
+
+    if abs(d) >= EFFECT_SIZE_CAP:
+        print(f"  rejected: |d|={abs(d):.3f} >= {EFFECT_SIZE_CAP} (likely degenerate)")
+        return None
+
+    test_id = make_test_id(prop, cfg)
+    if any(e["id"] == test_id for e in feed):
+        print(f"  skipped: duplicate id {test_id}")
+        return None
+
+    print("→ Phase 2: requesting interpretation…")
+    result_dict_for_interp = {
+        "effect_size": result.effect_size,
+        "p_value": result.p_value,
+        "sc_weat_x_mean": result.sc_weat_x_mean,
+        "sc_p_x": result.sc_p_x,
+        "sc_weat_y_mean": result.sc_weat_y_mean,
+        "sc_p_y": result.sc_p_y,
+        "n": {"X": result.n_X, "Y": result.n_Y, "A": result.n_A, "B": result.n_B},
+        "words": {
+            "X_used": result.X_used, "Y_used": result.Y_used,
+            "A_used": result.A_used, "B_used": result.B_used,
+        },
+        "per_word_s": result.per_word_s,
+    }
+    try:
+        interp = proposer.interpret(prop, result_dict_for_interp)
+        print(f"  format:       {interp.headline_format}")
+        print(f"  pattern:      {interp.verdict_pattern}")
+        print(f"  cohens_d:     {interp.cohens_d_category}")
+        print(f"  headline:     {interp.headline_text}")
+        obs_preview = interp.observation
+        if len(obs_preview) > 200:
+            obs_preview = obs_preview[:197] + "..."
+        print(f"  observation:  {obs_preview}")
+        if interp.finding_line:
+            print(f"  finding:      {interp.finding_line}")
+    except Exception as e:
+        print(f"  interpretation failed (test still recorded): {e}")
+        from autoweat.proposer import Interpretation
+        interp = Interpretation(
+            headline_format="neutral_label",
+            headline_text="[interpretation phase raised exception]",
+            expectation="",
+            observation=str(e),
+            finding_line="",
+            direction="ambiguous",
+            verdict_pattern="UNKNOWN",
+            cohens_d_category="unknown",
+            direction_matches_prior=None,
+            x_mean_s=0.0,
+            y_mean_s=0.0,
+            raw="",
+        )
+
+    entry = {
+        "id": test_id,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "schema_version": "inductive.v6",
+        "domain": prop.domain,
+        "contrast_label": prop.contrast_label,
+
+        # v12 four-beat card fields
+        "headline_format": interp.headline_format,
+        "headline_text": interp.headline_text,
+        "expectation": interp.expectation,
+        "observation": interp.observation,
+        "finding_line": interp.finding_line,
+
+        # v12 prior tracking
+        "has_prior": prop.has_prior,
+        "prior_statement": prop.prior_statement,
+
+        # v12 computed classification fields
+        "verdict_pattern": interp.verdict_pattern,
+        "cohens_d_category": interp.cohens_d_category,
+        "direction_matches_prior": interp.direction_matches_prior,
+
+        "direction": interp.direction,
+        "x_mean_s": interp.x_mean_s,
+        "y_mean_s": interp.y_mean_s,
+        "labels": {
+            "X": prop.X_label,
+            "Y": prop.Y_label,
+            "A": prop.A_label,
+            "B": prop.B_label,
+        },
+        "effect_size": result.effect_size,
+        "p_value": result.p_value,
+        "sc_weat_x_mean": result.sc_weat_x_mean,
+        "sc_p_x": result.sc_p_x,
+        "sc_weat_y_mean": result.sc_weat_y_mean,
+        "sc_p_y": result.sc_p_y,
+        "per_word_sc_weat": result.per_word_sc_weat,
+        "test_statistic": result.test_statistic,
+        "n": {
+            "X": result.n_X, "Y": result.n_Y,
+            "A": result.n_A, "B": result.n_B,
+        },
+        "n_permutations": result.n_permutations,
+        "exact": result.exact,
+        "words": {
+            "X_used": result.X_used, "Y_used": result.Y_used,
+            "A_used": result.A_used, "B_used": result.B_used,
+            "X_dropped": result.X_dropped, "Y_dropped": result.Y_dropped,
+            "A_dropped": result.A_dropped, "B_dropped": result.B_dropped,
+        },
+        "per_word_s": result.per_word_s,
+        "config": {
+            "embedding_backend": backend.name,
+            "proposer_model": cfg["proposer"]["model"],
+            "thinking_style": cfg["proposer"].get("thinking_style", "none"),
+            "thinking_effort": cfg["proposer"].get("thinking_effort"),
+            "history_size_seen": len(history_slice),
+            "sampling": cfg["proposer"].get("sampling", {}),
+        },
+    }
+    feed.append(entry)
+    recent_domains.append(prop.domain)
+    print(f"  ✓ accepted as {test_id}")
+    return entry
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--config", default="config.yaml")
+    ap.add_argument("--once", action="store_true", help="Run one iteration and exit")
+    ap.add_argument("--no-push", action="store_true", help="Skip git commit+push")
+    args = ap.parse_args()
+
+    cfg = load_config(args.config)
+    repo_root = Path(args.config).resolve().parent
+
+    print(f"AutoWEAT starting (inductive) — repo={repo_root}")
+    print(f"  embedding: {cfg['embedding']}")
+    print(f"  proposer:  {cfg['proposer']['model']}")
+    hs = cfg["proposer"].get("history_size", 30)
+    hs_label = "all" if hs < 0 else ("off" if hs == 0 else str(hs))
+    print(f"  history:   {hs_label}")
+
+    backend = load_backend(cfg["embedding"])
+    print(f"  loaded backend: {backend.name}  |vocab|={len(backend.vocab)}")
+
+    proposer = OllamaProposer(
+        model=cfg["proposer"]["model"],
+        persona_path=cfg["proposer"].get("persona_path", "persona.md"),
+        host=cfg["proposer"].get("host", "http://localhost:11434"),
+        sampling=cfg["proposer"].get("sampling", {}),
+        thinking_style=cfg["proposer"].get("thinking_style", "none"),
+        thinking_effort=cfg["proposer"].get("thinking_effort"),
+        max_json_retries=cfg["proposer"].get("max_json_retries", 3),
+        request_timeout=cfg["proposer"].get("request_timeout", 1800),
+    )
+
+    feed_path = repo_root / "docs" / "feed.json"
+    feed = load_feed(feed_path)
+    print(f"  existing feed: {len(feed)} tests")
+
+    rng = random.Random(cfg.get("seed", 20260410))
+    recent_domains: deque = deque(maxlen=5)
+
+    interval = cfg.get("interval_seconds", 300)
+    max_iters = 1 if args.once else cfg.get("max_iterations", 0) or 10**9
+
+    i = 0
+    while i < max_iters:
+        i += 1
+        print(f"\n=== iteration {i} ({datetime.now().strftime('%H:%M:%S')}) ===")
+        entry = one_iteration(proposer, backend, cfg, rng, recent_domains, feed, repo_root)
+        if entry:
+            save_feed(feed_path, feed)
+            if not args.no_push:
+                git_push(repo_root, f"autoweat: {entry['id']} {entry['domain']} d={entry['effect_size']:+.2f}")
+        if i < max_iters and interval > 0:
+            time.sleep(interval)
+
+
+if __name__ == "__main__":
+    main()
