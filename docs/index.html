@@ -163,6 +163,24 @@
     margin: 0;
     font-weight: 400;
   }
+  .entry-link .e-time {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--fg-dimer);
+  }
+
+  /* Total count under the about paragraph */
+  .total-count {
+    font-size: 13px;
+    color: var(--fg-dimer);
+    margin: -48px 0 56px;     /* compensates for .about's bottom margin */
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+  /* When .total-count exists right after .about, the about block doesn't
+     need its own bottom gap. We use the adjacent-sibling combinator. */
+  .about:has(+ .total-count) { margin-bottom: 8px; }
+  .about + .total-count { margin: 0 0 56px; }
 
   /* ── Detail view ── */
   .back-link {
@@ -183,11 +201,34 @@
   }
   .detail-title .vs { color: var(--fg-dim); font-weight: 400; }
 
-  .byline {
+  /* Detail-page metadata. Two stacked lines:
+       .meta-editorial — date · time · verdict (the human-facing summary)
+       .meta-tech      — embedding · proposer (the technical provenance)
+     The technical line is dimmer and uses mono numerals so the eye registers
+     it as machine-info, not editorial copy. */
+  .meta {
     font-size: 14px;
     color: var(--fg-dim);
-    margin: 0 0 40px;
+    margin: 0 0 4px;
+    line-height: 1.55;
   }
+  .meta-editorial {
+    color: var(--fg-dim);
+  }
+  .meta-tech {
+    color: var(--fg-dimer);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+    margin-bottom: 36px;
+  }
+  .meta-tech .meta-key {
+    color: var(--fg-dim);
+    margin-right: 4px;
+  }
+  /* When the editorial line is *not* followed by a tech line, give it the
+     full bottom gap before the lede. */
+  .meta-editorial:not(:has(+ .meta-tech)) { margin-bottom: 36px; }
 
   /* Lede paragraph (Lingxi's first-paragraph weight) */
   .lede {
@@ -324,6 +365,7 @@ const SAMPLE = [
   {
     id: "e14", timestamp: "2026-04-15T08:30:00Z",
     interpretive_fired: true,
+    config: { embedding_backend: "GloVe Dolma 2024 · 300d", proposer_model: "gpt-oss:120b" },
     effect_size: 1.78, p_value: 0.0002,
     sc_weat_x_mean: 0.40, sc_p_x: 0.18,
     sc_weat_y_mean: -0.80, sc_p_y: 0.012,
@@ -340,6 +382,7 @@ const SAMPLE = [
   {
     id: "e13", timestamp: "2026-04-14T22:15:00Z",
     interpretive_fired: false,
+    config: { embedding_backend: "GloVe Dolma 2024 · 300d", proposer_model: "gpt-oss:120b" },
     effect_size: 0.54, p_value: 0.205,
     sc_weat_x_mean: 0.51, sc_p_x: 0.197,
     sc_weat_y_mean: 0.41, sc_p_y: 0.297,
@@ -426,6 +469,20 @@ function fmtFullDate(ts) {
   const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
+/* "2026-04-15" — used to detect same-day entries on the list */
+function fmtDateKey(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,"0")}-${String(d.getUTCDate()).padStart(2,"0")}`;
+}
+/* "09:42 UTC" — short time, no seconds */
+function fmtTime(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const h = String(d.getUTCHours()).padStart(2,"0");
+  const m = String(d.getUTCMinutes()).padStart(2,"0");
+  return `${h}:${m} UTC`;
+}
 function esc(s) {
   if (s == null) return "";
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -465,16 +522,27 @@ function renderList() {
     seen.get(key).tests.push(t);
   }
 
+  // Count occurrences per date so we know which entries need a time stamp shown
+  const dateCounts = new Map();
+  for (const t of sorted) {
+    const k = fmtDateKey(t.timestamp);
+    dateCounts.set(k, (dateCounts.get(k) || 0) + 1);
+  }
+
   const groupsHtml = groups.map(g => {
     const items = g.tests.map(t => {
       const v = verdictText(t);
       const dotClass = v === "significant, decomposition aligns" ? "aligned"
                      : v === "significant, decomposition does not align" ? "notaligned"
                      : "";
+      const sameDay = (dateCounts.get(fmtDateKey(t.timestamp)) || 0) > 1;
+      const timeChip = sameDay
+        ? `<span class="e-time">${esc(fmtTime(t.timestamp))}</span> · `
+        : "";
       return `
         <a class="entry-link ${dotClass}" href="#${esc(t.id)}">
           <h3 class="e-title">${esc(tidy(t.labels.X))} <span class="vs">vs</span> ${esc(tidy(t.labels.Y))}</h3>
-          <p class="e-desc">On ${esc(tidy(t.labels.A))} <span class="vs">vs</span> ${esc(tidy(t.labels.B))}.</p>
+          <p class="e-desc">${timeChip}On ${esc(tidy(t.labels.A))} <span class="vs">vs</span> ${esc(tidy(t.labels.B))}.</p>
         </a>
       `;
     }).join("");
@@ -486,6 +554,10 @@ function renderList() {
     `;
   }).join("");
 
+  const totalLine = sorted.length
+    ? `<p class="total-count">${sorted.length} test${sorted.length===1?"":"s"} so far.</p>`
+    : "";
+
   view.innerHTML = `
     <h1 class="list-title">An autonomous bench of word-embedding bias tests.</h1>
     <p class="about">
@@ -494,6 +566,7 @@ function renderList() {
       computes them. Results below in reverse chronological order;
       no human curation between proposal and posting.
     </p>
+    ${totalLine}
     ${groupsHtml ? `<div class="entries">${groupsHtml}</div>` : '<div class="empty">No tests in feed yet.</div>'}
   `;
   window.scrollTo(0, 0);
@@ -545,13 +618,31 @@ function renderDetail(id) {
   const embedSrc = (t.config && t.config.embedding_backend)
     || (t.config && t.config.embedding_source)
     || t.embedding_source
-    || "word embedding";
+    || null;
+
+  // LLM proposer — read from config if present, else null
+  const proposer = (t.config && t.config.proposer_model)
+    || (t.config && t.config.llm_model)
+    || t.proposer_model
+    || null;
+
+  // Build the technical metadata line conditionally so missing fields don't
+  // leave dangling separators.
+  const techParts = [];
+  if (embedSrc) techParts.push(`<span class="meta-key">embedding</span> ${esc(embedSrc)}`);
+  if (proposer) techParts.push(`<span class="meta-key">proposer</span> ${esc(proposer)}`);
+  const techLine = techParts.length
+    ? `<p class="meta meta-tech">${techParts.join(" &nbsp;·&nbsp; ")}</p>`
+    : "";
 
   view.innerHTML = `
     <a class="back-link" href="#">← All tests</a>
 
     <h1 class="detail-title">${esc(tidy(labels.X))} <span class="vs">vs</span> ${esc(tidy(labels.Y))}</h1>
-    <p class="byline">${fmtFullDate(t.timestamp)} &nbsp;·&nbsp; ${esc(verdictText(t))} &nbsp;·&nbsp; ${esc(embedSrc)}</p>
+    <p class="meta meta-editorial">
+      ${fmtFullDate(t.timestamp)} &nbsp;·&nbsp; ${esc(fmtTime(t.timestamp))} &nbsp;·&nbsp; ${esc(verdictText(t))}
+    </p>
+    ${techLine}
 
     <p class="lede">
       A WEAT test of <strong>${esc(tidy(labels.X))}</strong> <span class="vs">vs</span> <strong>${esc(tidy(labels.Y))}</strong>,
@@ -568,7 +659,7 @@ function renderDetail(id) {
       <div class="code-window">
         <div class="tab">
           <span class="tab-label">WEAT &nbsp;·&nbsp; SC-WEAT decomposition</span>
-          <span class="tab-meta">${esc(embedSrc)}</span>
+          <span class="tab-meta">${esc(embedSrc || "")}</span>
         </div>
         <pre class="no-wrap">${statsBody}</pre>
       </div>
