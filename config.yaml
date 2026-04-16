@@ -35,24 +35,24 @@ max_iterations: 10
 # malformed JSON on the first try and succeeds on the second.
 
 # ─── PRESET A: gpt-oss:120b on reasoning=high (DEFAULT) ────────────────────
-#proposer:
-#  model: "gpt-oss:20b" #"gpt-oss:120b"
-#  host: "http://localhost:11434"
-#  persona_path: "persona.md"
-#  thinking_style: "gpt-oss"
-#  thinking_effort: "high"
-#  max_json_retries: 3
-#  # OpenAI's official recommendation for gpt-oss:
-#  #   https://github.com/openai/gpt-oss#recommended-sampling-parameters
-#  # Ollama's default top_p is 0.9 — must override to 1.0 explicitly.
-#  # top_k=0 disables top-k truncation (HF transformers default of 50
-#  # silently degrades gpt-oss output if left unspecified).
-#  sampling:
-#    temperature: 1.0
-#    top_p: 1.0
-#    top_k: 0
-#    num_ctx: 32768
-#    repeat_penalty: 1.0
+proposer:
+  model: "gpt-oss:20b" #"gpt-oss:120b"
+  host: "http://localhost:11434"
+  persona_path: "persona.md"
+  thinking_style: "gpt-oss"
+  thinking_effort: "high"
+  max_json_retries: 3
+  # OpenAI's official recommendation for gpt-oss:
+  #   https://github.com/openai/gpt-oss#recommended-sampling-parameters
+  # Ollama's default top_p is 0.9 — must override to 1.0 explicitly.
+  # top_k=0 disables top-k truncation (HF transformers default of 50
+  # silently degrades gpt-oss output if left unspecified).
+  sampling:
+    temperature: 1.0
+    top_p: 1.0
+    top_k: 0
+    num_ctx: 32768
+    repeat_penalty: 1.0
 
 # ─── PRESET B: qwen3:32b with thinking on ─────────────────────────────────
 # Qwen3 (April 2025 release). To use, comment out the gpt-oss preset above
@@ -110,20 +110,20 @@ max_iterations: 10
 # line, no API `think` field — just the token. AutoWEAT handles this when
 # thinking_style: gemma4.
 #
-proposer:
-   model: "gemma4:31b-it-q8_0"            # or "gemma4:26b" for the faster MoE
-   host: "http://localhost:11434"
-   persona_path: "persona.md"
-   thinking_style: "gemma4"
-   thinking_effort: "on"          # any truthy value enables <|think|>; "off" disables
-   max_json_retries: 3
-   # Recommended Gemma 4 sampling (Unsloth + Google AI for Developers):
-   sampling:
-     temperature: 1.0
-     top_p: 0.95
-     top_k: 64                    # NOTE: 64, not 0 or 20 — Gemma-specific
-     num_ctx: 32768               # 256k available; 32k is plenty for AutoWEAT
-     repeat_penalty: 1.0
+#proposer:
+#   model: "gemma4:31b-it-q8_0"            # or "gemma4:26b" for the faster MoE
+#   host: "http://localhost:11434"
+#   persona_path: "persona.md"
+#   thinking_style: "gemma4"
+#   thinking_effort: "on"          # any truthy value enables <|think|>; "off" disables
+#   max_json_retries: 3
+#   # Recommended Gemma 4 sampling (Unsloth + Google AI for Developers):
+#   sampling:
+#     temperature: 1.0
+#     top_p: 0.95
+#     top_k: 64                    # NOTE: 64, not 0 or 20 — Gemma-specific
+#     num_ctx: 32768               # 256k available; 32k is plenty for AutoWEAT
+#     repeat_penalty: 1.0
 
 # ─── PRESET E: llama3.1:8b (no thinking, fast baseline) ───────────────────
 # Useful for comparing proposal quality between a small non-reasoning model
