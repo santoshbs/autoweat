@@ -58,22 +58,22 @@ max_iterations: 10
 # Qwen3 (April 2025 release). To use, comment out the gpt-oss preset above
 # and uncomment this whole block.
 #
-proposer:
-   model: "qwen3:32b"
-   host: "http://localhost:11434"
-   persona_path: "persona.md"
-   thinking_style: "qwen3"
-   thinking_effort: "high"        # any truthy value enables Ollama's `think: true`
-   max_json_retries: 3
-   # Qwen3 thinking-mode recommendations (Qwen team, April 2025):
-   sampling:
-     temperature: 0.6
-     top_p: 0.95
-     top_k: 20
-     min_p: 0.0
-     num_ctx: 32768               # qwen3 supports 32k natively, more with rope
-     repeat_penalty: 1.0          # disable; presence_penalty does the work
-     presence_penalty: 1.5
+#proposer:
+#   model: "qwen3:32b"
+#   host: "http://localhost:11434"
+#   persona_path: "persona.md"
+#   thinking_style: "qwen3"
+#   thinking_effort: "high"        # any truthy value enables Ollama's `think: true`
+#   max_json_retries: 3
+#   # Qwen3 thinking-mode recommendations (Qwen team, April 2025):
+#   sampling:
+#     temperature: 0.6
+#     top_p: 0.95
+#     top_k: 20
+#     min_p: 0.0
+#     num_ctx: 32768               # qwen3 supports 32k natively, more with rope
+#     repeat_penalty: 1.0          # disable; presence_penalty does the work
+#     presence_penalty: 1.5
 
 # ─── PRESET C: qwen3.5:35b with thinking on ───────────────────────────────
 # Qwen3.5 (late-2025 hybrid Gated-Delta-Net + MoE). Uses different defaults
@@ -82,22 +82,22 @@ proposer:
 # when a system role message is included. /api/generate (which is what
 # AutoWEAT already uses) avoids the hang.
 #
-#proposer:
-#   model: 'qwen3.5:27b' #'qwen3.6:35b-a3b' #'qwen3.6:35b-a3b-q8_0' #"" #"qwen3.5:27b"
-#   host: "http://localhost:11434"
-#   persona_path: "persona.md"
-#   thinking_style: "qwen3"        # same Ollama `think` field as qwen3
-#   thinking_effort: "high"
-#   max_json_retries: 3
-#   # Qwen3.5 thinking-mode recommendations (Qwen team, late 2025):
-#   sampling:
-#     temperature: 1.0
-#     top_p: 0.95
-#     top_k: 20
-#     min_p: 0.0
-#     num_ctx: 32768
-#     repeat_penalty: 1.0
-#     presence_penalty: 1.5
+proposer:
+   model: 'qwen3.5:27b' #'qwen3.6:35b-a3b' #'qwen3.6:35b-a3b-q8_0' #"" #"qwen3.5:27b"
+   host: "http://localhost:11434"
+   persona_path: "persona.md"
+   thinking_style: "qwen3"        # same Ollama `think` field as qwen3
+   thinking_effort: "high"
+   max_json_retries: 3
+   # Qwen3.5 thinking-mode recommendations (Qwen team, late 2025):
+   sampling:
+     temperature: 1.0
+     top_p: 0.95
+     top_k: 20
+     min_p: 0.0
+     num_ctx: 32768
+     repeat_penalty: 1.0
+     presence_penalty: 1.5
 
 # ─── PRESET D: gemma4:31b with thinking on ────────────────────────────────
 # Gemma 4 (Google DeepMind, April 2026). 31B dense or 26b-a4b MoE.
