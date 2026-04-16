@@ -1891,5 +1891,116 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "c0244f6aca7d",
+    "timestamp": "2026-04-16T11:07:05.087520+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "age",
+    "contrast_label": "youth versus old age with autonomy versus care",
+    "labels": {
+      "X": "youth and young people",
+      "Y": "seniors and elderly people",
+      "A": "autonomy and independence terms",
+      "B": "care and dependence terms"
+    },
+    "effect_size": 0.590901196796068,
+    "p_value": 0.14317,
+    "sc_weat_x_mean": 0.07802552018888048,
+    "sc_p_x": 0.81706,
+    "sc_weat_y_mean": -0.13007166878842577,
+    "sc_p_y": 0.69087,
+    "n": {
+      "X": 13,
+      "Y": 13,
+      "A": 14,
+      "B": 14
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "adolescent",
+        "young",
+        "freshman",
+        "juvenile",
+        "minor",
+        "youth",
+        "student",
+        "junior",
+        "teen",
+        "apprentice",
+        "fledgling",
+        "child",
+        "beginner"
+      ],
+      "Y_used": [
+        "senior",
+        "elder",
+        "pensioner",
+        "aged",
+        "retiree",
+        "grandparent",
+        "geriatric",
+        "veteran",
+        "patriarch",
+        "matriarch",
+        "old",
+        "elderly",
+        "seasoned"
+      ],
+      "A_used": [
+        "independent",
+        "free",
+        "autonomous",
+        "decide",
+        "choice",
+        "active",
+        "bold",
+        "venture",
+        "drive",
+        "willpower",
+        "agency",
+        "control",
+        "direct",
+        "will"
+      ],
+      "B_used": [
+        "assist",
+        "help",
+        "support",
+        "fragile",
+        "nurse",
+        "gentle",
+        "patient",
+        "tender",
+        "shelter",
+        "aid",
+        "rely",
+        "depend",
+        "guidance",
+        "kindness"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
