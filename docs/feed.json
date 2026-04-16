@@ -1556,5 +1556,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "0fa2620c74cf",
+    "timestamp": "2026-04-16T10:50:09.334309+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "labor",
+    "contrast_label": "care-oriented roles versus technical roles with empathy versus analysis",
+    "labels": {
+      "X": "care and support roles",
+      "Y": "technical and analytical roles",
+      "A": "empathy and warmth terms",
+      "B": "logic and precision terms"
+    },
+    "effect_size": 1.754841322497782,
+    "p_value": 1.479204602101358e-06,
+    "sc_weat_x_mean": 0.3409266966844682,
+    "sc_p_x": 0.3318188743548819,
+    "sc_weat_y_mean": -1.110918862949152,
+    "sc_p_y": 0.0013076168682576005,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "nurse",
+        "teacher",
+        "therapist",
+        "counselor",
+        "nanny",
+        "aide",
+        "coach",
+        "volunteer",
+        "midwife",
+        "caregiver",
+        "helper",
+        "attendant"
+      ],
+      "Y_used": [
+        "engineer",
+        "coder",
+        "technician",
+        "analyst",
+        "mechanic",
+        "welder",
+        "architect",
+        "programmer",
+        "smith",
+        "operator",
+        "builder",
+        "electrician"
+      ],
+      "A_used": [
+        "empathy",
+        "heart",
+        "kind",
+        "soft",
+        "warm",
+        "listen",
+        "feel",
+        "patient",
+        "gentle",
+        "caring",
+        "love",
+        "comfort"
+      ],
+      "B_used": [
+        "logic",
+        "mind",
+        "hard",
+        "cold",
+        "sharp",
+        "solve",
+        "think",
+        "precise",
+        "exact",
+        "tool",
+        "skill",
+        "system"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that in this corpus, care and support roles are more strongly associated with empathy and warmth terms, while technical and analytical roles are more closely linked to logic and precision terms. This pattern likely arises because web text often describes care-oriented work using affective language and technical work using cognitive or instrumental language. A social scientist studying the labor market would find this interesting because it demonstrates how professional identities are linguistically partitioned. This association suggests that language encodes a persistent dichotomy between perceived emotional and intellectual competencies in the workplace.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 14,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
