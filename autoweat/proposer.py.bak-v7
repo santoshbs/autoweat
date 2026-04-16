@@ -1,36 +1,40 @@
 """
-proposer.py — AutoWEAT v14: WEAT-only proposer (SC-WEAT removed).
+proposer.py — AutoWEAT v13: minimal Charlesworth-faithful proposer.
 
 Two phases per iteration:
 
   Phase 1 (propose):   LLM picks X, Y, A, B labels and word lists.
-                       20-25 words per list. Outputs JSON only.
+                       No headline format, no verdict prediction,
+                       no prior. Just a test to run.
 
-  Phase 2 (interpret): Runs IFF WEAT is significant (p < .05). Under
-                       that condition, the LLM writes one short
+  Phase 2 (interpret): Runs ONLY when the relative WEAT is significant
+                       (p < .05) AND the SC-WEAT directions are
+                       consistent with the WEAT direction (opposite
+                       signs, SC-WEAT(X) sign matches WEAT sign).
+                       Under that condition, the LLM writes one short
                        paragraph: what the result shows, a possible
-                       explanation, why it might matter.
+                       explanation, why it might matter. No format
+                       rules, no verdict patterns, no forbidden
+                       language lists. Just the paragraph.
 
-                       When p >= .05, Phase 2 is skipped and the test
-                       is stored with no interpretive paragraph.
+                       When the condition is NOT met, Phase 2 is
+                       skipped and the test is stored with no
+                       interpretive paragraph.
 
-Output schema: inductive.v8 (see run.py). Differences from v7:
-  - sc_weat_x_mean, sc_p_x, sc_weat_y_mean, sc_p_y dropped
-  - n_permutations_sc, exact_sc dropped
-  - per_word_sc_weat dropped
-  - interpretation fires on p < .05 alone (no SC-WEAT alignment check)
+Output schema: inductive.v7 (see run.py).
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import requests
 
-AUTOWEAT_PROPOSER_VERSION = "2026-04-16-v14-weat-only"
+AUTOWEAT_PROPOSER_VERSION = "2026-04-13-v13-charlesworth-minimal"
 
 
 # ─── Phase 1: proposal schema ──────────────────────────────────────
@@ -57,21 +61,18 @@ no proper nouns. All four word lists should be roughly the same size
 """
 
 
-# ─── Phase 2: interpretation prompt ────────────────────────────────
+# ─── Phase 2: interpretation prompt (short, no schema) ─────────────
 
 INTERPRETATION_PROMPT = """You are being asked to write ONE short paragraph (4-7 sentences)
-interpreting a WEAT result. The WEAT is statistically significant
-(p < .05), meaning the relative association between the two target
-sets and the two attribute sets is unlikely to be noise.
+interpreting a WEAT result. The relative WEAT is significant AND the
+single-category decomposition is directionally consistent with the
+relative effect.
 
 Write the paragraph in three movements:
 
 (1) What the result shows in plain English. State the finding as an
     observation about how the corpus uses this vocabulary. Name the
     four labels (X, Y, A, B) naturally; do not invent new categories.
-    The direction of the effect: if WEAT d is positive, X-words lean
-    toward A relative to Y-words; if negative, X-words lean toward B
-    relative to Y-words.
 
 (2) A plausible explanation for why this pattern might exist in a
     corpus of English-language web text. Not a proof, just a
@@ -125,19 +126,36 @@ class Interpretation:
         return {"paragraph": self.paragraph, "fired": self.fired}
 
 
-# ─── Significance gate ─────────────────────────────────────────────
+# ─── Consistency condition ─────────────────────────────────────────
 
 
-def interpretive_fires(effect_size: float, p_value: float) -> bool:
-    """Fires iff WEAT p < .05 and the effect is non-zero.
+def interpretive_fires(
+    effect_size: float,
+    p_value: float,
+    sc_weat_x_mean: float,
+    sc_weat_y_mean: float,
+) -> bool:
+    """Charlesworth-style consistency check.
 
-    SC-WEAT alignment check was removed in v14 because SC-WEAT
-    absolute signs are unreliable under attribute-pool corpus-
-    frequency asymmetry. WEAT alone is the authoritative signal.
+    Fires IFF:
+    (1) WEAT p < .05
+    (2) SC-WEAT(X) and SC-WEAT(Y) have opposite signs
+    (3) sign(SC-WEAT(X)) == sign(WEAT D)
+
+    SC-WEAT p-values are NOT checked (per Charlesworth).
+    SC-WEAT magnitudes are NOT checked (per Charlesworth).
     """
     if p_value is None or p_value >= 0.05:
         return False
     if effect_size is None or effect_size == 0:
+        return False
+    if sc_weat_x_mean is None or sc_weat_y_mean is None:
+        return False
+    # Condition 2: opposite signs
+    if sc_weat_x_mean * sc_weat_y_mean >= 0:
+        return False
+    # Condition 3: SC-WEAT(X) sign matches WEAT sign
+    if (sc_weat_x_mean > 0) != (effect_size > 0):
         return False
     return True
 
@@ -146,7 +164,7 @@ def interpretive_fires(effect_size: float, p_value: float) -> bool:
 
 
 class OllamaProposer:
-    """Minimal LLM proposer for AutoWEAT v14."""
+    """Minimal LLM proposer for AutoWEAT v13."""
 
     GPT_OSS_EFFORTS = ("low", "medium", "high")
 
@@ -172,11 +190,16 @@ class OllamaProposer:
     # ─── Shared request helper ──────────────────────────────────
 
     def _chat(self, system: str, user: str) -> str:
-        """Use /api/generate with `system` field (works for both Qwen3 and gpt-oss)."""
+        """Use /api/generate (not /api/chat) — Qwen3.5 hangs on /api/chat
+        when a system role message is included. /api/generate with the
+        `system` field is the format that works for both Qwen3 and gpt-oss.
+        """
         options: dict[str, Any] = {}
         options.update(self.sampling)
         if self.num_ctx is not None:
             options["num_ctx"] = self.num_ctx
+        # gpt-oss family reads "Reasoning: <effort>" from the very first
+        # line of the system prompt; for that family, prepend it here.
         sys_prompt = system
         if self.thinking_style == "gpt-oss" and self.thinking_effort:
             if self.thinking_effort in self.GPT_OSS_EFFORTS:
@@ -188,6 +211,7 @@ class OllamaProposer:
             "stream": False,
             "options": options,
         }
+        # Qwen3 family uses Ollama's top-level `think` field.
         if self.thinking_style == "qwen3":
             payload["think"] = (self.thinking_effort != "off"
                                 and self.thinking_effort is not None)
@@ -203,18 +227,13 @@ class OllamaProposer:
         self,
         history: list[dict] | None = None,
         recent_domains: list[str] | None = None,
-        mode: str = "well-studied",
         max_retries: int = 3,
     ) -> Proposal:
-        """Phase 1: ask the LLM for one WEAT test proposal.
-
-        mode: "well-studied" or "novel". Determines what kind of contrast
-        the LLM is expected to propose this round. The run loop alternates.
-        """
+        """Phase 1: ask the LLM for one WEAT test proposal."""
         history = history or []
         recent_domains = recent_domains or []
 
-        system = self._propose_system_prompt(recent_domains, mode)
+        system = self._propose_system_prompt(recent_domains)
         user = self._propose_user_message(history)
 
         last_err = None
@@ -243,7 +262,7 @@ class OllamaProposer:
             f"{max_retries} attempts. Last error: {last_err}"
         )
 
-    def _propose_system_prompt(self, recent_domains: list[str], mode: str) -> str:
+    def _propose_system_prompt(self, recent_domains: list[str]) -> str:
         recent_note = ""
         if recent_domains:
             uniq = list(dict.fromkeys(recent_domains[-8:]))
@@ -253,33 +272,9 @@ class OllamaProposer:
                 + ". Do not repeat a contrast from this list. Aim for a "
                 "different substantive question."
             )
-        if mode == "novel":
-            mode_directive = (
-                "\n\n═══ MODE FOR THIS ITERATION: NOVEL ═══\n"
-                "You are in NOVEL mode. Propose a contrast that a thoughtful "
-                "social scientist would find worth asking but that is NOT "
-                "part of the canonical WEAT literature. Avoid the well-studied "
-                "gender, race, age, and occupation contrasts. Look for patterns "
-                "in how language encodes authority, institutional framing, "
-                "labor categories, moral vocabulary, bodily experience, or "
-                "social registers. The reader should be unable to predict the "
-                "answer before the test runs.\n"
-                "═══════════════════════════════════════"
-            )
-        else:  # well-studied (default)
-            mode_directive = (
-                "\n\n═══ MODE FOR THIS ITERATION: WELL-STUDIED ═══\n"
-                "You are in WELL-STUDIED mode. Propose a classic, substantively "
-                "important WEAT contrast — gender stereotypes, racial bias, "
-                "age stereotypes, or occupational stereotyping. These baseline "
-                "tests establish whether the corpus reproduces known patterns. "
-                "Construct your own word lists; do not copy from memory.\n"
-                "══════════════════════════════════════════════"
-            )
         return (
             self.persona
             + recent_note
-            + mode_directive
             + "\n\nYou are AutoWEAT's proposer (Phase 1). Your sole output "
             "is a JSON object describing one WEAT test. No prose, no "
             "preamble, no markdown, no explanation. Just the JSON."
@@ -312,13 +307,15 @@ class OllamaProposer:
     # ─── Phase 2: interpret (conditional) ───────────────────────
 
     def interpret(self, proposal: Proposal, result_dict: dict) -> Interpretation:
-        """Phase 2: IF WEAT is significant, ask the LLM for one interpretive
-        paragraph. Otherwise return an empty Interpretation.
+        """Phase 2: IF the consistency condition holds, ask the LLM for one
+        interpretive paragraph. Otherwise return an empty Interpretation.
         """
         d = float(result_dict.get("effect_size", 0.0))
         p_two = float(result_dict.get("p_value", 1.0))
+        sc_x_mean = float(result_dict.get("sc_weat_x_mean", 0.0))
+        sc_y_mean = float(result_dict.get("sc_weat_y_mean", 0.0))
 
-        if not interpretive_fires(d, p_two):
+        if not interpretive_fires(d, p_two, sc_x_mean, sc_y_mean):
             return Interpretation(paragraph="", fired=False, raw="")
 
         system = INTERPRETATION_PROMPT
@@ -333,6 +330,10 @@ class OllamaProposer:
     ) -> str:
         d = float(result_dict.get("effect_size", 0.0))
         p = float(result_dict.get("p_value", 1.0))
+        sc_x = float(result_dict.get("sc_weat_x_mean", 0.0))
+        sc_p_x = float(result_dict.get("sc_p_x", 1.0))
+        sc_y = float(result_dict.get("sc_weat_y_mean", 0.0))
+        sc_p_y = float(result_dict.get("sc_p_y", 1.0))
 
         return (
             f"Test that was run:\n"
@@ -341,11 +342,17 @@ class OllamaProposer:
             f"  A = {proposal.A_label}\n"
             f"  B = {proposal.B_label}\n"
             f"\n"
-            f"Result:\n"
-            f"  WEAT:  d = {d:+.3f},  p = {p:.3f}\n"
+            f"Results:\n"
+            f"  WEAT:       D = {d:+.3f}, p = {p:.3f}\n"
+            f"  SC-WEAT(X): {sc_x:+.3f} (p = {sc_p_x:.3f})  "
+            f"[X = {proposal.X_label}]\n"
+            f"  SC-WEAT(Y): {sc_y:+.3f} (p = {sc_p_y:.3f})  "
+            f"[Y = {proposal.Y_label}]\n"
             f"\n"
-            f"The WEAT is statistically significant. Write the interpretive "
-            f"paragraph now. Output the paragraph text only."
+            f"The WEAT is significant and the SC-WEAT decomposition is "
+            f"directionally consistent (opposite signs, matching the "
+            f"WEAT direction). Write the interpretive paragraph now. "
+            f"Output the paragraph text only."
         )
 
     # ─── Helpers ────────────────────────────────────────────────
@@ -353,13 +360,17 @@ class OllamaProposer:
     @staticmethod
     def _extract_json(raw: str) -> dict:
         """Pull the first JSON object out of an LLM response."""
+        # Strip common wrappers
         s = raw.strip()
+        # Remove fences if present
         s = re.sub(r"^```(?:json)?\s*", "", s)
         s = re.sub(r"\s*```\s*$", "", s)
+        # Try direct parse first
         try:
             return json.loads(s)
         except Exception:
             pass
+        # Find the first { ... } block
         m = re.search(r"\{.*\}", s, re.DOTALL)
         if not m:
             raise ValueError("no JSON object found in response")
@@ -376,11 +387,13 @@ class OllamaProposer:
             ww = w.strip().lower()
             if not ww:
                 continue
+            # reject phrases, hyphens, numbers
             if " " in ww or "-" in ww or "_" in ww:
                 continue
             if not ww.isalpha():
                 continue
             out.append(ww)
+        # dedupe preserving order
         seen = set()
         deduped = []
         for w in out:
@@ -395,6 +408,7 @@ class OllamaProposer:
         s = raw.strip()
         s = re.sub(r"^```(?:\w+)?\s*", "", s)
         s = re.sub(r"\s*```\s*$", "", s)
+        # If the model accidentally wrapped it in JSON, try to extract
         if s.startswith("{"):
             try:
                 obj = json.loads(s)

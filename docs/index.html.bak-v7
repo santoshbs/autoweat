@@ -63,7 +63,7 @@
   /* ── Top nav (tiny, restrained) ── */
   .nav {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 20px;
     margin-bottom: 80px;
     font-size: 14px;
@@ -71,14 +71,8 @@
   .nav .brand {
     font-weight: 600;
     color: var(--fg);
+    margin-right: auto;
     letter-spacing: -0.005em;
-  }
-  .nav .tagline {
-    color: var(--fg-dim);
-    font-size: 13px;
-    flex: 1;
-    text-align: center;
-    font-weight: 400;
   }
   .nav a { color: var(--fg-dim); }
   .nav a:hover { color: var(--fg); text-decoration: none; }
@@ -143,7 +137,8 @@
     background: transparent;   /* no dot for non-significant */
     box-shadow: 0 0 0 3px var(--bg);
   }
-  .entry-link.significant::before { background: #16a34a; } /* green */
+  .entry-link.aligned::before  { background: #16a34a; }   /* green */
+  .entry-link.notaligned::before { background: #ca8a04; } /* amber/yellow */
   .entry-link:last-child { margin-bottom: 0; }
   .entry-link:hover { text-decoration: none; }
   .entry-link .e-title {
@@ -348,7 +343,7 @@
 
   <nav class="nav">
     <a href="#" class="brand">AutoWEAT</a>
-    <span class="tagline">An autonomous bench of word-embedding bias tests.</span>
+    <a href="https://github.com/santoshbs/autoweat" target="_blank" rel="noopener">Source</a>
     <a href="https://santoshbs.github.io" target="_blank" rel="noopener">santoshbs</a>
   </nav>
 
@@ -358,7 +353,7 @@
 
   <footer class="footer">
     <span>© 2026 Santosh B. Srinivas.</span>
-    <span>schema inductive.v8</span>
+    <span>schema inductive.v7</span>
   </footer>
 
 </div>
@@ -488,13 +483,6 @@ function fmtTime(ts) {
   const m = String(d.getUTCMinutes()).padStart(2,"0");
   return `${h}:${m} UTC`;
 }
-/* "Apr 16" — short month + day */
-function fmtShortDate(ts) {
-  if (!ts) return "";
-  const d = new Date(ts);
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  return `${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
-}
 function esc(s) {
   if (s == null) return "";
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -507,7 +495,10 @@ function tidy(s) {
 /* Verdict in plain words, no glyphs */
 function verdictText(t) {
   const sig = (t.p_value != null && t.p_value < 0.05);
-  return sig ? "significant" : "non-significant";
+  if (!sig) return "non-significant";
+  const sx = t.sc_weat_x_mean, sy = t.sc_weat_y_mean, d = t.effect_size;
+  const aligned = sig && d != null && d !== 0 && sx != null && sy != null && sx*sy < 0 && (sx > 0) === (d > 0);
+  return aligned ? "significant, decomposition aligns" : "significant, decomposition does not align";
 }
 
 /* ─── List view ─── */
@@ -531,17 +522,27 @@ function renderList() {
     seen.get(key).tests.push(t);
   }
 
+  // Count occurrences per date so we know which entries need a time stamp shown
+  const dateCounts = new Map();
+  for (const t of sorted) {
+    const k = fmtDateKey(t.timestamp);
+    dateCounts.set(k, (dateCounts.get(k) || 0) + 1);
+  }
+
   const groupsHtml = groups.map(g => {
     const items = g.tests.map(t => {
       const v = verdictText(t);
-      const dotClass = v === "significant" ? "significant" : "";
-      const d = new Date(t.timestamp);
-      const day = d.getUTCDate();
-      const chip = `<span class="e-time">${day} · ${esc(fmtTime(t.timestamp))}</span> · `;
+      const dotClass = v === "significant, decomposition aligns" ? "aligned"
+                     : v === "significant, decomposition does not align" ? "notaligned"
+                     : "";
+      const sameDay = (dateCounts.get(fmtDateKey(t.timestamp)) || 0) > 1;
+      const timeChip = sameDay
+        ? `<span class="e-time">${esc(fmtTime(t.timestamp))}</span> · `
+        : "";
       return `
         <a class="entry-link ${dotClass}" href="#${esc(t.id)}">
           <h3 class="e-title">${esc(tidy(t.labels.X))} <span class="vs">vs</span> ${esc(tidy(t.labels.Y))}</h3>
-          <p class="e-desc">${chip}On ${esc(tidy(t.labels.A))} <span class="vs">vs</span> ${esc(tidy(t.labels.B))}.</p>
+          <p class="e-desc">${timeChip}On ${esc(tidy(t.labels.A))} <span class="vs">vs</span> ${esc(tidy(t.labels.B))}.</p>
         </a>
       `;
     }).join("");
@@ -558,9 +559,10 @@ function renderList() {
     : "";
 
   view.innerHTML = `
+    <h1 class="list-title">An autonomous bench of word-embedding bias tests.</h1>
     <p class="about">
       A small local language model proposes WEAT-style hypotheses
-      (<a href="https://www.science.org/doi/abs/10.1126/science.aal4230" target="_blank" rel="noopener">Caliskan, Bryson &amp; Narayanan, 2017</a>); a locked Python script
+      (Caliskan, Bryson &amp; Narayanan, 2017); a locked Python script
       computes them. Results below in reverse chronological order;
       no human curation between proposal and posting.
     </p>
@@ -585,7 +587,9 @@ function renderDetail(id) {
   const words = t.words || {};
 
   const statsBody =
-    `<span class="k">WEAT</span>   d = <span class="num">${fmtD(t.effect_size)}</span>   <span class="pval">p = ${fmtP(t.p_value)}</span>`;
+    `<span class="k">WEAT       </span> d = <span class="num">${fmtD(t.effect_size)}</span>   <span class="pval">p = ${fmtP(t.p_value)}</span>\n` +
+    `<span class="k">SC-WEAT(X) </span> <span class="num">${fmtD(t.sc_weat_x_mean)}</span>   <span class="pval">p = ${fmtP(t.sc_p_x)}</span>   <span class="annot">→ ${esc(tidy(labels.X))}</span>\n` +
+    `<span class="k">SC-WEAT(Y) </span> <span class="num">${fmtD(t.sc_weat_y_mean)}</span>   <span class="pval">p = ${fmtP(t.sc_p_y)}</span>   <span class="annot">→ ${esc(tidy(labels.Y))}</span>`;
 
   const sets = [
     { key: "X", lbl: tidy(labels.X), wl: words.X_used || [], role: "target" },
@@ -654,7 +658,7 @@ function renderDetail(id) {
       <h2>Results</h2>
       <div class="code-window">
         <div class="tab">
-          <span class="tab-label">WEAT</span>
+          <span class="tab-label">WEAT &nbsp;·&nbsp; SC-WEAT decomposition</span>
           <span class="tab-meta">${esc(embedSrc || "")}</span>
         </div>
         <pre class="no-wrap">${statsBody}</pre>
@@ -681,16 +685,13 @@ function dataReady(fn) {
     })
     .then(data => {
       const arr = Array.isArray(data) ? data : (data.tests || []);
-      // Accept any schema that exists; future schema changes will be explicit here
-      TESTS = arr.filter(t => !t.schema_version
-        || t.schema_version === "inductive.v8"
-        || t.schema_version === "inductive.v7");
-      // If feed loaded successfully but is empty, show empty state (not demo data)
+      // Filter to schema v7 if the field is present; otherwise accept all
+      TESTS = arr.filter(t => !t.schema_version || t.schema_version === "inductive.v7");
+      if (TESTS.length === 0) TESTS = SAMPLE;
       fn();
     })
     .catch(() => {
-      // Fallback to embedded sample ONLY when feed.json can't be fetched
-      // (e.g. previewing the file directly off disk via file://)
+      // Fallback to embedded sample (preview / file:// usage)
       TESTS = SAMPLE;
       fn();
     });

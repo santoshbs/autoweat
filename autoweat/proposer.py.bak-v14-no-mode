@@ -203,18 +203,13 @@ class OllamaProposer:
         self,
         history: list[dict] | None = None,
         recent_domains: list[str] | None = None,
-        mode: str = "well-studied",
         max_retries: int = 3,
     ) -> Proposal:
-        """Phase 1: ask the LLM for one WEAT test proposal.
-
-        mode: "well-studied" or "novel". Determines what kind of contrast
-        the LLM is expected to propose this round. The run loop alternates.
-        """
+        """Phase 1: ask the LLM for one WEAT test proposal."""
         history = history or []
         recent_domains = recent_domains or []
 
-        system = self._propose_system_prompt(recent_domains, mode)
+        system = self._propose_system_prompt(recent_domains)
         user = self._propose_user_message(history)
 
         last_err = None
@@ -243,7 +238,7 @@ class OllamaProposer:
             f"{max_retries} attempts. Last error: {last_err}"
         )
 
-    def _propose_system_prompt(self, recent_domains: list[str], mode: str) -> str:
+    def _propose_system_prompt(self, recent_domains: list[str]) -> str:
         recent_note = ""
         if recent_domains:
             uniq = list(dict.fromkeys(recent_domains[-8:]))
@@ -253,33 +248,9 @@ class OllamaProposer:
                 + ". Do not repeat a contrast from this list. Aim for a "
                 "different substantive question."
             )
-        if mode == "novel":
-            mode_directive = (
-                "\n\n═══ MODE FOR THIS ITERATION: NOVEL ═══\n"
-                "You are in NOVEL mode. Propose a contrast that a thoughtful "
-                "social scientist would find worth asking but that is NOT "
-                "part of the canonical WEAT literature. Avoid the well-studied "
-                "gender, race, age, and occupation contrasts. Look for patterns "
-                "in how language encodes authority, institutional framing, "
-                "labor categories, moral vocabulary, bodily experience, or "
-                "social registers. The reader should be unable to predict the "
-                "answer before the test runs.\n"
-                "═══════════════════════════════════════"
-            )
-        else:  # well-studied (default)
-            mode_directive = (
-                "\n\n═══ MODE FOR THIS ITERATION: WELL-STUDIED ═══\n"
-                "You are in WELL-STUDIED mode. Propose a classic, substantively "
-                "important WEAT contrast — gender stereotypes, racial bias, "
-                "age stereotypes, or occupational stereotyping. These baseline "
-                "tests establish whether the corpus reproduces known patterns. "
-                "Construct your own word lists; do not copy from memory.\n"
-                "══════════════════════════════════════════════"
-            )
         return (
             self.persona
             + recent_note
-            + mode_directive
             + "\n\nYou are AutoWEAT's proposer (Phase 1). Your sole output "
             "is a JSON object describing one WEAT test. No prose, no "
             "preamble, no markdown, no explanation. Just the JSON."

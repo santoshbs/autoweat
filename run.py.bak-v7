@@ -1,24 +1,27 @@
 """
-run.py — AutoWEAT v14 runtime loop (WEAT-only).
+run.py — AutoWEAT v13 runtime loop.
 
 Pipeline per iteration:
   1. Read persona, config, current feed.
   2. Phase 1: LLM proposes X, Y, A, B labels and word lists.
-  3. Locked Python computes WEAT d + p (no SC-WEAT).
-  4. Phase 2 (conditional): IF WEAT is significant (p < .05), LLM writes
-     one interpretive paragraph. Otherwise no paragraph.
-  5. Feed entry written to docs/feed.json with schema `inductive.v8`.
+  3. Locked Python computes WEAT D/p and SC-WEAT X/Y means and p-values.
+  4. Phase 2 (conditional): IF WEAT is significant AND SC-WEAT directions
+     are consistent with WEAT, LLM writes one interpretive paragraph.
+     Otherwise no paragraph is produced.
+  5. Feed entry written to docs/feed.json with schema `inductive.v7`.
   6. Optional git commit+push.
 
-Feed entry schema (inductive.v8):
-  id, timestamp, schema_version="inductive.v8",
+Feed entry schema (inductive.v7):
+  id, timestamp, schema_version="inductive.v7",
   domain, contrast_label,
   labels: {X, Y, A, B},
   words:  {X_used, Y_used, A_used, B_used, X_dropped, Y_dropped, A_dropped, B_dropped},
   effect_size, p_value,
+  sc_weat_x_mean, sc_p_x,
+  sc_weat_y_mean, sc_p_y,
   n: {X, Y, A, B},
   n_permutations, exact,
-  interpretive_paragraph: str (empty if p >= .05),
+  interpretive_paragraph: str (empty if consistency condition not met),
   interpretive_fired: bool,
   config: {embedding_backend, proposer_model, thinking_style, thinking_effort,
            history_size_seen, sampling},
@@ -31,8 +34,10 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -47,7 +52,7 @@ from autoweat.weat import compute_weat, WEATResult
 from autoweat.embeddings import load_backend
 
 
-AUTOWEAT_SCHEMA_VERSION = "inductive.v8"
+AUTOWEAT_SCHEMA_VERSION = "inductive.v7"
 
 
 def load_config(path: str) -> dict:
@@ -117,6 +122,7 @@ def git_push(repo_root: str, message: str) -> None:
         )
         print(f"  pushed to git: {message}")
     except subprocess.CalledProcessError as e:
+        # nothing to commit is fine; other failures just print
         msg = (e.stderr.decode() if e.stderr else "") + (
             e.stdout.decode() if e.stdout else ""
         )
@@ -136,16 +142,8 @@ def run_one(
     """Run one iteration: propose → compute → (maybe) interpret → store."""
     history_slice = feed[-15:]
 
-    # Alternate mode: even feed length → well-studied, odd → novel.
-    # Starts with well-studied (baseline) as the very first test.
-    mode = "novel" if (len(feed) % 2 == 1) else "well-studied"
-
-    print(f"→ Phase 1: requesting proposal… (mode: {mode})")
-    prop = proposer.propose(
-        history=history_slice,
-        recent_domains=recent_domains,
-        mode=mode,
-    )
+    print("→ Phase 1: requesting proposal…")
+    prop = proposer.propose(history=history_slice, recent_domains=recent_domains)
     print(f"  domain:   {prop.domain}")
     print(f"  contrast: {prop.contrast_label}")
     print(
@@ -155,7 +153,7 @@ def run_one(
         f"  B = {prop.B_label} ({len(prop.B_words)} words)"
     )
 
-    print("→ Computing WEAT…")
+    print("→ Computing WEAT + SC-WEAT…")
     weat_cfg = cfg.get("weat", {}) or {}
     try:
         result: WEATResult = compute_weat(
@@ -167,17 +165,22 @@ def run_one(
             vocab=backend.vocab,
             rng=rng,
             max_permutations=weat_cfg.get("max_permutations", 100_000),
-            exact_threshold=weat_cfg.get("exact_threshold", 12),
-            min_pool_size=weat_cfg.get("min_pool_size", 20),
+            exact_threshold=weat_cfg.get("exact_threshold", 10),
         )
     except ValueError as e:
         print(f"  rejected (insufficient vocab): {e}")
         return None
     print(
-        f"  WEAT:  d = {result.effect_size:+.3f}, "
-        f"p = {result.p_value:.3f}  "
-        f"(n={result.n_X}, exact={result.exact}, "
-        f"perms={result.n_permutations})"
+        f"  WEAT:       D = {result.effect_size:+.3f}, "
+        f"p = {result.p_value:.3f}"
+    )
+    print(
+        f"  SC-WEAT(X): {result.sc_weat_x_mean:+.3f} "
+        f"(p = {result.sc_p_x:.3f})"
+    )
+    print(
+        f"  SC-WEAT(Y): {result.sc_weat_y_mean:+.3f} "
+        f"(p = {result.sc_p_y:.3f})"
     )
 
     # Determine id and skip duplicates
@@ -187,12 +190,21 @@ def run_one(
         return None
 
     # Phase 2: conditional interpretation
-    fires = interpretive_fires(result.effect_size, result.p_value)
+    fires = interpretive_fires(
+        result.effect_size,
+        result.p_value,
+        result.sc_weat_x_mean,
+        result.sc_weat_y_mean,
+    )
     if fires:
-        print("→ Phase 2: requesting interpretive paragraph (p < .05)…")
+        print("→ Phase 2: requesting interpretive paragraph (fires)…")
         result_dict_for_interp = {
             "effect_size": result.effect_size,
             "p_value": result.p_value,
+            "sc_weat_x_mean": result.sc_weat_x_mean,
+            "sc_p_x": result.sc_p_x,
+            "sc_weat_y_mean": result.sc_weat_y_mean,
+            "sc_p_y": result.sc_p_y,
         }
         try:
             interp = proposer.interpret(prop, result_dict_for_interp)
@@ -204,7 +216,7 @@ def run_one(
             print(f"  interpretation failed (test still recorded): {e}")
             interp = Interpretation(paragraph="", fired=False, raw="")
     else:
-        print("→ Phase 2: skipped (p >= .05)")
+        print("→ Phase 2: skipped (consistency condition not met)")
         interp = Interpretation(paragraph="", fired=False, raw="")
 
     entry = {
@@ -221,6 +233,10 @@ def run_one(
         },
         "effect_size": result.effect_size,
         "p_value": result.p_value,
+        "sc_weat_x_mean": result.sc_weat_x_mean,
+        "sc_p_x": result.sc_p_x,
+        "sc_weat_y_mean": result.sc_weat_y_mean,
+        "sc_p_y": result.sc_p_y,
         "n": {
             "X": result.n_X,
             "Y": result.n_Y,
@@ -244,7 +260,6 @@ def run_one(
         "config": {
             "embedding_backend": backend.name,
             "proposer_model": cfg["proposer"]["model"],
-            "proposer_mode": mode,
             "thinking_style": cfg["proposer"].get("thinking_style", "none"),
             "thinking_effort": cfg["proposer"].get("thinking_effort"),
             "history_size_seen": len(history_slice),
@@ -271,15 +286,16 @@ def main():
     feed_path = os.path.join(repo_root, cfg.get("feed_path", "docs/feed.json"))
     persona_path = os.path.join(repo_root, cfg.get("persona_path", "persona.md"))
 
-    print(f"autoweat v14 (WEAT-only) | config={args.config}")
+    print(f"autoweat v13 | config={args.config}")
     print(f"  feed:    {feed_path}")
     print(f"  persona: {persona_path}")
 
     backend = load_backend(cfg["embedding"])
     print(f"  backend: {backend.name}")
 
+    # Seeded RNG for reproducible permutations and balancing.
     import random as _random
-    rng = _random.Random(cfg.get("seed", 20260416))
+    rng = _random.Random(cfg.get("seed", 20260413))
 
     proposer = OllamaProposer(
         model=cfg["proposer"]["model"],

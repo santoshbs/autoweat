@@ -136,16 +136,8 @@ def run_one(
     """Run one iteration: propose → compute → (maybe) interpret → store."""
     history_slice = feed[-15:]
 
-    # Alternate mode: even feed length → well-studied, odd → novel.
-    # Starts with well-studied (baseline) as the very first test.
-    mode = "novel" if (len(feed) % 2 == 1) else "well-studied"
-
-    print(f"→ Phase 1: requesting proposal… (mode: {mode})")
-    prop = proposer.propose(
-        history=history_slice,
-        recent_domains=recent_domains,
-        mode=mode,
-    )
+    print("→ Phase 1: requesting proposal…")
+    prop = proposer.propose(history=history_slice, recent_domains=recent_domains)
     print(f"  domain:   {prop.domain}")
     print(f"  contrast: {prop.contrast_label}")
     print(
@@ -244,7 +236,6 @@ def run_one(
         "config": {
             "embedding_backend": backend.name,
             "proposer_model": cfg["proposer"]["model"],
-            "proposer_mode": mode,
             "thinking_style": cfg["proposer"].get("thinking_style", "none"),
             "thinking_effort": cfg["proposer"].get("thinking_effort"),
             "history_size_seen": len(history_slice),
