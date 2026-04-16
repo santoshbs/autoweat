@@ -426,5 +426,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "1ecb0424c49b",
+    "timestamp": "2026-04-16T09:48:42.566206+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "occupation",
+    "contrast_label": "corporate versus creative roles with structure versus intuition",
+    "labels": {
+      "X": "corporate and administrative roles",
+      "Y": "artistic and creative roles",
+      "A": "structure and order terms",
+      "B": "intuition and fluidity terms"
+    },
+    "effect_size": 1.85388634879007,
+    "p_value": 3.698011505253395e-07,
+    "sc_weat_x_mean": 1.2644357770231671,
+    "sc_p_x": 0.00019599460977842993,
+    "sc_weat_y_mean": -0.3332286476881452,
+    "sc_p_y": 0.391567646245261,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "manager",
+        "accountant",
+        "analyst",
+        "executive",
+        "director",
+        "clerk",
+        "officer",
+        "administrator",
+        "consultant",
+        "auditor",
+        "supervisor",
+        "treasurer"
+      ],
+      "Y_used": [
+        "artist",
+        "painter",
+        "writer",
+        "poet",
+        "dancer",
+        "musician",
+        "actor",
+        "designer",
+        "sculptor",
+        "composer",
+        "novelist",
+        "potter"
+      ],
+      "A_used": [
+        "schedule",
+        "system",
+        "plan",
+        "order",
+        "rule",
+        "logic",
+        "structure",
+        "method",
+        "process",
+        "goal",
+        "step",
+        "form"
+      ],
+      "B_used": [
+        "dream",
+        "feeling",
+        "spark",
+        "flow",
+        "vision",
+        "whim",
+        "spirit",
+        "color",
+        "passion",
+        "freedom",
+        "drift",
+        "sense"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results indicate that corporate and administrative roles are more strongly associated with structure and order terms than with intuition and fluidity terms, a contrast that is significantly more pronounced than for artistic and creative roles. This pattern is driven primarily by the strong link between corporate and administrative roles and concepts of structure and order. This association likely reflects common cultural narratives that characterize business environments as rigid and organized while framing creative pursuits as flexible. A social scientist would find this significant because it illustrates how professional stereotypes are embedded within large-scale linguistic data. Such findings reveal how language reinforces the perceived cognitive demands of different labor roles, mirroring broader social structures.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 4,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
