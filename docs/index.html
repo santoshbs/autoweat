@@ -4,6 +4,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AutoWEAT</title>
+<script>
+  // Apply saved theme preference BEFORE anything renders.
+  // Stored value: "light", "dark", or null (system).
+  (function () {
+    try {
+      var pref = localStorage.getItem("autoweat-theme");
+      if (pref === "light") document.documentElement.classList.add("theme-light");
+      else if (pref === "dark") document.documentElement.classList.add("theme-dark");
+    } catch (e) { /* localStorage blocked, just fall through to system */ }
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -23,8 +34,22 @@
     --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
   }
 
+  /* Dark palette — applied either by system preference (default)
+     or by an explicit html.theme-dark class (user override). */
+  .theme-dark {
+    --bg:        #0f0f0f;
+    --bg-code:   #1a1a1a;
+    --code-tab:  #232323;
+    --rule:      #232323;
+    --rule-soft: #1c1c1c;
+    --fg:        #ededed;
+    --fg-2:      #c8c8c8;
+    --fg-dim:    #8a8a8a;
+    --fg-dimer:  #5a5a5a;
+  }
   @media (prefers-color-scheme: dark) {
-    :root {
+    /* Only apply system dark when the user hasn't explicitly picked a theme */
+    :root:not(.theme-light):not(.theme-dark) {
       --bg:        #0f0f0f;
       --bg-code:   #1a1a1a;
       --code-tab:  #232323;
@@ -82,6 +107,17 @@
   }
   .nav a { color: var(--fg-dim); }
   .nav a:hover { color: var(--fg); text-decoration: none; }
+  .nav .theme-toggle {
+    background: none;
+    border: none;
+    color: var(--fg-dim);
+    font: inherit;
+    font-size: 14px;
+    padding: 0;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .nav .theme-toggle:hover { color: var(--fg); }
 
   /* ── List view ── */
   .section-label {
@@ -349,6 +385,7 @@
   <nav class="nav">
     <a href="#" class="brand">AutoWEAT</a>
     <span class="tagline">An autonomous bench of word-embedding bias tests.</span>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">◐</button>
     <a href="https://santoshbs.github.io" target="_blank" rel="noopener">santoshbs</a>
   </nav>
 
@@ -364,6 +401,69 @@
 </div>
 
 <script>
+/* ─── Theme toggle ─── */
+
+(function initTheme() {
+  const btn = document.getElementById("themeToggle");
+  if (!btn) return;
+  const root = document.documentElement;
+
+  // Three states: "system" (no class), "light" (.theme-light), "dark" (.theme-dark)
+  function currentState() {
+    if (root.classList.contains("theme-light")) return "light";
+    if (root.classList.contains("theme-dark")) return "dark";
+    return "system";
+  }
+
+  // "Effective" theme: what is actually being rendered, resolving system preference
+  function effectiveTheme() {
+    const state = currentState();
+    if (state === "light") return "light";
+    if (state === "dark") return "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  function updateGlyph() {
+    // Show the OPPOSITE of the effective theme (i.e. what you'll switch to)
+    const eff = effectiveTheme();
+    btn.textContent = eff === "dark" ? "☀" : "☾";
+    btn.title = eff === "dark" ? "Switch to light" : "Switch to dark";
+  }
+
+  function setState(next) {
+    root.classList.remove("theme-light", "theme-dark");
+    if (next === "light") {
+      root.classList.add("theme-light");
+      try { localStorage.setItem("autoweat-theme", "light"); } catch (e) {}
+    } else if (next === "dark") {
+      root.classList.add("theme-dark");
+      try { localStorage.setItem("autoweat-theme", "dark"); } catch (e) {}
+    } else {
+      try { localStorage.removeItem("autoweat-theme"); } catch (e) {}
+    }
+    updateGlyph();
+  }
+
+  // Clicking: flip to the opposite of whatever is currently effective.
+  // This means clicking in system-dark mode sets light (overriding system),
+  // and vice versa. A double-click cycle returns to system isn't exposed here
+  // to keep the UX simple (one-click toggle).
+  btn.addEventListener("click", function () {
+    const eff = effectiveTheme();
+    setState(eff === "dark" ? "light" : "dark");
+  });
+
+  // React to system theme changes while user is in "system" state
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) {
+    mq.addEventListener("change", function () {
+      if (currentState() === "system") updateGlyph();
+    });
+  }
+
+  updateGlyph();
+})();
+
 /* ─── Sample data (replaced by fetch('feed.json') on deploy) ─── */
 
 const SAMPLE = [
