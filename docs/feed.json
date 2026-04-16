@@ -999,5 +999,118 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "eb3d7f6e282a",
+    "timestamp": "2026-04-16T10:18:52.559406+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "inequality",
+    "contrast_label": "high wealth versus low wealth",
+    "labels": {
+      "X": "high wealth and affluent terms",
+      "Y": "low wealth and impoverished terms",
+      "A": "luxury and leisure terms",
+      "B": "scarcity and hardship terms"
+    },
+    "effect_size": 1.592012112018317,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.1985703368789998,
+    "sc_p_x": 0.48298,
+    "sc_weat_y_mean": -1.1458665586063561,
+    "sc_p_y": 0.00035,
+    "n": {
+      "X": 14,
+      "Y": 14,
+      "A": 14,
+      "B": 14
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "rich",
+        "affluent",
+        "wealthy",
+        "opulent",
+        "privileged",
+        "prosperous",
+        "elite",
+        "loaded",
+        "moneyed",
+        "comfortable",
+        "upper",
+        "high",
+        "plush",
+        "lavish"
+      ],
+      "Y_used": [
+        "poor",
+        "needy",
+        "impoverished",
+        "broke",
+        "destitute",
+        "penniless",
+        "indigent",
+        "deprived",
+        "bankrupt",
+        "meager",
+        "lower",
+        "low",
+        "scant",
+        "lacking"
+      ],
+      "A_used": [
+        "vacation",
+        "jewelry",
+        "yacht",
+        "champagne",
+        "silk",
+        "mansion",
+        "spa",
+        "resort",
+        "travel",
+        "leisure",
+        "gold",
+        "velvet",
+        "diamonds",
+        "caviar"
+      ],
+      "B_used": [
+        "rent",
+        "debt",
+        "coupon",
+        "budget",
+        "hunger",
+        "labor",
+        "stress",
+        "cheap",
+        "basic",
+        "hardship",
+        "thrift",
+        "shortage",
+        "pennies",
+        "crumbs"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that high wealth and affluent terms are more strongly associated with luxury and leisure terms, whereas low wealth and impoverished terms are more closely linked to scarcity and hardship terms. This effect is driven primarily by the strong association between low wealth and impoverished terms and the concepts of scarcity and hardship. This pattern likely arises because English-language web text frequently frames poverty through the lens of struggle and deprivation while associating wealth with comfort and privilege. A social scientist would find this significant because it reveals how language reinforces the perceived inevitability of hardship for those with lower economic status. Such findings highlight how digital corpora encode structural social inequalities by mapping economic categories onto distinct material realities.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 9,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
