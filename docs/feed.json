@@ -2470,5 +2470,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "474bc0895441",
+    "timestamp": "2026-04-16T11:42:18.822502+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "justice",
+    "contrast_label": "retributive versus restorative justice",
+    "labels": {
+      "X": "retributive justice terms",
+      "Y": "restorative justice terms",
+      "A": "rigidity and hardness terms",
+      "B": "flexibility and softness terms"
+    },
+    "effect_size": 1.3399164392664553,
+    "p_value": 0.0005857650224321378,
+    "sc_weat_x_mean": 0.01561721690890149,
+    "sc_p_x": 0.9668147843541571,
+    "sc_weat_y_mean": -0.3779687804111925,
+    "sc_p_y": 0.30445728722751203,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "punish",
+        "crime",
+        "jail",
+        "fine",
+        "guilt",
+        "fault",
+        "penalty",
+        "judge",
+        "sentence",
+        "prison",
+        "cell",
+        "guard"
+      ],
+      "Y_used": [
+        "heal",
+        "help",
+        "mend",
+        "repair",
+        "trust",
+        "apology",
+        "peace",
+        "growth",
+        "listen",
+        "unity",
+        "bond",
+        "bridge"
+      ],
+      "A_used": [
+        "hard",
+        "cold",
+        "iron",
+        "wall",
+        "stone",
+        "fixed",
+        "strict",
+        "tight",
+        "sharp",
+        "heavy",
+        "blunt",
+        "dark"
+      ],
+      "B_used": [
+        "soft",
+        "warm",
+        "light",
+        "open",
+        "fluid",
+        "bend",
+        "give",
+        "smooth",
+        "clear",
+        "bright",
+        "wide",
+        "air"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results indicate that retributive justice terms are more strongly associated with rigidity and hardness terms than restorative justice terms are. Conversely, restorative justice terms show a stronger association with flexibility and softness terms. This pattern likely emerges because retributive frameworks are often described through the lens of strict adherence to rules and uncompromising punishment. In contrast, restorative practices are typically framed as adaptive processes focused on healing and interpersonal dialogue. A social scientist might find this significant because it reveals how deeply ingrained these opposing conceptual metaphors are in general discourse. Understanding these linguistic associations helps explain how the perceived hardness or softness of a justice system influences public attitudes toward legal reform.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
