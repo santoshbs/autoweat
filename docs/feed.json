@@ -1439,5 +1439,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "dd19a18029a2",
+    "timestamp": "2026-04-16T10:40:04.557089+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "gender",
+    "contrast_label": "gender with rationality versus emotionality",
+    "labels": {
+      "X": "women and feminine terms",
+      "Y": "men and masculine terms",
+      "A": "logic and rationality terms",
+      "B": "emotion and sensitivity terms"
+    },
+    "effect_size": -0.9763246839191508,
+    "p_value": 0.00562,
+    "sc_weat_x_mean": -0.8708397056763847,
+    "sc_p_x": 0.00939,
+    "sc_weat_y_mean": -0.6065520656780067,
+    "sc_p_y": 0.08122,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "woman",
+        "feminine",
+        "lady",
+        "girl",
+        "female",
+        "mother",
+        "sister",
+        "aunt",
+        "bride",
+        "daughter",
+        "niece",
+        "she",
+        "her",
+        "womanly",
+        "madam"
+      ],
+      "Y_used": [
+        "man",
+        "masculine",
+        "gentleman",
+        "boy",
+        "male",
+        "father",
+        "brother",
+        "uncle",
+        "groom",
+        "son",
+        "nephew",
+        "he",
+        "him",
+        "manly",
+        "sir"
+      ],
+      "A_used": [
+        "logic",
+        "rational",
+        "reason",
+        "analysis",
+        "objective",
+        "factual",
+        "calculation",
+        "precise",
+        "theorem",
+        "proof",
+        "systematic",
+        "evidence",
+        "coherence",
+        "argument",
+        "data"
+      ],
+      "B_used": [
+        "emotion",
+        "feeling",
+        "sensitivity",
+        "intuition",
+        "empathy",
+        "mood",
+        "heart",
+        "passion",
+        "tender",
+        "warmth",
+        "soul",
+        "sentiment",
+        "instinct",
+        "delicate",
+        "soft"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 13,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
