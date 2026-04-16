@@ -321,5 +321,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "e115ab649b31",
+    "timestamp": "2026-04-16T09:43:20.157081+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "sociology",
+    "contrast_label": "urban versus rural environments with cosmopolitan versus traditional attributes",
+    "labels": {
+      "X": "urban environments",
+      "Y": "rural environments",
+      "A": "cosmopolitan attributes",
+      "B": "traditional attributes"
+    },
+    "effect_size": 1.1241136765085138,
+    "p_value": 0.004712006259993876,
+    "sc_weat_x_mean": 0.2383136759577904,
+    "sc_p_x": 0.4594912423691533,
+    "sc_weat_y_mean": -0.5375500410793356,
+    "sc_p_y": 0.11039303945482436,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "city",
+        "downtown",
+        "subway",
+        "sidewalk",
+        "skyscraper",
+        "apartment",
+        "traffic",
+        "bustle",
+        "plaza",
+        "concrete",
+        "street",
+        "metro"
+      ],
+      "Y_used": [
+        "farm",
+        "village",
+        "meadow",
+        "pasture",
+        "country",
+        "valley",
+        "orchard",
+        "grove",
+        "creek",
+        "forest",
+        "field",
+        "woodland"
+      ],
+      "A_used": [
+        "global",
+        "diverse",
+        "trend",
+        "rapid",
+        "fast",
+        "fashion",
+        "network",
+        "current",
+        "hybrid",
+        "variety",
+        "modern",
+        "complex"
+      ],
+      "B_used": [
+        "quiet",
+        "local",
+        "heritage",
+        "steady",
+        "rustic",
+        "native",
+        "simple",
+        "rooted",
+        "ancient",
+        "classic",
+        "calm",
+        "natural"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results indicate that urban environments are more strongly associated with cosmopolitan attributes than traditional attributes, while rural environments are more closely linked to traditional attributes. This pattern suggests a clear linguistic separation between these two types of locations in the analyzed corpus. This association likely reflects common cultural stereotypes that associate city life with modernity and rural life with heritage. Such biases are often amplified in web text, which frequently relies on simplified tropes to describe geographic regions. For a social scientist, this finding is significant because it shows how language encodes a binary social structure between the urban and the rural. Identifying these patterns helps reveal the subtle ways digital communication reinforces existing societal divisions.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 3,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
