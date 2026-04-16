@@ -2575,5 +2575,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "b15988f93335",
+    "timestamp": "2026-04-16T11:50:07.396767+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "sociology",
+    "contrast_label": "sacred and secular concepts with timeless and temporal attributes",
+    "labels": {
+      "X": "religious and sacred terms",
+      "Y": "scientific and secular terms",
+      "A": "timeless and eternal attributes",
+      "B": "temporal and fleeting attributes"
+    },
+    "effect_size": 1.5858943945559008,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.118321680255909,
+    "sc_p_x": 0.71086,
+    "sc_weat_y_mean": -0.5871646366425785,
+    "sc_p_y": 0.08247,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "prayer",
+        "altar",
+        "temple",
+        "hymn",
+        "faith",
+        "soul",
+        "spirit",
+        "divine",
+        "sacred",
+        "ritual",
+        "priest",
+        "gospel",
+        "creed",
+        "chapel",
+        "psalm"
+      ],
+      "Y_used": [
+        "science",
+        "lab",
+        "data",
+        "proof",
+        "logic",
+        "fact",
+        "reason",
+        "theory",
+        "method",
+        "evidence",
+        "study",
+        "nature",
+        "human",
+        "world",
+        "atom"
+      ],
+      "A_used": [
+        "always",
+        "forever",
+        "ancient",
+        "timeless",
+        "infinite",
+        "eternal",
+        "lasting",
+        "old",
+        "vast",
+        "enduring",
+        "constant",
+        "steady",
+        "fixed",
+        "permanent",
+        "ageless"
+      ],
+      "B_used": [
+        "now",
+        "today",
+        "hour",
+        "clock",
+        "brief",
+        "current",
+        "recent",
+        "limited",
+        "moment",
+        "fast",
+        "date",
+        "time",
+        "daily",
+        "fleeting",
+        "sudden"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results indicate that religious and sacred terms are more strongly associated with timeless and eternal attributes than scientific and secular terms are. In this corpus, the vocabulary of the sacred is linked to permanence, while the vocabulary of the secular is more closely aligned with temporal and fleeting attributes. This pattern likely reflects a conceptual divide where spiritual discourse emphasizes immutable truths and scientific discourse focuses on empirical change. Such a linguistic trend suggests that religious concepts are framed as existing outside of time, whereas scientific concepts are viewed as bound by it. A social scientist would find this important because it reveals how language encodes the perceived distinction between the eternal nature of faith and the evolving nature of human knowledge.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
