@@ -2353,5 +2353,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "fe8e5015fef7",
+    "timestamp": "2026-04-16T11:27:10.677043+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "culture",
+    "contrast_label": "corporate business versus artistic creativity",
+    "labels": {
+      "X": "corporate and business terms",
+      "Y": "artistic and creative terms",
+      "A": "efficiency and profit terms",
+      "B": "expression and beauty terms"
+    },
+    "effect_size": 1.8771832273559814,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.9523181455087684,
+    "sc_p_x": 0.00209,
+    "sc_weat_y_mean": -1.1012966732901375,
+    "sc_p_y": 8e-05,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "company",
+        "office",
+        "profit",
+        "market",
+        "manager",
+        "corporate",
+        "trade",
+        "industry",
+        "fiscal",
+        "stock",
+        "budget",
+        "firm",
+        "executive",
+        "venture",
+        "commerce"
+      ],
+      "Y_used": [
+        "studio",
+        "poem",
+        "painting",
+        "dance",
+        "music",
+        "sculpture",
+        "canvas",
+        "gallery",
+        "novel",
+        "lyric",
+        "drama",
+        "sketch",
+        "rhythm",
+        "melody",
+        "craft"
+      ],
+      "A_used": [
+        "fast",
+        "gain",
+        "growth",
+        "yield",
+        "scale",
+        "output",
+        "productive",
+        "lean",
+        "result",
+        "goal",
+        "metric",
+        "target",
+        "margin",
+        "return",
+        "optimal"
+      ],
+      "B_used": [
+        "soul",
+        "flow",
+        "mood",
+        "grace",
+        "vision",
+        "style",
+        "feeling",
+        "depth",
+        "spirit",
+        "raw",
+        "vivid",
+        "unique",
+        "bright",
+        "pure",
+        "wild"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that corporate and business terms are more strongly associated with efficiency and profit terms than they are with expression and beauty terms. Conversely, artistic and creative terms show a significantly stronger association with expression and beauty terms. This pattern likely exists because web-based discourse typically frames professional environments through the lens of utility and financial gain while framing creative pursuits through the lens of aesthetics and personal meaning. A social scientist might find this important because it demonstrates how language encodes a rigid dichotomy between the instrumental values of commerce and the intrinsic values of art. Such a finding suggests that these conceptual domains are maintained as distinct, almost opposing, spheres of activity in the collective digital consciousness.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
