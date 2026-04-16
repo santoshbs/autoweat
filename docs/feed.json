@@ -882,5 +882,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "78eea8b85365",
+    "timestamp": "2026-04-16T10:11:16.599593+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "identity",
+    "contrast_label": "digital versus physical identity",
+    "labels": {
+      "X": "digital and virtual identity",
+      "Y": "physical and embodied identity",
+      "A": "ephemeral and fluid attributes",
+      "B": "concrete and stable attributes"
+    },
+    "effect_size": -0.7942107097300741,
+    "p_value": 0.02826,
+    "sc_weat_x_mean": -0.5948424450423649,
+    "sc_p_x": 0.08021,
+    "sc_weat_y_mean": -0.3447846701558124,
+    "sc_p_y": 0.27529,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "profile",
+        "avatar",
+        "handle",
+        "username",
+        "screen",
+        "pixel",
+        "online",
+        "virtual",
+        "digital",
+        "browser",
+        "web",
+        "network",
+        "link",
+        "post",
+        "feed"
+      ],
+      "Y_used": [
+        "body",
+        "skin",
+        "face",
+        "hand",
+        "breath",
+        "bone",
+        "muscle",
+        "blood",
+        "heart",
+        "touch",
+        "scent",
+        "voice",
+        "gaze",
+        "pulse",
+        "weight"
+      ],
+      "A_used": [
+        "fast",
+        "transient",
+        "fleeting",
+        "elusive",
+        "fluid",
+        "subtle",
+        "soft",
+        "thin",
+        "vague",
+        "airy",
+        "rapid",
+        "quick",
+        "brief",
+        "pale",
+        "slight"
+      ],
+      "B_used": [
+        "hard",
+        "heavy",
+        "solid",
+        "sturdy",
+        "thick",
+        "firm",
+        "dense",
+        "still",
+        "deep",
+        "rough",
+        "strong",
+        "fixed",
+        "grounded",
+        "stable",
+        "massive"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 8,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
