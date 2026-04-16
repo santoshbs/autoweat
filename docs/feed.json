@@ -103,5 +103,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "d148f72e60a5",
+    "timestamp": "2026-04-16T09:32:42.072178+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "age",
+    "contrast_label": "age with digital versus analog technology",
+    "labels": {
+      "X": "youth and young people",
+      "Y": "elderly and older people",
+      "A": "digital and modern technology",
+      "B": "analog and traditional media"
+    },
+    "effect_size": 0.743676061916287,
+    "p_value": 0.07408929070660125,
+    "sc_weat_x_mean": -0.20587887899833626,
+    "sc_p_x": 0.585417409350644,
+    "sc_weat_y_mean": -0.5346185764219227,
+    "sc_p_y": 0.1357843260521952,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "youth",
+        "teen",
+        "adolescent",
+        "junior",
+        "young",
+        "youngster",
+        "kid",
+        "juvenile",
+        "student",
+        "pupil",
+        "rookie",
+        "freshman"
+      ],
+      "Y_used": [
+        "elderly",
+        "senior",
+        "aged",
+        "old",
+        "pensioner",
+        "veteran",
+        "elder",
+        "retiree",
+        "grandmother",
+        "grandfather",
+        "ancestor",
+        "mature"
+      ],
+      "A_used": [
+        "computer",
+        "internet",
+        "app",
+        "digital",
+        "smartphone",
+        "software",
+        "online",
+        "network",
+        "virtual",
+        "coding",
+        "pixel",
+        "screen"
+      ],
+      "B_used": [
+        "paper",
+        "book",
+        "letter",
+        "clock",
+        "analog",
+        "history",
+        "custom",
+        "heritage",
+        "ritual",
+        "classic",
+        "tradition",
+        "archive"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 1,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
