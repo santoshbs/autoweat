@@ -2123,5 +2123,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "b58c710a28a4",
+    "timestamp": "2026-04-16T11:18:40.076121+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "sociology",
+    "contrast_label": "urban versus rural settings with pace of life attributes",
+    "labels": {
+      "X": "urban and city terms",
+      "Y": "rural and country terms",
+      "A": "fast and hurried attributes",
+      "B": "slow and peaceful attributes"
+    },
+    "effect_size": 1.3821110077690792,
+    "p_value": 5e-05,
+    "sc_weat_x_mean": 0.289071515746745,
+    "sc_p_x": 0.37211,
+    "sc_weat_y_mean": -0.43731511974415344,
+    "sc_p_y": 0.17338,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "metropolis",
+        "skyscraper",
+        "sidewalk",
+        "traffic",
+        "apartment",
+        "crowd",
+        "subway",
+        "street",
+        "alley",
+        "district",
+        "plaza",
+        "pavement",
+        "center",
+        "borough",
+        "hub"
+      ],
+      "Y_used": [
+        "village",
+        "farmhouse",
+        "meadow",
+        "pasture",
+        "forest",
+        "valley",
+        "field",
+        "harvest",
+        "barn",
+        "rural",
+        "creek",
+        "woodland",
+        "prairie",
+        "acre",
+        "grove"
+      ],
+      "A_used": [
+        "speed",
+        "rush",
+        "noise",
+        "hurry",
+        "active",
+        "rapid",
+        "urgent",
+        "quick",
+        "brisk",
+        "frantic",
+        "sudden",
+        "immediate",
+        "prompt",
+        "swift",
+        "nimble"
+      ],
+      "B_used": [
+        "calm",
+        "peace",
+        "still",
+        "quiet",
+        "slow",
+        "steady",
+        "patient",
+        "restful",
+        "gentle",
+        "soft",
+        "lazy",
+        "leisurely",
+        "dormant",
+        "serene",
+        "mellow"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that in this corpus, urban and city terms are more strongly associated with fast and hurried attributes, whereas rural and country terms are more closely linked to slow and peaceful attributes. This pattern likely emerges from widespread cultural narratives that contrast the high-energy pace of metropolitan life with the perceived stillness of the countryside. Such a finding is significant for social scientists because it demonstrates how linguistic associations mirror and potentially reinforce binary stereotypes about geography. Analyzing these associations reveals how the perceived nature of a place becomes inextricably linked to the tempo of the life lived there.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
