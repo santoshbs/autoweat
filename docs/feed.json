@@ -2240,5 +2240,118 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "3a6134d12c08",
+    "timestamp": "2026-04-16T11:22:05.521443+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "technology",
+    "contrast_label": "technology versus humanity with efficiency versus warmth",
+    "labels": {
+      "X": "technology and digital terms",
+      "Y": "humanity and biological terms",
+      "A": "efficiency and speed terms",
+      "B": "warmth and nuance terms"
+    },
+    "effect_size": 1.7279420473842375,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 1.0329650399510162,
+    "sc_p_x": 0.00317,
+    "sc_weat_y_mean": 0.037098695050838085,
+    "sc_p_y": 0.91427,
+    "n": {
+      "X": 14,
+      "Y": 14,
+      "A": 14,
+      "B": 14
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "software",
+        "computer",
+        "robot",
+        "machine",
+        "digital",
+        "network",
+        "data",
+        "system",
+        "circuit",
+        "screen",
+        "chip",
+        "code",
+        "device",
+        "processor"
+      ],
+      "Y_used": [
+        "person",
+        "soul",
+        "heart",
+        "spirit",
+        "flesh",
+        "blood",
+        "feeling",
+        "breath",
+        "skin",
+        "mind",
+        "pulse",
+        "being",
+        "mortal",
+        "body"
+      ],
+      "A_used": [
+        "fast",
+        "quick",
+        "precise",
+        "optimal",
+        "rapid",
+        "swift",
+        "direct",
+        "smooth",
+        "lean",
+        "sharp",
+        "streamlined",
+        "effective",
+        "agile",
+        "exact"
+      ],
+      "B_used": [
+        "soft",
+        "warm",
+        "gentle",
+        "complex",
+        "rich",
+        "deep",
+        "subtle",
+        "kind",
+        "tender",
+        "organic",
+        "fluid",
+        "mellow",
+        "empathetic",
+        "cozy"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
