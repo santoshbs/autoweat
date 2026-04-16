@@ -1217,5 +1217,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "949667e7d91c",
+    "timestamp": "2026-04-16T10:32:14.196236+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "sociology",
+    "contrast_label": "formal authority versus informal peer relationships",
+    "labels": {
+      "X": "formal authority figures",
+      "Y": "informal peer figures",
+      "A": "regulatory and commanding terms",
+      "B": "collaborative and personal terms"
+    },
+    "effect_size": 1.4622177789162858,
+    "p_value": 9.134088417975886e-05,
+    "sc_weat_x_mean": 0.0037609985425165475,
+    "sc_p_x": 0.9914945735379171,
+    "sc_weat_y_mean": -0.9535390262453505,
+    "sc_p_y": 0.008406319753742017,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "boss",
+        "manager",
+        "director",
+        "officer",
+        "captain",
+        "chief",
+        "president",
+        "governor",
+        "judge",
+        "warden",
+        "dean",
+        "principal"
+      ],
+      "Y_used": [
+        "friend",
+        "peer",
+        "neighbor",
+        "mate",
+        "partner",
+        "sibling",
+        "colleague",
+        "companion",
+        "equal",
+        "ally",
+        "associate",
+        "fellow"
+      ],
+      "A_used": [
+        "rule",
+        "order",
+        "command",
+        "law",
+        "policy",
+        "decree",
+        "mandate",
+        "requirement",
+        "formal",
+        "official",
+        "system",
+        "statute"
+      ],
+      "B_used": [
+        "trust",
+        "advice",
+        "suggest",
+        "share",
+        "listen",
+        "agree",
+        "help",
+        "support",
+        "casual",
+        "informal",
+        "personal",
+        "flexible"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that the corpus associates formal authority figures more strongly with regulatory and commanding terms than it does informal peer figures. This relative difference is primarily driven by a strong association between informal peer figures and collaborative and personal terms. This pattern likely reflects the typical way web text describes social roles, where peer-to-peer interactions are characterized by cooperation while authority is defined by a lack of such informality. A social scientist might find this important because it demonstrates how language encodes hierarchical power dynamics. These associations reveal the ingrained social expectations that differentiate the perceived behavior of leaders from that of their peers.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 11,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
