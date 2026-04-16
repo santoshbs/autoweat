@@ -1778,5 +1778,118 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "6c6729414b91",
+    "timestamp": "2026-04-16T11:03:20.450094+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "culture",
+    "contrast_label": "tradition versus innovation with stability versus fluidity",
+    "labels": {
+      "X": "tradition and ancestral terms",
+      "Y": "innovation and futuristic terms",
+      "A": "stability and permanence terms",
+      "B": "fluidity and speed terms"
+    },
+    "effect_size": 1.4965119233907351,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.1478676450884262,
+    "sc_p_x": 0.67655,
+    "sc_weat_y_mean": -0.1309766949611286,
+    "sc_p_y": 0.72265,
+    "n": {
+      "X": 14,
+      "Y": 14,
+      "A": 14,
+      "B": 14
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "tradition",
+        "heritage",
+        "custom",
+        "origin",
+        "legacy",
+        "ancient",
+        "classic",
+        "old",
+        "ritual",
+        "folk",
+        "antique",
+        "ancestral",
+        "past",
+        "history"
+      ],
+      "Y_used": [
+        "innovation",
+        "future",
+        "progress",
+        "novel",
+        "modern",
+        "new",
+        "advanced",
+        "tomorrow",
+        "change",
+        "growth",
+        "fresh",
+        "update",
+        "current",
+        "ahead"
+      ],
+      "A_used": [
+        "stability",
+        "permanence",
+        "steady",
+        "fixed",
+        "enduring",
+        "constant",
+        "still",
+        "rigid",
+        "firm",
+        "lasting",
+        "solid",
+        "heavy",
+        "inert",
+        "static"
+      ],
+      "B_used": [
+        "speed",
+        "fluidity",
+        "fast",
+        "dynamic",
+        "shifting",
+        "rapid",
+        "quick",
+        "agile",
+        "mobile",
+        "volatile",
+        "fleeting",
+        "light",
+        "active",
+        "flexible"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results indicate that tradition and ancestral terms are more closely associated with stability and permanence terms than with fluidity and speed terms. Conversely, innovation and futuristic terms show a stronger association with fluidity and speed terms than with stability and permanence terms. This pattern likely arises because web-based English text often characterizes the past as a fixed foundation while framing the future as a period of rapid, unpredictable change. A social scientist would find this significant because it reveals how linguistic structures link the concept of heritage to immutability and progress to instability. This suggests that the vocabulary of innovation is inherently tied to a sense of transience.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
