@@ -1322,5 +1322,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "e179fabd1a9a",
+    "timestamp": "2026-04-16T10:36:04.399728+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "labor",
+    "contrast_label": "academic versus vocational tracks with abstract versus concrete attributes",
+    "labels": {
+      "X": "academic and university terms",
+      "Y": "vocational and trade terms",
+      "A": "abstract and cognitive terms",
+      "B": "concrete and physical terms"
+    },
+    "effect_size": 1.6927194349982095,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.8986297764890154,
+    "sc_p_x": 0.00687,
+    "sc_weat_y_mean": -0.2825471778836269,
+    "sc_p_y": 0.3778,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "university",
+        "professor",
+        "student",
+        "lecture",
+        "degree",
+        "campus",
+        "library",
+        "seminar",
+        "scholar",
+        "thesis",
+        "study",
+        "research",
+        "faculty",
+        "academy",
+        "course"
+      ],
+      "Y_used": [
+        "trade",
+        "craft",
+        "apprentice",
+        "worker",
+        "shop",
+        "forge",
+        "plumber",
+        "mechanic",
+        "electrician",
+        "welder",
+        "carpenter",
+        "mason",
+        "technician",
+        "smith",
+        "laborer"
+      ],
+      "A_used": [
+        "thought",
+        "logic",
+        "reason",
+        "mind",
+        "concept",
+        "principle",
+        "analysis",
+        "mental",
+        "intellectual",
+        "cognitive",
+        "theory",
+        "insight",
+        "notion",
+        "premise",
+        "deduction"
+      ],
+      "B_used": [
+        "hand",
+        "muscle",
+        "touch",
+        "heavy",
+        "solid",
+        "hard",
+        "material",
+        "object",
+        "weight",
+        "surface",
+        "gear",
+        "metal",
+        "stone",
+        "brick",
+        "physical"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that academic and university terms are more strongly associated with abstract and cognitive terms than vocational and trade terms are. This effect is primarily driven by a significant association between academic and university terms and the abstract and cognitive category. This pattern likely exists because web-based descriptions of higher education emphasize theoretical analysis, whereas vocational descriptions focus more on tangible skills and manual application. For a social scientist, this finding is important because it demonstrates how language encodes a conceptual divide between different types of labor. Such linguistic patterns reveal a systemic association of intellectualism with academic paths and physicality with vocational ones, reflecting broader social hierarchies.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 12,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
