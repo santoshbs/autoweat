@@ -765,5 +765,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "348714ac1501",
+    "timestamp": "2026-04-16T10:06:12.233552+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "culture",
+    "contrast_label": "scientific rationality versus spiritual faith",
+    "labels": {
+      "X": "scientific and rational terms",
+      "Y": "spiritual and faith terms",
+      "A": "certainty and precision terms",
+      "B": "intuition and emotion terms"
+    },
+    "effect_size": 1.715316284731939,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 1.29733884764988,
+    "sc_p_x": 0.0,
+    "sc_weat_y_mean": 0.4122088621365888,
+    "sc_p_y": 0.22771,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "science",
+        "logic",
+        "reason",
+        "evidence",
+        "data",
+        "theory",
+        "method",
+        "research",
+        "empirical",
+        "observation",
+        "analysis",
+        "objective",
+        "fact",
+        "system",
+        "formula"
+      ],
+      "Y_used": [
+        "faith",
+        "prayer",
+        "soul",
+        "spirit",
+        "belief",
+        "divine",
+        "sacred",
+        "miracle",
+        "worship",
+        "devotion",
+        "holy",
+        "grace",
+        "ritual",
+        "temple",
+        "church"
+      ],
+      "A_used": [
+        "true",
+        "valid",
+        "correct",
+        "real",
+        "verified",
+        "certain",
+        "exact",
+        "precise",
+        "clear",
+        "direct",
+        "literal",
+        "actual",
+        "hard",
+        "firm",
+        "solid"
+      ],
+      "B_used": [
+        "felt",
+        "imagined",
+        "hoped",
+        "sensed",
+        "intuitive",
+        "vague",
+        "soft",
+        "warm",
+        "light",
+        "deep",
+        "mysterious",
+        "hidden",
+        "subtle",
+        "emotional",
+        "dreamy"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 7,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
