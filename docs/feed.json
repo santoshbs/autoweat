@@ -1112,5 +1112,110 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "6ca667f3d855",
+    "timestamp": "2026-04-16T10:26:04.548284+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "ethics",
+    "contrast_label": "legal versus moral frameworks",
+    "labels": {
+      "X": "legal and regulatory terms",
+      "Y": "moral and ethical terms",
+      "A": "written and external attributes",
+      "B": "felt and internal attributes"
+    },
+    "effect_size": 1.7757978743078529,
+    "p_value": 7.39602301050679e-07,
+    "sc_weat_x_mean": 0.7038098887442318,
+    "sc_p_x": 0.056911657463548704,
+    "sc_weat_y_mean": -0.3014345585844573,
+    "sc_p_y": 0.37924217389825143,
+    "n": {
+      "X": 12,
+      "Y": 12,
+      "A": 12,
+      "B": 12
+    },
+    "n_permutations": 2704156,
+    "exact": true,
+    "words": {
+      "X_used": [
+        "law",
+        "statute",
+        "code",
+        "regulation",
+        "decree",
+        "act",
+        "ordinance",
+        "rule",
+        "court",
+        "judge",
+        "mandate",
+        "protocol"
+      ],
+      "Y_used": [
+        "ethic",
+        "morality",
+        "value",
+        "virtue",
+        "conscience",
+        "belief",
+        "principle",
+        "honor",
+        "spirit",
+        "faith",
+        "ethos",
+        "heart"
+      ],
+      "A_used": [
+        "written",
+        "external",
+        "formal",
+        "explicit",
+        "documented",
+        "recorded",
+        "public",
+        "standard",
+        "codified",
+        "rigid",
+        "official",
+        "outward"
+      ],
+      "B_used": [
+        "felt",
+        "internal",
+        "implicit",
+        "intuitive",
+        "personal",
+        "private",
+        "hidden",
+        "emotional",
+        "spiritual",
+        "fluid",
+        "vague",
+        "inward"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results indicate that in this corpus, legal and regulatory terms are more closely associated with written and external attributes, whereas moral and ethical terms are more strongly linked to felt and internal attributes. This pattern likely reflects a conceptual divide in English web text where law is treated as a system of documented rules and external enforcement, while morality is framed as a matter of personal conscience and internal sentiment. Such a finding is significant for social scientists because it demonstrates how language encodes the distinction between formal institutional control and private psychological experience. Understanding these associations helps reveal the underlying social structures that separate the objective \"letter of the law\" from the subjective nature of ethical conviction.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 10,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
