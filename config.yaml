@@ -35,45 +35,45 @@ max_iterations: 10
 # malformed JSON on the first try and succeeds on the second.
 
 # ─── PRESET A: gpt-oss:120b on reasoning=high (DEFAULT) ────────────────────
-proposer:
-  model: "gpt-oss:20b" #"gpt-oss:120b"
-  host: "http://localhost:11434"
-  persona_path: "persona.md"
-  thinking_style: "gpt-oss"
-  thinking_effort: "high"
-  max_json_retries: 3
-  # OpenAI's official recommendation for gpt-oss:
-  #   https://github.com/openai/gpt-oss#recommended-sampling-parameters
-  # Ollama's default top_p is 0.9 — must override to 1.0 explicitly.
-  # top_k=0 disables top-k truncation (HF transformers default of 50
-  # silently degrades gpt-oss output if left unspecified).
-  sampling:
-    temperature: 1.0
-    top_p: 1.0
-    top_k: 0
-    num_ctx: 32768
-    repeat_penalty: 1.0
+#proposer:
+#  model: "gpt-oss:20b" #"gpt-oss:120b"
+#  host: "http://localhost:11434"
+#  persona_path: "persona.md"
+#  thinking_style: "gpt-oss"
+#  thinking_effort: "high"
+#  max_json_retries: 3
+#  # OpenAI's official recommendation for gpt-oss:
+#  #   https://github.com/openai/gpt-oss#recommended-sampling-parameters
+#  # Ollama's default top_p is 0.9 — must override to 1.0 explicitly.
+#  # top_k=0 disables top-k truncation (HF transformers default of 50
+#  # silently degrades gpt-oss output if left unspecified).
+#  sampling:
+#    temperature: 1.0
+#    top_p: 1.0
+#    top_k: 0
+#    num_ctx: 32768
+#    repeat_penalty: 1.0
 
 # ─── PRESET B: qwen3:32b with thinking on ─────────────────────────────────
 # Qwen3 (April 2025 release). To use, comment out the gpt-oss preset above
 # and uncomment this whole block.
 #
-# proposer:
-#   model: "qwen3:32b"
-#   host: "http://localhost:11434"
-#   persona_path: "persona.md"
-#   thinking_style: "qwen3"
-#   thinking_effort: "high"        # any truthy value enables Ollama's `think: true`
-#   max_json_retries: 3
-#   # Qwen3 thinking-mode recommendations (Qwen team, April 2025):
-#   sampling:
-#     temperature: 0.6
-#     top_p: 0.95
-#     top_k: 20
-#     min_p: 0.0
-#     num_ctx: 32768               # qwen3 supports 32k natively, more with rope
-#     repeat_penalty: 1.0          # disable; presence_penalty does the work
-#     presence_penalty: 1.5
+proposer:
+   model: "qwen3:32b"
+   host: "http://localhost:11434"
+   persona_path: "persona.md"
+   thinking_style: "qwen3"
+   thinking_effort: "high"        # any truthy value enables Ollama's `think: true`
+   max_json_retries: 3
+   # Qwen3 thinking-mode recommendations (Qwen team, April 2025):
+   sampling:
+     temperature: 0.6
+     top_p: 0.95
+     top_k: 20
+     min_p: 0.0
+     num_ctx: 32768               # qwen3 supports 32k natively, more with rope
+     repeat_penalty: 1.0          # disable; presence_penalty does the work
+     presence_penalty: 1.5
 
 # ─── PRESET C: qwen3.5:35b with thinking on ───────────────────────────────
 # Qwen3.5 (late-2025 hybrid Gated-Delta-Net + MoE). Uses different defaults
