@@ -2002,5 +2002,126 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "1ff8035396f8",
+    "timestamp": "2026-04-16T11:13:52.296813+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "sociology",
+    "contrast_label": "private versus public spheres with emotion versus reason",
+    "labels": {
+      "X": "private and intimate terms",
+      "Y": "public and social terms",
+      "A": "emotion and feeling terms",
+      "B": "reason and civility terms"
+    },
+    "effect_size": 0.9799440879025739,
+    "p_value": 0.00476,
+    "sc_weat_x_mean": 0.29305104835897133,
+    "sc_p_x": 0.32429,
+    "sc_weat_y_mean": -0.24856275150103208,
+    "sc_p_y": 0.4217,
+    "n": {
+      "X": 16,
+      "Y": 16,
+      "A": 16,
+      "B": 16
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "home",
+        "secret",
+        "hidden",
+        "quiet",
+        "bedroom",
+        "diary",
+        "whisper",
+        "inner",
+        "personal",
+        "closed",
+        "intimate",
+        "solitary",
+        "private",
+        "silent",
+        "interior",
+        "veiled"
+      ],
+      "Y_used": [
+        "street",
+        "square",
+        "stage",
+        "loud",
+        "crowd",
+        "forum",
+        "speech",
+        "outer",
+        "social",
+        "open",
+        "exposed",
+        "collective",
+        "public",
+        "plaza",
+        "market",
+        "broad"
+      ],
+      "A_used": [
+        "love",
+        "fear",
+        "hope",
+        "warmth",
+        "trust",
+        "heart",
+        "soft",
+        "deep",
+        "tender",
+        "close",
+        "feel",
+        "ache",
+        "longing",
+        "passion",
+        "grief",
+        "joy"
+      ],
+      "B_used": [
+        "law",
+        "rule",
+        "duty",
+        "right",
+        "order",
+        "rigid",
+        "formal",
+        "polite",
+        "clear",
+        "state",
+        "logic",
+        "code",
+        "policy",
+        "norm",
+        "civic",
+        "official"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that private and intimate terms are more strongly associated with emotion and feeling terms, whereas public and social terms are more closely linked to reason and civility terms. This pattern likely emerges because English-language web text often frames home-based, interpersonal interactions through the lens of affect while describing civic or professional life through a lens of logic and decorum. Such a finding is significant for social scientists because it demonstrates how language reinforces a traditional dichotomy between the domestic and public spheres. By analyzing these associations, researchers can see how digital corpora encode social expectations regarding where emotion is appropriate and where rationality is required.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
