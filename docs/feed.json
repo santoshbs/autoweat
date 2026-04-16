@@ -531,5 +531,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "5c47ccde299b",
+    "timestamp": "2026-04-16T09:57:04.458720+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "health",
+    "contrast_label": "health versus illness with activity versus stasis",
+    "labels": {
+      "X": "healthy and fit terms",
+      "Y": "sick and frail terms",
+      "A": "activity and movement terms",
+      "B": "stasis and stillness terms"
+    },
+    "effect_size": 1.5879379266882183,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.11599611536125523,
+    "sc_p_x": 0.72502,
+    "sc_weat_y_mean": -0.8538680501474457,
+    "sc_p_y": 0.00561,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "fit",
+        "strong",
+        "robust",
+        "vibrant",
+        "hearty",
+        "sound",
+        "athletic",
+        "nimble",
+        "agile",
+        "fresh",
+        "glowing",
+        "vital",
+        "healthy",
+        "trim",
+        "sturdy"
+      ],
+      "Y_used": [
+        "ill",
+        "weak",
+        "frail",
+        "sickly",
+        "tired",
+        "pale",
+        "feverish",
+        "aching",
+        "numb",
+        "fragile",
+        "weary",
+        "spent",
+        "sore",
+        "chronic",
+        "ailing"
+      ],
+      "A_used": [
+        "jump",
+        "run",
+        "dance",
+        "play",
+        "climb",
+        "swim",
+        "hike",
+        "work",
+        "build",
+        "move",
+        "flow",
+        "grow",
+        "thrive",
+        "bloom",
+        "soar"
+      ],
+      "B_used": [
+        "sleep",
+        "rest",
+        "wait",
+        "stop",
+        "stay",
+        "lie",
+        "sit",
+        "pause",
+        "hold",
+        "still",
+        "halt",
+        "slow",
+        "cease",
+        "drift",
+        "slump"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The analysis shows that the corpus associates healthy and fit terms more strongly with activity and movement terms than it associates sick and frail terms with those same concepts. This relative effect is primarily driven by a significant association between sick and frail terms and stasis and stillness terms. This pattern likely emerges from common descriptive language used to characterize illness, which frequently emphasizes limited mobility or confinement. For a social scientist, this finding is important because it illustrates how language conceptually links physical health to the capacity for agency. Such associations may reflect deeper societal norms that equate wellness with activity and illness with a state of passivity.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 5,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
