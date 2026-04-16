@@ -208,5 +208,118 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "03de391a12b6",
+    "timestamp": "2026-04-16T09:36:30.256217+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "gender",
+    "contrast_label": "gender with leadership versus caregiving",
+    "labels": {
+      "X": "men and masculine terms",
+      "Y": "women and feminine terms",
+      "A": "leadership and authority terms",
+      "B": "caregiving and support terms"
+    },
+    "effect_size": 1.2333791975337836,
+    "p_value": 0.00053,
+    "sc_weat_x_mean": -0.029826342305285827,
+    "sc_p_x": 0.9307,
+    "sc_weat_y_mean": -0.46538863524049623,
+    "sc_p_y": 0.18175,
+    "n": {
+      "X": 14,
+      "Y": 14,
+      "A": 14,
+      "B": 14
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "man",
+        "boy",
+        "husband",
+        "father",
+        "son",
+        "male",
+        "brother",
+        "uncle",
+        "nephew",
+        "gentleman",
+        "masculine",
+        "guy",
+        "sir",
+        "king"
+      ],
+      "Y_used": [
+        "woman",
+        "girl",
+        "wife",
+        "mother",
+        "daughter",
+        "female",
+        "sister",
+        "aunt",
+        "niece",
+        "lady",
+        "feminine",
+        "gal",
+        "madam",
+        "queen"
+      ],
+      "A_used": [
+        "lead",
+        "power",
+        "direct",
+        "command",
+        "rule",
+        "strong",
+        "decide",
+        "force",
+        "order",
+        "drive",
+        "firm",
+        "assertive",
+        "bold",
+        "stern"
+      ],
+      "B_used": [
+        "help",
+        "nurture",
+        "soft",
+        "kind",
+        "warm",
+        "care",
+        "gentle",
+        "sweet",
+        "support",
+        "calm",
+        "tender",
+        "love",
+        "quiet",
+        "mild"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 2,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
