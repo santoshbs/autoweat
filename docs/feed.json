@@ -648,5 +648,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "06c4facaebb5",
+    "timestamp": "2026-04-16T09:59:41.691900+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "family",
+    "contrast_label": "parental authority versus childhood exploration",
+    "labels": {
+      "X": "parents and parental figures",
+      "Y": "children and youth",
+      "A": "guidance and authority terms",
+      "B": "curiosity and learning terms"
+    },
+    "effect_size": 0.3008311980221596,
+    "p_value": 0.42748,
+    "sc_weat_x_mean": -0.5492647659511796,
+    "sc_p_x": 0.06236,
+    "sc_weat_y_mean": -0.6730761433522495,
+    "sc_p_y": 0.02386,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "mother",
+        "father",
+        "parent",
+        "mama",
+        "papa",
+        "guardian",
+        "adult",
+        "elder",
+        "patriarch",
+        "matriarch",
+        "caregiver",
+        "provider",
+        "head",
+        "senior",
+        "ancestor"
+      ],
+      "Y_used": [
+        "child",
+        "son",
+        "daughter",
+        "kid",
+        "toddler",
+        "infant",
+        "youth",
+        "adolescent",
+        "pupil",
+        "student",
+        "junior",
+        "offspring",
+        "youngster",
+        "baby",
+        "minor"
+      ],
+      "A_used": [
+        "guide",
+        "rule",
+        "teach",
+        "direct",
+        "lead",
+        "command",
+        "advise",
+        "manage",
+        "govern",
+        "correct",
+        "instruct",
+        "mentor",
+        "caution",
+        "steer",
+        "oversee"
+      ],
+      "B_used": [
+        "play",
+        "learn",
+        "ask",
+        "explore",
+        "wonder",
+        "discover",
+        "grow",
+        "listen",
+        "imagine",
+        "try",
+        "seek",
+        "study",
+        "question",
+        "mimic",
+        "experiment"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 6,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
