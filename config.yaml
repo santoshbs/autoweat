@@ -83,7 +83,7 @@ max_iterations: 10
 # AutoWEAT already uses) avoids the hang.
 #
 proposer:
-   model: 'qwen3.6:35b-a3b' #'qwen3.6:35b-a3b-q8_0' #"" #"qwen3.5:27b"
+   model: 'qwen3.6:35b-a3b-q8_0' #'qwen3.6:35b-a3b' #'qwen3.6:35b-a3b-q8_0' #"" #"qwen3.5:27b"
    host: "http://localhost:11434"
    persona_path: "persona.md"
    thinking_style: "qwen3"        # same Ollama `think` field as qwen3
