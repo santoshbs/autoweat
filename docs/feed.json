@@ -1661,5 +1661,122 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "3668d72addbb",
+    "timestamp": "2026-04-16T10:56:00.632363+00:00",
+    "schema_version": "inductive.v7",
+    "domain": "sociology",
+    "contrast_label": "familial bonds versus institutional structures",
+    "labels": {
+      "X": "family and kinship terms",
+      "Y": "state and institutional terms",
+      "A": "intimacy and warmth terms",
+      "B": "formality and distance terms"
+    },
+    "effect_size": 1.6979123208626292,
+    "p_value": 0.0,
+    "sc_weat_x_mean": 0.7550856071111165,
+    "sc_p_x": 0.01562,
+    "sc_weat_y_mean": -0.5325134260950859,
+    "sc_p_y": 0.13449,
+    "n": {
+      "X": 15,
+      "Y": 15,
+      "A": 15,
+      "B": 15
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "mother",
+        "father",
+        "sister",
+        "brother",
+        "daughter",
+        "son",
+        "parent",
+        "child",
+        "cousin",
+        "aunt",
+        "uncle",
+        "kinship",
+        "home",
+        "household",
+        "relative"
+      ],
+      "Y_used": [
+        "government",
+        "law",
+        "senate",
+        "court",
+        "agency",
+        "office",
+        "bureau",
+        "policy",
+        "state",
+        "official",
+        "regulation",
+        "department",
+        "ministry",
+        "system",
+        "administration"
+      ],
+      "A_used": [
+        "warmth",
+        "trust",
+        "love",
+        "closeness",
+        "affection",
+        "care",
+        "heart",
+        "bond",
+        "tender",
+        "soft",
+        "kind",
+        "sweet",
+        "dear",
+        "hug",
+        "intimate"
+      ],
+      "B_used": [
+        "rule",
+        "protocol",
+        "procedure",
+        "distant",
+        "cold",
+        "strict",
+        "order",
+        "detached",
+        "rigid",
+        "standard",
+        "norm",
+        "code",
+        "formal",
+        "sterile",
+        "precise"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "interpretive_paragraph": "The results show that family and kinship terms are more strongly associated with intimacy and warmth terms, while state and institutional terms are more closely linked to formality and distance terms. This pattern likely reflects a broad cultural distinction in English-language text between the private, emotional sphere of home life and the impersonal, bureaucratic nature of official organizations. A social scientist might find this interesting because it illustrates how language encodes the conceptual boundary between personal relationships and systemic power. Such a linguistic divide highlights the different social expectations and emotional tones assigned to kinship versus the state. It reveals how structural societal divisions are embedded directly within the vocabulary of a corpus.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
