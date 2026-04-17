@@ -4727,5 +4727,154 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "9bcbf5667a6a",
+    "timestamp": "2026-04-17T21:18:26.943481+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "psychology",
+    "contrast_label": "optimists vs pessimists on the axis of intelligence vs naivety",
+    "labels": {
+      "X": "optimists",
+      "Y": "pessimists",
+      "A": "intelligence",
+      "B": "naivety"
+    },
+    "canonical_keys": {
+      "X": "optimists",
+      "Y": "pessimists",
+      "A": "intelligence",
+      "B": "naivety"
+    },
+    "effect_size": 0.8511196664721832,
+    "p_value": 0.00612,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "optimist",
+        "dreamer",
+        "believer",
+        "idealist",
+        "enthusiast",
+        "visionary",
+        "hopeful",
+        "sanguine",
+        "positive",
+        "upbeat",
+        "cheerful",
+        "confident",
+        "sunny",
+        "spirited",
+        "buoyant",
+        "joyful",
+        "eager",
+        "radiant",
+        "lighthearted",
+        "cheerleader"
+      ],
+      "Y_used": [
+        "pessimist",
+        "cynic",
+        "skeptic",
+        "realist",
+        "defeatist",
+        "doubter",
+        "doomer",
+        "misanthrope",
+        "negative",
+        "dour",
+        "somber",
+        "sour",
+        "distrustful",
+        "wary",
+        "cautious",
+        "critical",
+        "gloomy",
+        "morose",
+        "melancholy",
+        "fatalist"
+      ],
+      "A_used": [
+        "intelligent",
+        "smart",
+        "clever",
+        "bright",
+        "brilliant",
+        "sharp",
+        "keen",
+        "astute",
+        "wise",
+        "learned",
+        "academic",
+        "rational",
+        "logical",
+        "gifted",
+        "expert",
+        "knowledgeable",
+        "perceptive",
+        "mental",
+        "intellectual",
+        "cerebral"
+      ],
+      "B_used": [
+        "naive",
+        "gullible",
+        "innocent",
+        "simple",
+        "childish",
+        "immature",
+        "green",
+        "inexperienced",
+        "blind",
+        "trusting",
+        "oblivious",
+        "simplistic",
+        "raw",
+        "unwitting",
+        "artless",
+        "ingenuous",
+        "foolish",
+        "vapid",
+        "shallow",
+        "uncomplicated"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "negative",
+      "confidence": "low",
+      "rationale": "While general sentiment favors optimism, the 'depressive realism' trope in psychology associates pessimism with higher intellectual accuracy and realism."
+    },
+    "interpretive_paragraph": "The results show that words associated with optimists are more strongly linked to intelligence than words associated with pessimists are. Conversely, pessimists demonstrate a stronger relative association with naivety within the corpus. This pattern may exist because web-based discourse often equates a positive, \"can-do\" attitude with success and strategic intelligence. In this context, a pessimistic outlook might be framed as a failure to recognize potential opportunities, thereby linking it to naivety. A social scientist would find this interesting because it reveals how language encodes a perceived connection between emotional disposition and cognitive ability. Such associations suggest that society implicitly values optimism as a marker of intellectual competence.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology",
+        "organizational behavior"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
