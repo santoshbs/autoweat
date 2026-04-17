@@ -2110,5 +2110,154 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "38b539c09a7d",
+    "timestamp": "2026-04-17T15:51:30.578709+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "economics",
+    "contrast_label": "economists vs psychologists on rationality vs empathy",
+    "labels": {
+      "X": "economists",
+      "Y": "psychologists",
+      "A": "rationality",
+      "B": "empathy"
+    },
+    "canonical_keys": {
+      "X": "economists",
+      "Y": "psychologists",
+      "A": "rationality",
+      "B": "empathy"
+    },
+    "effect_size": 1.2461913359501775,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "economist",
+        "banker",
+        "financier",
+        "quant",
+        "accountant",
+        "broker",
+        "trader",
+        "actuary",
+        "consultant",
+        "auditor",
+        "planner",
+        "statistician",
+        "strategist",
+        "official",
+        "director",
+        "manager",
+        "executive",
+        "treasurer",
+        "analyst",
+        "specialist"
+      ],
+      "Y_used": [
+        "psychologist",
+        "therapist",
+        "counselor",
+        "clinician",
+        "psychiatrist",
+        "coach",
+        "mentor",
+        "healer",
+        "listener",
+        "observer",
+        "shrink",
+        "practitioner",
+        "behaviorist",
+        "psychoanalyst",
+        "caseworker",
+        "academic",
+        "professor",
+        "student",
+        "resident",
+        "intern"
+      ],
+      "A_used": [
+        "logical",
+        "objective",
+        "calculating",
+        "rational",
+        "systematic",
+        "analytical",
+        "precise",
+        "cold",
+        "detached",
+        "efficient",
+        "rigorous",
+        "factual",
+        "mathematical",
+        "reasoned",
+        "clear",
+        "direct",
+        "sound",
+        "coherent",
+        "lucid",
+        "stark"
+      ],
+      "B_used": [
+        "empathetic",
+        "warm",
+        "compassionate",
+        "feeling",
+        "kind",
+        "understanding",
+        "supportive",
+        "gentle",
+        "tender",
+        "caring",
+        "emotional",
+        "intuitive",
+        "soft",
+        "sensitive",
+        "patient",
+        "loving",
+        "helpful",
+        "benevolent",
+        "mindful",
+        "sympathetic"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "high",
+      "rationale": "Economists are stereotypically associated with quantitative rationality and objective analysis, whereas psychologists are associated with emotional understanding and empathy."
+    },
+    "interpretive_paragraph": "The results show that in the analyzed corpus, economists are more strongly associated with rationality than psychologists are, while psychologists are more closely linked with empathy. This pattern likely emerges because web text often reflects common stereotypes that frame economics as a logic-driven science and psychology as a human-centric practice. A social scientist studying these disciplines might find this significant as it reveals how linguistic associations encode the perceived emotional and intellectual boundaries between different professional identities. Understanding these patterns helps clarify how the public conceptualizes the distinct roles and virtues of these experts in society.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 14,
+      "cooled_domains_at_proposal": [
+        "social psychology",
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
