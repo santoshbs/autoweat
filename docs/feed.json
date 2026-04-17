@@ -5020,5 +5020,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "8a8bf5081040",
+    "timestamp": "2026-04-17T22:22:01.054266+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "veterans vs civilians on rigidity vs flexibility",
+    "labels": {
+      "X": "veterans",
+      "Y": "civilians",
+      "A": "rigidity",
+      "B": "flexibility"
+    },
+    "canonical_keys": {
+      "X": "veterans",
+      "Y": "civilians",
+      "A": "rigidity",
+      "B": "flexibility"
+    },
+    "effect_size": -0.00998533142744713,
+    "p_value": 0.97643,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "soldier",
+        "veteran",
+        "warrior",
+        "troop",
+        "sergeant",
+        "captain",
+        "marine",
+        "sailor",
+        "airman",
+        "combatant",
+        "officer",
+        "recruit",
+        "infantry",
+        "guard",
+        "sentinel",
+        "mercenary",
+        "fighter",
+        "defender",
+        "patrol",
+        "commando"
+      ],
+      "Y_used": [
+        "civilian",
+        "citizen",
+        "resident",
+        "neutral",
+        "layperson",
+        "inhabitant",
+        "commoner",
+        "secular",
+        "civil",
+        "amateur",
+        "bystander",
+        "local",
+        "person",
+        "individual",
+        "pedestrian",
+        "dweller",
+        "townsperson",
+        "villager",
+        "member",
+        "public"
+      ],
+      "A_used": [
+        "rigid",
+        "strict",
+        "formal",
+        "stiff",
+        "fixed",
+        "hard",
+        "stern",
+        "inflexible",
+        "disciplined",
+        "unchanging",
+        "stubborn",
+        "firm",
+        "set",
+        "uncompromising",
+        "severe",
+        "precise",
+        "orderly",
+        "tight",
+        "static",
+        "constant"
+      ],
+      "B_used": [
+        "flexible",
+        "fluid",
+        "adaptable",
+        "plastic",
+        "supple",
+        "versatile",
+        "open",
+        "changing",
+        "loose",
+        "easy",
+        "yielding",
+        "agile",
+        "pliable",
+        "varied",
+        "shifting",
+        "elastic",
+        "adjustable",
+        "nimble",
+        "soft",
+        "relaxed"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Military identity is strongly associated with strict discipline and formal structure, though this may be countered by the concept of tactical adaptability."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "organizational behavior"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
