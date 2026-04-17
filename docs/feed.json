@@ -472,5 +472,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "a06a1e7415b3",
+    "timestamp": "2026-04-17T14:16:16.905914+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "diplomats vs activists on sincerity vs strategy",
+    "labels": {
+      "X": "diplomats",
+      "Y": "activists",
+      "A": "sincerity",
+      "B": "strategy"
+    },
+    "canonical_keys": {
+      "X": "diplomats",
+      "Y": "activists",
+      "A": "sincerity",
+      "B": "strategy"
+    },
+    "effect_size": 0.44829165567093504,
+    "p_value": 0.16258,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "diplomat",
+        "ambassador",
+        "envoy",
+        "consul",
+        "attache",
+        "negotiator",
+        "mediator",
+        "representative",
+        "emissary",
+        "delegate",
+        "official",
+        "minister",
+        "secretary",
+        "liaison",
+        "rapporteur",
+        "commissioner",
+        "prefect",
+        "agent",
+        "counselor",
+        "legate"
+      ],
+      "Y_used": [
+        "activist",
+        "campaigner",
+        "protester",
+        "organizer",
+        "militant",
+        "agitator",
+        "advocate",
+        "reformer",
+        "dissident",
+        "rebel",
+        "insurgent",
+        "lobbyist",
+        "crusader",
+        "striker",
+        "demonstrator",
+        "petitioner",
+        "partisan",
+        "zealot",
+        "radical",
+        "rioter"
+      ],
+      "A_used": [
+        "sincere",
+        "honest",
+        "truthful",
+        "candid",
+        "open",
+        "genuine",
+        "frank",
+        "direct",
+        "authentic",
+        "real",
+        "heartfelt",
+        "plain",
+        "transparent",
+        "upright",
+        "loyal",
+        "pure",
+        "clear",
+        "trustworthy",
+        "faithful",
+        "earnest"
+      ],
+      "B_used": [
+        "strategic",
+        "calculated",
+        "subtle",
+        "cunning",
+        "sly",
+        "manipulative",
+        "shrewd",
+        "tactical",
+        "indirect",
+        "veiled",
+        "opaque",
+        "poised",
+        "measured",
+        "artful",
+        "planned",
+        "schematic",
+        "deceptive",
+        "prudent",
+        "wily",
+        "clever"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "uncertain",
+      "confidence": "low",
+      "rationale": "While diplomats are stereotypically strategic, modern discourse often associates activism with calculated media strategy and branding."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 3,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
