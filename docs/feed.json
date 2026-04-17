@@ -2259,5 +2259,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "287a4b2b5ee0",
+    "timestamp": "2026-04-17T15:55:52.385739+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "arts",
+    "contrast_label": "critics vs creators on the dimension of passion vs detachment",
+    "labels": {
+      "X": "critics",
+      "Y": "creators",
+      "A": "passion",
+      "B": "detachment"
+    },
+    "canonical_keys": {
+      "X": "critics",
+      "Y": "creators",
+      "A": "passion",
+      "B": "detachment"
+    },
+    "effect_size": -1.1612133146543075,
+    "p_value": 7e-05,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "critic",
+        "reviewer",
+        "pundit",
+        "commentator",
+        "judge",
+        "specialist",
+        "columnist",
+        "observer",
+        "scholar",
+        "connoisseur",
+        "evaluator",
+        "assessor",
+        "detractor",
+        "appraiser",
+        "examiner",
+        "screener",
+        "referee",
+        "panelist",
+        "curator",
+        "expert"
+      ],
+      "Y_used": [
+        "artist",
+        "author",
+        "painter",
+        "poet",
+        "composer",
+        "sculptor",
+        "maker",
+        "builder",
+        "designer",
+        "crafter",
+        "innovator",
+        "inventor",
+        "producer",
+        "architect",
+        "director",
+        "playwright",
+        "lyricist",
+        "weaver",
+        "potter",
+        "smith"
+      ],
+      "A_used": [
+        "passionate",
+        "eager",
+        "intense",
+        "fervent",
+        "ardent",
+        "zealous",
+        "emotional",
+        "spirited",
+        "vivid",
+        "burning",
+        "keen",
+        "heartfelt",
+        "driven",
+        "excited",
+        "warm",
+        "glowing",
+        "lush",
+        "wild",
+        "bold",
+        "strong"
+      ],
+      "B_used": [
+        "detached",
+        "cold",
+        "distant",
+        "objective",
+        "neutral",
+        "aloof",
+        "clinical",
+        "impartial",
+        "remote",
+        "sterile",
+        "dry",
+        "dispassionate",
+        "indifferent",
+        "cool",
+        "formal",
+        "stark",
+        "disengaged",
+        "rigid",
+        "flat",
+        "blank"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "low",
+      "rationale": "Critics often use highly emotive and passionate language to express value judgments, whereas creators may be described by the technical process of their work."
+    },
+    "interpretive_paragraph": "The results indicate that in this corpus, critics are more strongly associated with detachment, while creators are more closely linked to passion. This pattern likely reflects a cultural perception of the creative process as an intensely emotional endeavor and the act of criticism as one requiring objective distance and analytical cool. Such a distinction reinforces the common framing of producing art as an act of feeling and evaluating it as an act of observation. A social scientist might find this significant because it reveals how language encodes a dichotomy between emotional expression and intellectual distance across different professional roles. These linguistic associations may mirror societal expectations regarding the temperament and perceived legitimacy of those who create versus those who judge.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
