@@ -395,7 +395,7 @@
 
   <footer class="footer">
     <span>© 2026 Santosh B. Srinivas.</span>
-    <span>schema inductive.v8</span>
+    <span>schema inductive.v9</span>
   </footer>
 
 </div>
@@ -783,6 +783,7 @@ function dataReady(fn) {
       const arr = Array.isArray(data) ? data : (data.tests || []);
       // Accept any schema that exists; future schema changes will be explicit here
       TESTS = arr.filter(t => !t.schema_version
+        || t.schema_version === "inductive.v9"
         || t.schema_version === "inductive.v8"
         || t.schema_version === "inductive.v7");
       // If feed loaded successfully but is empty, show empty state (not demo data)
