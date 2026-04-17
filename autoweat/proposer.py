@@ -41,14 +41,13 @@ from typing import Any
 import requests
 
 from autoweat.domains import (
-    DOMAINS,
     VALID_DOMAINS,
     format_taxonomy_for_prompt,
     normalize_domain,
 )
 
 
-AUTOWEAT_PROPOSER_VERSION = "2026-04-17-v15-domains-prediction"
+AUTOWEAT_PROPOSER_VERSION = "2026-04-17-v16-actor-attribute-asymmetry"
 
 
 # ─── Phase 1: proposal schema text (injected into system prompt) ───
@@ -57,16 +56,16 @@ PROPOSAL_SCHEMA = """Output exactly this JSON structure. Do not add fields or
 comments. Do not wrap in markdown fences.
 
 {
-  "domain": "<canonical domain name from the taxonomy, e.g. 'sociology'>",
-  "contrast_label": "<short natural-English description of what you are probing>",
-  "X_label": "<short label for target set X>",
-  "Y_label": "<short label for target set Y>",
-  "A_label": "<short label for attribute set A>",
-  "B_label": "<short label for attribute set B>",
-  "X_words": [<20-25 common English words representing X>],
-  "Y_words": [<20-25 common English words representing Y>],
-  "A_words": [<20-25 common English words representing A>],
-  "B_words": [<20-25 common English words representing B>],
+  "domain": "<canonical domain name from the taxonomy>",
+  "contrast_label": "<short natural-English description of what the test probes>",
+  "X_label": "<label for the first actor category (target X)>",
+  "Y_label": "<label for the second actor category (target Y)>",
+  "A_label": "<label for the first descriptive dimension (attribute A)>",
+  "B_label": "<label for the second descriptive dimension (attribute B)>",
+  "X_words": [<20-25 common English words that refer to or address members of X>],
+  "Y_words": [<20-25 common English words that refer to or address members of Y>],
+  "A_words": [<20-25 common English words that express the A dimension>],
+  "B_words": [<20-25 common English words that express the B dimension>],
   "prediction": {
     "expected_direction": "<one of: positive, negative, uncertain>",
     "confidence": "<one of: low, medium, high>",
@@ -229,6 +228,13 @@ class OllamaProposer:
         if self.thinking_style == "gpt-oss" and self.thinking_effort:
             if self.thinking_effort in self.GPT_OSS_EFFORTS:
                 sys_prompt = f"Reasoning: {self.thinking_effort}\n\n" + system
+        elif self.thinking_style == "gemma4" and self.thinking_effort:
+            # Gemma 4 enables thinking by prepending the <|think|> control
+            # token. Any truthy effort enables it; "off" / "false" / "no"
+            # disables. See Google AI for Developers (April 2026).
+            effort_off = str(self.thinking_effort).lower() in ("off", "false", "no", "0")
+            if not effort_off:
+                sys_prompt = "<|think|>\n" + system
         payload: dict[str, Any] = {
             "model": self.model,
             "system": sys_prompt,
@@ -306,20 +312,14 @@ class OllamaProposer:
 
         if mode == "novel":
             mode_directive = (
-                "MODE FOR THIS ITERATION: NOVEL. Propose a contrast that is "
-                "interesting, potentially unexpected or counter-intuitive, "
-                "AND substantively important. If you can predict the result "
-                "with high confidence before it runs, the contrast is not "
-                "novel — pick a different one. You MUST fill in the "
-                "`prediction` block."
+                "MODE FOR THIS ITERATION: NOVEL. Follow the novel-mode "
+                "rules in the persona. The `prediction` block is REQUIRED."
             )
         else:
             mode_directive = (
-                "MODE FOR THIS ITERATION: WELL-STUDIED. Propose a classic, "
-                "substantively important baseline contrast from the chosen "
-                "domain. Classic does not mean 'only gender and race' — "
-                "every domain has classic contrasts. The `prediction` "
-                "block is optional in this mode."
+                "MODE FOR THIS ITERATION: WELL-STUDIED. Follow the "
+                "well-studied-mode rules in the persona. The `prediction` "
+                "block is optional."
             )
 
         cooled_note = ""
@@ -333,8 +333,9 @@ class OllamaProposer:
         return (
             self.persona
             + "\n\n═══ DOMAIN TAXONOMY ═══\n"
-            + "Pick ONE domain below as the primary domain. Use the exact "
-              "canonical name (the string before the colon).\n\n"
+            + "Pick ONE canonical domain name from the list below. This "
+              "tags the test for filing; it does not restrict what you "
+              "can propose inside that domain.\n\n"
             + taxonomy
             + cooled_note
             + "\n\n═══ THIS ITERATION ═══\n"
