@@ -3931,5 +3931,149 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "4a16e707b1c2",
+    "timestamp": "2026-04-17T19:04:36.731310+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "organizational behavior",
+    "contrast_label": "accountants vs designers on rigor vs intuition",
+    "labels": {
+      "X": "accountants",
+      "Y": "designers",
+      "A": "rigor",
+      "B": "intuition"
+    },
+    "canonical_keys": {
+      "X": "accountants",
+      "Y": "designers",
+      "A": "rigor",
+      "B": "intuition"
+    },
+    "effect_size": 1.5290505083092907,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "accountant",
+        "auditor",
+        "bookkeeper",
+        "controller",
+        "analyst",
+        "treasurer",
+        "clerk",
+        "bursar",
+        "comptroller",
+        "actuary",
+        "financier",
+        "taxman",
+        "appraiser",
+        "cashier",
+        "teller",
+        "agent",
+        "officer",
+        "director",
+        "manager",
+        "steward"
+      ],
+      "Y_used": [
+        "designer",
+        "artist",
+        "illustrator",
+        "stylist",
+        "creator",
+        "architect",
+        "decorator",
+        "crafter",
+        "visionary",
+        "maker",
+        "painter",
+        "sketcher",
+        "drafter",
+        "curator",
+        "artisan",
+        "sculptor",
+        "modeler",
+        "dresser",
+        "weaver",
+        "potter"
+      ],
+      "A_used": [
+        "rigorous",
+        "strict",
+        "precise",
+        "exact",
+        "accurate",
+        "formal",
+        "methodical",
+        "systematic",
+        "disciplined",
+        "careful",
+        "thorough",
+        "meticulous",
+        "stringent",
+        "rigid",
+        "hard",
+        "detailed",
+        "focused",
+        "consistent",
+        "logical",
+        "analytic"
+      ],
+      "B_used": [
+        "intuitive",
+        "instinctive",
+        "spontaneous",
+        "fluid",
+        "flexible",
+        "imaginative",
+        "random",
+        "organic",
+        "felt",
+        "natural",
+        "implicit",
+        "unplanned",
+        "creative",
+        "free",
+        "whimsical",
+        "vague",
+        "loose",
+        "soft",
+        "sudden",
+        "inspired"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": null,
+    "interpretive_paragraph": "The analysis shows that accountants are more strongly associated with rigor than designers are, while designers lean more toward intuition. This pattern likely reflects the professional stereotypes embedded in web text, where accounting is framed as a discipline of strict adherence to rules and precision, whereas design is framed as a creative process driven by aesthetic instinct. A social scientist might find this interesting because it demonstrates how language reinforces a perceived cognitive divide between analytical and creative labor. Such associations reveal how societal expectations about professional roles are encoded into the vocabulary used to describe different occupations.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
