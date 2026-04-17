@@ -2865,5 +2865,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "1e39887b8746",
+    "timestamp": "2026-04-17T16:59:41.244977+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "clerical altruism versus corporate ambition",
+    "labels": {
+      "X": "clergy",
+      "Y": "CEOs",
+      "A": "altruism",
+      "B": "ambition"
+    },
+    "canonical_keys": {
+      "X": "clergy",
+      "Y": "ceos",
+      "A": "altruism",
+      "B": "ambition"
+    },
+    "effect_size": 1.611558826132463,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "priest",
+        "pastor",
+        "bishop",
+        "minister",
+        "cleric",
+        "monk",
+        "nun",
+        "rabbi",
+        "imam",
+        "chaplain",
+        "deacon",
+        "cardinal",
+        "pope",
+        "vicar",
+        "rector",
+        "curate",
+        "preacher",
+        "reverend",
+        "parson",
+        "friar"
+      ],
+      "Y_used": [
+        "ceo",
+        "executive",
+        "director",
+        "manager",
+        "president",
+        "boss",
+        "chief",
+        "head",
+        "leader",
+        "officer",
+        "administrator",
+        "proprietor",
+        "owner",
+        "founder",
+        "partner",
+        "principal",
+        "governor",
+        "controller",
+        "superintendent",
+        "chairman"
+      ],
+      "A_used": [
+        "selfless",
+        "kind",
+        "giving",
+        "generous",
+        "caring",
+        "helpful",
+        "charitable",
+        "benevolent",
+        "compassionate",
+        "loving",
+        "altruistic",
+        "supportive",
+        "devoted",
+        "sacrificial",
+        "tender",
+        "warm",
+        "gracious",
+        "merciful",
+        "humble",
+        "open"
+      ],
+      "B_used": [
+        "ambitious",
+        "driven",
+        "eager",
+        "hungry",
+        "aspiring",
+        "competitive",
+        "greedy",
+        "grasping",
+        "ruthless",
+        "powerful",
+        "assertive",
+        "bold",
+        "determined",
+        "striving",
+        "climbing",
+        "commanding",
+        "dominant",
+        "aggressive",
+        "persistent",
+        "focused"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "While stereotypes strongly associate clergy with selflessness and executives with drive, modern discourse often conflates religious institutional power with ambition and corporate branding with philanthropy."
+    },
+    "interpretive_paragraph": "The results indicate that in this corpus, words associated with clergy lean more strongly toward altruism than words associated with CEOs, who are more closely linked to ambition. This pattern likely stems from pervasive cultural narratives in web text that characterize religious leadership as selfless and corporate leadership as competitive. For a social scientist, this association is significant because it reveals how language encodes traditional expectations regarding the moral character of different authority figures. By analyzing these linguistic patterns, researchers can better understand how society structurally differentiates the perceived motivations of spiritual versus economic power.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
