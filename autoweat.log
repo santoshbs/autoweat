@@ -1,0 +1,135 @@
+nohup: ignoring input
+autoweat v15 (domains + prediction + dedup) | config=config.yaml
+  feed:    /home/santoshbs/autoweat/docs/feed.json
+  persona: /home/santoshbs/autoweat/persona.md
+  cache:   /home/santoshbs/autoweat/docs/concept_cache.json
+  backend: gensim:dolma.2024.300d.kv
+  feed entries: 0  |  cached concepts: 0
+
+─── round 1 ───
+→ Phase 1: requesting proposal… (mode: well-studied)
+  attempt 1: accepted
+  domain:   sociology
+  contrast: class status vs cultural consumption
+  X = wealthy and elite terms (25 words)
+  Y = poor and working class terms (25 words)
+  A = high culture and arts (25 words)
+  B = popular and physical leisure (25 words)
+  prediction: positive (medium) — Historical class distinctions in cultural sociology suggest an association between economic privilege and high cultural capital.
+→ Computing WEAT…
+  WEAT:  d = +0.602, p = 0.034  (n=25, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: The analysis reveals that the wealthy and elite terms align more closely with high culture and arts, while popular and physical leisure aligns more with poor and working class terms. This statistic...
+  ✓ accepted as 777726a09186
+  pushed to git: autoweat: 777726a09186 sociology d=+0.60
+
+─── round 2 ───
+→ Phase 1: requesting proposal… (mode: novel)
+  attempt 1: accepted
+  domain:   organizational behavior
+  contrast: hierarchy versus network structure in relation to stability versus adaptability
+  X = hierarchy terms (25 words)
+  Y = network terms (25 words)
+  A = stability terms (25 words)
+  B = adaptability terms (25 words)
+  prediction: uncertain (low) — Organizational scholarship debates whether hierarchies ensure stability or rigidity and whether networks foster adaptation or fragmentation.
+→ Computing WEAT…
+  WEAT:  d = +0.879, p = 0.001  (n=25, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: The statistical result indicates that hierarchy terms are significantly more associated with stability terms than network terms are within the English web corpus. This finding suggests a consistent...
+  ✓ accepted as 43669d1ceacc
+  pushed to git: autoweat: 43669d1ceacc organizational behavior d=+0.88
+
+─── round 3 ───
+→ Phase 1: requesting proposal… (mode: well-studied)
+  attempt 1: 1 validation problem(s)
+    · Your Y word list has only 17 words after cleaning. Minimum is 20. All words must be single common English words (lowerca…
+  attempt 2: accepted
+  domain:   anthropology
+  contrast: social relations versus political structures across ritual and material practices
+  X = kinship and family terms (20 words)
+  Y = political and state terms (20 words)
+  A = ritual and ceremonial terms (20 words)
+  B = material and craft terms (20 words)
+  prediction: positive (medium) — Kinship systems are traditionally associated with ritual exchange and social bonding rather than instrumental production in anthropological literature.
+→ Computing WEAT…
+  WEAT:  d = +1.240, p = 0.000  (n=20, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: This analysis reveals that kinship and family terms are significantly more associated with ritual and ceremonial terms than political and state terms are. The positive effect size confirms that fam...
+  ✓ accepted as 92283ce8f0e0
+  pushed to git: autoweat: 92283ce8f0e0 anthropology d=+1.24
+
+─── round 4 ───
+→ Phase 1: requesting proposal… (mode: novel)
+  attempt 1: accepted
+  domain:   economics
+  contrast: gift economy vs market commodity terms × social connection terms vs commercial exchange terms
+  X = gift and generosity terms (20 words)
+  Y = market goods terms (20 words)
+  A = social connection terms (20 words)
+  B = commercial exchange terms (20 words)
+  prediction: positive (medium) — Gifts are culturally framed as signaling social bonds while commodities signal market transactions, though modern text may blur these moral boundaries.
+→ Computing WEAT…
+  WEAT:  d = +1.046, p = 0.001  (n=20, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: The results show that gift and generosity terms are more closely associated with social connection terms than market goods terms are, whereas market goods terms align more strongly with commercial ...
+  ✓ accepted as 5b2751480dbf
+  pushed to git: autoweat: 5b2751480dbf economics d=+1.05
+
+─── round 5 ───
+→ Phase 1: requesting proposal… (mode: well-studied)
+  attempt 1: accepted
+  domain:   social psychology
+  contrast: gender stereotypes associating masculinity with agency and femininity with communion
+  X = men and masculine terms (25 words)
+  Y = women and feminine terms (25 words)
+  A = agentic and instrumental terms (25 words)
+  B = communal and expressive terms (25 words)
+  prediction: positive (high) — Social psychology literature consistently finds that masculinity is stereotypically associated with agency and femininity with communion.
+→ Computing WEAT…
+  WEAT:  d = +1.141, p = 0.000  (n=25, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: The statistical evidence demonstrates that in this corpus, men and masculine terms associate more strongly with agentic and instrumental terms, while women and feminine terms associate more strongl...
+  ✓ accepted as e0bf2a659986
+  pushed to git: autoweat: e0bf2a659986 social psychology d=+1.14
+
+─── round 6 ───
+→ Phase 1: requesting proposal… (mode: novel)
+  attempt 1: 2 validation problem(s)
+    · Your B_label 'stability language' refers to the same concept as the cached concept 'stability terms'. When reusing a con…
+    · Your B word list for 'stability language' only overlaps 10% with the cached list (need >= 70%). The cached word list for…
+  attempt 2: accepted
+  domain:   linguistics
+  contrast: alignment of abstract versus concrete concepts with agent versus action vocabulary
+  X = abstract and nominal concepts (25 words)
+  Y = concrete and object concepts (25 words)
+  A = agent and doer nouns (25 words)
+  B = action and process nouns (25 words)
+  prediction: negative (low) — Abstract concepts may align more closely with action processes than agents, or show no clear bias depending on corpus semantics.
+→ Computing WEAT…
+  WEAT:  d = -1.048, p = 0.000  (n=25, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: The statistical result indicates that abstract and nominal concepts lean significantly toward action and process nouns relative to concrete and object concepts. In contrast, concrete and object con...
+  ✓ accepted as 00ba8c373d48
+  pushed to git: autoweat: 00ba8c373d48 linguistics d=-1.05
+
+─── round 7 ───
+→ Phase 1: requesting proposal… (mode: well-studied)
+  attempt 1: proposal parse failed — HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900)
+  attempt 2: proposal parse failed — HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900)
+  attempt 3: accepted
+  domain:   management
+  contrast: Efficiency versus Effectiveness
+  X = efficiency terms (25 words)
+  Y = effectiveness terms (25 words)
+  A = control and structure terms (25 words)
+  B = innovation and idea terms (25 words)
+  prediction: positive (medium) — Efficiency concepts typically correlate with speed and action while effectiveness correlates with outcome and structure, leading to a moderate positive association with control terms.
+→ Computing WEAT…
+  WEAT:  d = +0.752, p = 0.006  (n=25, exact=False, perms=100000)
+→ Phase 2: requesting interpretive paragraph (p < .05)…
+  paragraph: In this corpus, efficiency terms are more strongly associated with control and structure terms than effectiveness terms are. Conversely, effectiveness terms show a stronger relative alignment with ...
+  ✓ accepted as 931fb753b46b
+  pushed to git: autoweat: 931fb753b46b management d=+0.75
+
+─── round 8 ───
