@@ -3785,5 +3785,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "831143b918db",
+    "timestamp": "2026-04-17T18:31:32.451417+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "tourists vs locals on curiosity vs indifference",
+    "labels": {
+      "X": "tourists",
+      "Y": "locals",
+      "A": "curiosity",
+      "B": "indifference"
+    },
+    "canonical_keys": {
+      "X": "tourists",
+      "Y": "locals",
+      "A": "curiosity",
+      "B": "indifference"
+    },
+    "effect_size": 0.20665259826927845,
+    "p_value": 0.52339,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "tourist",
+        "traveler",
+        "visitor",
+        "backpacker",
+        "sightseer",
+        "guest",
+        "voyager",
+        "vacationer",
+        "explorer",
+        "migrant",
+        "outsider",
+        "stranger",
+        "wanderer",
+        "sojourner",
+        "excursionist",
+        "pilgrim",
+        "commuter",
+        "nomad",
+        "wayfarer",
+        "holidaymaker"
+      ],
+      "Y_used": [
+        "local",
+        "resident",
+        "native",
+        "citizen",
+        "inhabitant",
+        "dweller",
+        "neighbor",
+        "townsman",
+        "villager",
+        "indigenous",
+        "domestic",
+        "homegrown",
+        "rooted",
+        "settled",
+        "stationary",
+        "permanent",
+        "endemic",
+        "provincial",
+        "regional",
+        "urbanite"
+      ],
+      "A_used": [
+        "curious",
+        "inquisitive",
+        "interested",
+        "questioning",
+        "exploring",
+        "searching",
+        "wondering",
+        "eager",
+        "intrigued",
+        "open",
+        "novel",
+        "fresh",
+        "observant",
+        "seeking",
+        "probing",
+        "alert",
+        "mindful",
+        "attentive",
+        "fascinated",
+        "keen"
+      ],
+      "B_used": [
+        "indifferent",
+        "bored",
+        "apathetic",
+        "numb",
+        "routine",
+        "habitual",
+        "dull",
+        "flat",
+        "weary",
+        "tired",
+        "accustomed",
+        "familiar",
+        "banal",
+        "stale",
+        "blind",
+        "ignored",
+        "passive",
+        "cold",
+        "distant",
+        "detached"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "The corpus likely associates the visitor's perspective with novelty and the resident's with habituation."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
