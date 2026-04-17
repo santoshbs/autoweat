@@ -4876,5 +4876,149 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "e9dd8da2e5be",
+    "timestamp": "2026-04-17T21:27:34.242261+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "social psychology",
+    "contrast_label": "age stereotypes regarding innovation and tradition",
+    "labels": {
+      "X": "young people",
+      "Y": "elderly people",
+      "A": "innovation",
+      "B": "tradition"
+    },
+    "canonical_keys": {
+      "X": "people|young",
+      "Y": "elderly|people",
+      "A": "innovation",
+      "B": "tradition"
+    },
+    "effect_size": 1.0309177021000606,
+    "p_value": 0.00053,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "youth",
+        "adolescent",
+        "teenager",
+        "juvenile",
+        "student",
+        "child",
+        "rookie",
+        "novice",
+        "junior",
+        "youngster",
+        "pupil",
+        "freshman",
+        "apprentice",
+        "beginner",
+        "kid",
+        "maiden",
+        "lad",
+        "girl",
+        "boy",
+        "young"
+      ],
+      "Y_used": [
+        "elder",
+        "senior",
+        "pensioner",
+        "retiree",
+        "veteran",
+        "ancestor",
+        "patriarch",
+        "matriarch",
+        "grandparent",
+        "geriatric",
+        "aged",
+        "ancient",
+        "venerable",
+        "seasoned",
+        "mature",
+        "gray",
+        "wrinkled",
+        "oldster",
+        "adult",
+        "elderly"
+      ],
+      "A_used": [
+        "new",
+        "modern",
+        "novel",
+        "advanced",
+        "creative",
+        "inventive",
+        "original",
+        "current",
+        "future",
+        "progressive",
+        "radical",
+        "unique",
+        "experimental",
+        "bold",
+        "updating",
+        "fresh",
+        "latest",
+        "cutting",
+        "evolving",
+        "pioneering"
+      ],
+      "B_used": [
+        "traditional",
+        "classic",
+        "historic",
+        "custom",
+        "ritual",
+        "habit",
+        "established",
+        "conventional",
+        "standard",
+        "legacy",
+        "heritage",
+        "ancestral",
+        "timeless",
+        "fixed",
+        "stable",
+        "rooted",
+        "formal",
+        "orthodox",
+        "enduring",
+        "prehistoric"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": null,
+    "interpretive_paragraph": "The analysis reveals that young people are more strongly associated with innovation than elderly people are, relative to their association with tradition. This pattern likely reflects common cultural narratives in web-based text that frame youth as drivers of technological change. Simultaneously, it suggests a tendency to characterize the elderly as guardians of historical customs. A social scientist might find this interesting because it demonstrates how language encodes age-based stereotypes regarding adaptability and social roles. Such findings highlight how implicit biases about generational capabilities are embedded within the very structure of digital communication.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "organizational behavior"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
