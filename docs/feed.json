@@ -1364,5 +1364,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "173c6080e551",
+    "timestamp": "2026-04-17T15:28:57.020192+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "organizational behavior",
+    "contrast_label": "whistleblowers vs loyalists on integrity vs reliability",
+    "labels": {
+      "X": "whistleblowers",
+      "Y": "loyalists",
+      "A": "integrity",
+      "B": "reliability"
+    },
+    "canonical_keys": {
+      "X": "whistleblowers",
+      "Y": "loyalists",
+      "A": "integrity",
+      "B": "reliability"
+    },
+    "effect_size": 0.38107774814082734,
+    "p_value": 0.22474,
+    "n": {
+      "X": 21,
+      "Y": 21,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "whistleblower",
+        "informant",
+        "leaker",
+        "dissident",
+        "rebel",
+        "witness",
+        "reporter",
+        "insider",
+        "critic",
+        "outcast",
+        "exile",
+        "betrayer",
+        "snitch",
+        "mole",
+        "source",
+        "notifier",
+        "alarmist",
+        "defector",
+        "complainant",
+        "accuser",
+        "agitator"
+      ],
+      "Y_used": [
+        "loyalist",
+        "follower",
+        "ally",
+        "devotee",
+        "partisan",
+        "adherent",
+        "supporter",
+        "companion",
+        "teammate",
+        "subordinate",
+        "disciple",
+        "believer",
+        "member",
+        "patriot",
+        "stalwart",
+        "sidekick",
+        "acolyte",
+        "retainer",
+        "henchman",
+        "servant",
+        "wingman"
+      ],
+      "A_used": [
+        "genuine",
+        "virtuous",
+        "fair",
+        "authentic",
+        "moral",
+        "ethical",
+        "righteous",
+        "just",
+        "noble",
+        "honest",
+        "correct",
+        "straight",
+        "sincere",
+        "pure",
+        "candid",
+        "decent",
+        "upright",
+        "truthful",
+        "honorable",
+        "trustworthy"
+      ],
+      "B_used": [
+        "steady",
+        "constant",
+        "dependable",
+        "stable",
+        "consistent",
+        "predictable",
+        "reliable",
+        "sure",
+        "hardy",
+        "firm",
+        "resolute",
+        "unwavering",
+        "durable",
+        "punctual",
+        "regular",
+        "secure",
+        "certain",
+        "routine",
+        "trusty",
+        "solid"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Whistleblowers are often framed as principled risk-takers while loyalists are seen as dependable but potentially complicit."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 9,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
