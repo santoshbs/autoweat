@@ -1961,5 +1961,154 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "402d509ec983",
+    "timestamp": "2026-04-17T15:46:14.805465+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "psychology",
+    "contrast_label": "innovators vs administrators on the dimension of anxiety",
+    "labels": {
+      "X": "innovators",
+      "Y": "administrators",
+      "A": "anxiety",
+      "B": "calm"
+    },
+    "canonical_keys": {
+      "X": "innovators",
+      "Y": "administrators",
+      "A": "anxiety",
+      "B": "calm"
+    },
+    "effect_size": -0.8939996578421703,
+    "p_value": 0.00423,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "innovator",
+        "inventor",
+        "creator",
+        "founder",
+        "pioneer",
+        "visionary",
+        "disruptor",
+        "entrepreneur",
+        "artist",
+        "dreamer",
+        "genius",
+        "rebel",
+        "vanguard",
+        "starter",
+        "author",
+        "architect",
+        "catalyst",
+        "trailblazer",
+        "originator",
+        "maker"
+      ],
+      "Y_used": [
+        "administrator",
+        "manager",
+        "official",
+        "clerk",
+        "bureaucrat",
+        "officer",
+        "coordinator",
+        "supervisor",
+        "director",
+        "agent",
+        "steward",
+        "regulator",
+        "custodian",
+        "executive",
+        "handler",
+        "operator",
+        "functionary",
+        "overseer",
+        "controller",
+        "secretary"
+      ],
+      "A_used": [
+        "anxious",
+        "nervous",
+        "tense",
+        "stressed",
+        "worried",
+        "uneasy",
+        "fearful",
+        "frantic",
+        "jittery",
+        "apprehensive",
+        "restless",
+        "shaky",
+        "panicked",
+        "distressed",
+        "alarmed",
+        "fraught",
+        "unstable",
+        "pressured",
+        "turbulent",
+        "erratic"
+      ],
+      "B_used": [
+        "calm",
+        "peaceful",
+        "serene",
+        "relaxed",
+        "quiet",
+        "still",
+        "steady",
+        "placid",
+        "tranquil",
+        "composed",
+        "patient",
+        "mild",
+        "smooth",
+        "easy",
+        "balanced",
+        "centered",
+        "mellow",
+        "untroubled",
+        "dormant",
+        "restful"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "low",
+      "rationale": "While innovators are often romanticized as confident, the inherent uncertainty of their role may associate them more strongly with anxiety than the stable role of an administrator."
+    },
+    "interpretive_paragraph": "The results indicate that in this corpus, innovators are more strongly associated with calm than administrators are, who instead lean more toward anxiety. This pattern may emerge because web text often depicts administrative roles as being defined by the management of organizational stress and crisis, whereas innovators are frequently framed as confident visionaries. A social scientist might find this interesting because it reveals how professional identities are linguistically tied to specific emotional states. Such patterns suggest that society encodes the burdens of stability and oversight as stressful, while framing disruption as a more composed endeavor.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 13,
+      "cooled_domains_at_proposal": [
+        "sociology",
+        "social psychology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
