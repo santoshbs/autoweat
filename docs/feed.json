@@ -962,5 +962,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "1a7268ccff28",
+    "timestamp": "2026-04-17T10:39:31.974530+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "social psychology",
+    "contrast_label": "urban vs rural stereotypes along warmth and competence dimensions",
+    "labels": {
+      "X": "urban and city terms",
+      "Y": "rural and country terms",
+      "A": "warmth and interpersonal qualities",
+      "B": "competence and ability terms"
+    },
+    "canonical_keys": {
+      "X": "city|urban",
+      "Y": "country|rural",
+      "A": "interpersonal|qualities|warmth",
+      "B": "ability|competence"
+    },
+    "effect_size": -0.22511118181571185,
+    "p_value": 0.48809,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "city",
+        "downtown",
+        "metro",
+        "metropolis",
+        "urbanized",
+        "suburban",
+        "commercial",
+        "industrial",
+        "concrete",
+        "buildings",
+        "traffic",
+        "crowds",
+        "bustling",
+        "highrise",
+        "apartment",
+        "neighborhood",
+        "blocks",
+        "streets",
+        "pavements",
+        "dense"
+      ],
+      "Y_used": [
+        "rural",
+        "country",
+        "farm",
+        "countryside",
+        "village",
+        "town",
+        "farming",
+        "agricultural",
+        "pastoral",
+        "fields",
+        "pasture",
+        "meadow",
+        "woods",
+        "forest",
+        "orchard",
+        "livestock",
+        "crops",
+        "harvest",
+        "seasonal",
+        "land"
+      ],
+      "A_used": [
+        "warm",
+        "friendly",
+        "affectionate",
+        "loving",
+        "compassionate",
+        "sweet",
+        "nice",
+        "considerate",
+        "thoughtful",
+        "patient",
+        "understanding",
+        "empathetic",
+        "supportive",
+        "close",
+        "bonded",
+        "trusting",
+        "respectful",
+        "approachable",
+        "caring",
+        "gentle"
+      ],
+      "B_used": [
+        "capable",
+        "skilled",
+        "expert",
+        "effective",
+        "efficient",
+        "able",
+        "proficient",
+        "talented",
+        "experienced",
+        "knowledgeable",
+        "intelligent",
+        "competent",
+        "masterful",
+        "adept",
+        "trained",
+        "qualified",
+        "resourceful",
+        "productive",
+        "accomplished",
+        "strong"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "negative",
+      "confidence": "low",
+      "rationale": "Urban contexts may be associated with competence through institutional concentration while rural contexts may be associated with warmth through community emphasis but the direction is not certain without prior testing"
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.5:27b",
+      "proposer_mode": "well-studied",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 6,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
