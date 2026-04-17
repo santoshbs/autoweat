@@ -1816,5 +1816,150 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "906afbd20e07",
+    "timestamp": "2026-04-17T15:41:26.067193+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "management",
+    "contrast_label": "entrepreneurs vs bureaucrats on risk vs security",
+    "labels": {
+      "X": "entrepreneurs",
+      "Y": "bureaucrats",
+      "A": "risk",
+      "B": "security"
+    },
+    "canonical_keys": {
+      "X": "entrepreneurs",
+      "Y": "bureaucrats",
+      "A": "risk",
+      "B": "security"
+    },
+    "effect_size": 1.2482743107313956,
+    "p_value": 1e-05,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "entrepreneur",
+        "founder",
+        "creator",
+        "pioneer",
+        "startup",
+        "venture",
+        "innovator",
+        "visionary",
+        "owner",
+        "soloist",
+        "disruptor",
+        "builder",
+        "launcher",
+        "dreamer",
+        "producer",
+        "capitalist",
+        "freelancer",
+        "developer",
+        "inventor",
+        "maker"
+      ],
+      "Y_used": [
+        "bureaucrat",
+        "official",
+        "clerk",
+        "administrator",
+        "functionary",
+        "officer",
+        "agent",
+        "secretary",
+        "employee",
+        "worker",
+        "attendant",
+        "handler",
+        "steward",
+        "coordinator",
+        "regulator",
+        "keeper",
+        "auditor",
+        "staffer",
+        "assistant",
+        "technician"
+      ],
+      "A_used": [
+        "risky",
+        "bold",
+        "daring",
+        "adventurous",
+        "speculative",
+        "hazardous",
+        "uncertain",
+        "brave",
+        "reckless",
+        "gamble",
+        "chance",
+        "volatile",
+        "precarious",
+        "unpredictable",
+        "venture",
+        "hazard",
+        "exposure",
+        "peril",
+        "threat",
+        "jump"
+      ],
+      "B_used": [
+        "safe",
+        "secure",
+        "cautious",
+        "prudent",
+        "careful",
+        "stable",
+        "certain",
+        "guaranteed",
+        "protected",
+        "reliable",
+        "steady",
+        "sure",
+        "fixed",
+        "guarded",
+        "constant",
+        "conservative",
+        "defensive",
+        "shielded",
+        "firm",
+        "solid"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": null,
+    "interpretive_paragraph": "The results indicate that in this corpus, words associated with entrepreneurs are more strongly linked to concepts of risk than words associated with bureaucrats, while bureaucrats are more closely linked to security. This pattern likely reflects common cultural narratives that frame entrepreneurship as a venture of uncertainty and bureaucratic work as the maintenance of stability and procedural safety. A social scientist might find this significant because it reveals how deeply embedded these occupational stereotypes are within digital text. Understanding these linguistic associations helps illuminate how society conceptually separates the role of the innovator from the role of the administrator.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 12,
+      "cooled_domains_at_proposal": [
+        "social psychology",
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
