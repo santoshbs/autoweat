@@ -3157,5 +3157,162 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "16064c3c8f84",
+    "timestamp": "2026-04-17T17:23:00.881161+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "humanities",
+    "contrast_label": "historians vs futurists on hope vs melancholy",
+    "labels": {
+      "X": "historians",
+      "Y": "futurists",
+      "A": "hope",
+      "B": "melancholy"
+    },
+    "canonical_keys": {
+      "X": "historians",
+      "Y": "futurists",
+      "A": "hope",
+      "B": "melancholy"
+    },
+    "effect_size": -0.2020880442787201,
+    "p_value": 0.50811,
+    "n": {
+      "X": 22,
+      "Y": 22,
+      "A": 22,
+      "B": 22
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "historian",
+        "archivist",
+        "chronicler",
+        "scholar",
+        "antiquarian",
+        "biographer",
+        "researcher",
+        "curator",
+        "academic",
+        "professor",
+        "documentarian",
+        "diarist",
+        "clerk",
+        "scribe",
+        "expert",
+        "specialist",
+        "student",
+        "teacher",
+        "collector",
+        "genealogist",
+        "antiquary",
+        "analyst"
+      ],
+      "Y_used": [
+        "futurist",
+        "visionary",
+        "prophet",
+        "seer",
+        "speculator",
+        "trendsetter",
+        "innovator",
+        "pioneer",
+        "strategist",
+        "dreamer",
+        "prognosticator",
+        "forecaster",
+        "theorist",
+        "designer",
+        "engineer",
+        "architect",
+        "technologist",
+        "modernist",
+        "imaginer",
+        "writer",
+        "author",
+        "thinker"
+      ],
+      "A_used": [
+        "hopeful",
+        "optimistic",
+        "bright",
+        "positive",
+        "promising",
+        "aspiring",
+        "eager",
+        "joyful",
+        "radiant",
+        "upbeat",
+        "confident",
+        "sanguine",
+        "cheerful",
+        "light",
+        "expectant",
+        "wishing",
+        "glowing",
+        "sunny",
+        "welcome",
+        "rising",
+        "blooming",
+        "thriving"
+      ],
+      "B_used": [
+        "melancholy",
+        "sad",
+        "gloomy",
+        "nostalgic",
+        "dismal",
+        "somber",
+        "bleak",
+        "mournful",
+        "depressed",
+        "heavy",
+        "dark",
+        "sorrowful",
+        "weeping",
+        "lonely",
+        "desolate",
+        "wistful",
+        "grim",
+        "dour",
+        "tragic",
+        "hollow",
+        "faded",
+        "gray"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "uncertain",
+      "confidence": "low",
+      "rationale": "The common trope of the gloomy historian vs the optimistic futurist may be reversed in a corpus dominated by modern dystopian futurism and narratives of historical progress."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology",
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
