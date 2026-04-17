@@ -1218,5 +1218,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "21c7f2ca31fe",
+    "timestamp": "2026-04-17T15:11:38.568460+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "organizational behavior",
+    "contrast_label": "managers vs employees on controlling vs cooperative traits",
+    "labels": {
+      "X": "managers",
+      "Y": "employees",
+      "A": "controlling",
+      "B": "cooperative"
+    },
+    "canonical_keys": {
+      "X": "managers",
+      "Y": "employees",
+      "A": "controlling",
+      "B": "cooperative"
+    },
+    "effect_size": 0.6691387100175845,
+    "p_value": 0.03418,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "foreman",
+        "executive",
+        "principal",
+        "admin",
+        "coordinator",
+        "chief",
+        "supervisor",
+        "lead",
+        "manager",
+        "director",
+        "president",
+        "leader",
+        "warden",
+        "overseer",
+        "controller",
+        "governor",
+        "captain",
+        "superintendent",
+        "head",
+        "officer"
+      ],
+      "Y_used": [
+        "employee",
+        "worker",
+        "staff",
+        "laborer",
+        "clerk",
+        "assistant",
+        "associate",
+        "subordinate",
+        "hire",
+        "recruit",
+        "hand",
+        "operative",
+        "member",
+        "agent",
+        "helper",
+        "servant",
+        "apprentice",
+        "trainee",
+        "junior",
+        "aide"
+      ],
+      "A_used": [
+        "dominant",
+        "rigid",
+        "strict",
+        "authoritative",
+        "firm",
+        "direct",
+        "commanding",
+        "decisive",
+        "governing",
+        "regulating",
+        "steering",
+        "overbearing",
+        "presiding",
+        "assertive",
+        "strong",
+        "controlling",
+        "imperative",
+        "stern",
+        "hard",
+        "uncompromising"
+      ],
+      "B_used": [
+        "helpful",
+        "supportive",
+        "collaborative",
+        "flexible",
+        "open",
+        "friendly",
+        "agreeable",
+        "mutual",
+        "shared",
+        "joint",
+        "united",
+        "aligned",
+        "trusting",
+        "social",
+        "team",
+        "communal",
+        "adaptive",
+        "accommodating",
+        "yielding",
+        "gentle"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Managers are typically associated with directive and authoritative roles, whereas employees are associated with execution and teamwork."
+    },
+    "interpretive_paragraph": "The results indicate that in the analyzed corpus, managers are more strongly associated with controlling terms than employees are. Conversely, employees tend to be associated with cooperative terms more than managers. This pattern likely emerges because web-based descriptions of professional roles often emphasize the authoritative nature of management and the collaborative expectations of staff positions. A social scientist might find this result significant as it demonstrates how linguistic patterns mirror institutional power dynamics. Such associations suggest that the language of the workplace encodes specific behavioral stereotypes based on hierarchical rank.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 8,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
