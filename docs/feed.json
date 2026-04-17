@@ -2721,5 +2721,149 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "4869e94d9666",
+    "timestamp": "2026-04-17T16:52:17.192016+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "social psychology",
+    "contrast_label": "social class stereotypes of refinement versus coarseness",
+    "labels": {
+      "X": "aristocrats",
+      "Y": "commoners",
+      "A": "refinement",
+      "B": "coarseness"
+    },
+    "canonical_keys": {
+      "X": "aristocrats",
+      "Y": "commoners",
+      "A": "refinement",
+      "B": "coarseness"
+    },
+    "effect_size": 0.7316357805446604,
+    "p_value": 0.02059,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "aristocrat",
+        "noble",
+        "lord",
+        "lady",
+        "duke",
+        "duchess",
+        "baron",
+        "count",
+        "earl",
+        "prince",
+        "princess",
+        "monarch",
+        "royalty",
+        "peer",
+        "patrician",
+        "elite",
+        "mogul",
+        "tycoon",
+        "dignitary",
+        "sovereign"
+      ],
+      "Y_used": [
+        "commoner",
+        "plebeian",
+        "peasant",
+        "proletarian",
+        "citizen",
+        "worker",
+        "laborer",
+        "villager",
+        "townsman",
+        "civilian",
+        "layperson",
+        "rustic",
+        "tenant",
+        "serf",
+        "pauper",
+        "beggar",
+        "underclass",
+        "tradesman",
+        "artisan",
+        "apprentice"
+      ],
+      "A_used": [
+        "refined",
+        "polished",
+        "elegant",
+        "sophisticated",
+        "cultured",
+        "poised",
+        "graceful",
+        "ornate",
+        "exquisite",
+        "deluxe",
+        "fancy",
+        "posh",
+        "stately",
+        "dignified",
+        "courtly",
+        "urbane",
+        "chic",
+        "classy",
+        "smooth",
+        "subtle"
+      ],
+      "B_used": [
+        "coarse",
+        "rough",
+        "crude",
+        "raw",
+        "rustic",
+        "blunt",
+        "basic",
+        "honest",
+        "direct",
+        "humble",
+        "stark",
+        "earthy",
+        "rugged",
+        "unrefined",
+        "plain",
+        "simple",
+        "modest",
+        "natural",
+        "naive",
+        "harsh"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": null,
+    "interpretive_paragraph": "The analysis reveals that aristocrats are more strongly associated with refinement than commoners are, while commoners are more closely linked to coarseness. This pattern likely stems from long-standing cultural stereotypes present in English-language texts that equate high social status with polished behavior and lower status with a lack of sophistication. Such associations persist in digital corpora because they mirror traditional narratives regarding class distinctions. A social scientist studying social stratification would find this significant as it shows how language reinforces perceived moral or aesthetic differences between social ranks. This illustrates the way semantic associations can encode and perpetuate systemic class biases.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
