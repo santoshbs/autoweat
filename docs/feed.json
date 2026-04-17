@@ -2571,5 +2571,155 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "3cc72e2220e9",
+    "timestamp": "2026-04-17T16:16:57.546576+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "psychology",
+    "contrast_label": "experts vs amateurs on confidence vs humility",
+    "labels": {
+      "X": "experts",
+      "Y": "amateurs",
+      "A": "confidence",
+      "B": "humility"
+    },
+    "canonical_keys": {
+      "X": "experts",
+      "Y": "amateurs",
+      "A": "confidence",
+      "B": "humility"
+    },
+    "effect_size": 0.9975377834281255,
+    "p_value": 0.00078,
+    "n": {
+      "X": 21,
+      "Y": 21,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "expert",
+        "specialist",
+        "authority",
+        "professional",
+        "master",
+        "maven",
+        "scholar",
+        "pro",
+        "veteran",
+        "adept",
+        "ace",
+        "pundit",
+        "savant",
+        "guru",
+        "technician",
+        "connoisseur",
+        "analyst",
+        "consultant",
+        "practitioner",
+        "chief",
+        "lead"
+      ],
+      "Y_used": [
+        "amateur",
+        "novice",
+        "beginner",
+        "learner",
+        "rookie",
+        "hobbyist",
+        "layperson",
+        "trainee",
+        "apprentice",
+        "student",
+        "neophyte",
+        "newbie",
+        "dilettante",
+        "layman",
+        "recruit",
+        "initiate",
+        "starter",
+        "youth",
+        "pupil",
+        "candidate",
+        "entrant"
+      ],
+      "A_used": [
+        "confident",
+        "sure",
+        "bold",
+        "assertive",
+        "proud",
+        "firm",
+        "decisive",
+        "positive",
+        "strong",
+        "poised",
+        "fearless",
+        "arrogant",
+        "cocky",
+        "resolute",
+        "steady",
+        "unwavering",
+        "direct",
+        "convinced",
+        "certain",
+        "absolute"
+      ],
+      "B_used": [
+        "humble",
+        "modest",
+        "shy",
+        "quiet",
+        "deferential",
+        "meek",
+        "unassuming",
+        "tentative",
+        "hesitant",
+        "uncertain",
+        "apologetic",
+        "reserved",
+        "cautious",
+        "soft",
+        "gentle",
+        "sheepish",
+        "diffident",
+        "muted",
+        "lowkey",
+        "mild"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "negative",
+      "confidence": "medium",
+      "rationale": "The Dunning-Kruger effect suggests that novices often overestimate their competence, while experts are more prone to intellectual humility and nuance."
+    },
+    "interpretive_paragraph": "The results show that in the analyzed corpus, words related to experts are more strongly associated with confidence than words related to amateurs, who are more closely linked to humility. This pattern likely arises because web text often portrays mastery as being defined by authority and certainty, while beginners are characterized by a more modest or deferential posture. A social scientist would find this result interesting as it demonstrates how professional hierarchies are embedded in linguistic structures. These associations reveal how language encodes systemic expectations about status and expertise. Such patterns may ultimately influence how individuals perceive authority and credibility in real-world interactions.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
