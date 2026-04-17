@@ -326,5 +326,87 @@
       "hey"
     ],
     "first_seen": "2026-04-17T11:49:21.018833+00:00"
+  },
+  "vegans": {
+    "display_label": "vegans",
+    "words": [
+      "tofu",
+      "tempeh",
+      "seitan",
+      "quinoa",
+      "lentils",
+      "beans",
+      "chickpeas",
+      "kale",
+      "spinach",
+      "broccoli",
+      "avocado",
+      "cashew",
+      "almond",
+      "walnut",
+      "pumpkin",
+      "sunflower",
+      "oat",
+      "coconut",
+      "soy",
+      "veggie",
+      "bean",
+      "pea",
+      "pesto",
+      "hummus"
+    ],
+    "first_seen": "2026-04-17T11:52:59.480424+00:00"
+  },
+  "ethical": {
+    "display_label": "ethical words",
+    "words": [
+      "compassion",
+      "justice",
+      "fairness",
+      "sustainability",
+      "rights",
+      "humane",
+      "responsible",
+      "eco",
+      "crueltyfree",
+      "biodiversity",
+      "ecosystem",
+      "vegetarian",
+      "plantbased",
+      "veganism",
+      "ethical",
+      "kindness",
+      "conscience",
+      "stewardship",
+      "green",
+      "mindful"
+    ],
+    "first_seen": "2026-04-17T11:52:59.480424+00:00"
+  },
+  "indulgent": {
+    "display_label": "indulgent words",
+    "words": [
+      "tasty",
+      "flavorful",
+      "delicious",
+      "savory",
+      "decadent",
+      "buttery",
+      "rich",
+      "spicy",
+      "umami",
+      "zesty",
+      "luscious",
+      "juicy",
+      "succulent",
+      "mouthwatering",
+      "silky",
+      "sweet",
+      "cheesy",
+      "crispy",
+      "creamy",
+      "soft"
+    ],
+    "first_seen": "2026-04-17T11:52:59.480424+00:00"
   }
 }
