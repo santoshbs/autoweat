@@ -3013,5 +3013,149 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "0cfc40a6da6c",
+    "timestamp": "2026-04-17T17:17:19.958700+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "police vs social workers on control vs support",
+    "labels": {
+      "X": "police",
+      "Y": "social workers",
+      "A": "control",
+      "B": "support"
+    },
+    "canonical_keys": {
+      "X": "police",
+      "Y": "social|workers",
+      "A": "control",
+      "B": "support"
+    },
+    "effect_size": 1.621581763791068,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "cop",
+        "officer",
+        "deputy",
+        "sheriff",
+        "trooper",
+        "warden",
+        "marshal",
+        "agent",
+        "sergeant",
+        "lieutenant",
+        "captain",
+        "inspector",
+        "detective",
+        "commissioner",
+        "patrolman",
+        "constable",
+        "guard",
+        "policeman",
+        "policewoman",
+        "recruit"
+      ],
+      "Y_used": [
+        "caseworker",
+        "counselor",
+        "therapist",
+        "advocate",
+        "consultant",
+        "advisor",
+        "helper",
+        "specialist",
+        "provider",
+        "clinician",
+        "practitioner",
+        "coordinator",
+        "facilitator",
+        "mentor",
+        "guide",
+        "worker",
+        "agent",
+        "staff",
+        "aide",
+        "liaison"
+      ],
+      "A_used": [
+        "controlling",
+        "strict",
+        "rigid",
+        "firm",
+        "hard",
+        "dominant",
+        "forceful",
+        "restrictive",
+        "formal",
+        "governing",
+        "commanding",
+        "directing",
+        "limiting",
+        "constraining",
+        "managing",
+        "orderly",
+        "ruling",
+        "authoritarian",
+        "oppressive",
+        "stern"
+      ],
+      "B_used": [
+        "supportive",
+        "helpful",
+        "aiding",
+        "assisting",
+        "nurturing",
+        "caring",
+        "guiding",
+        "encouraging",
+        "comforting",
+        "sustaining",
+        "relieving",
+        "uplifting",
+        "enabling",
+        "fostering",
+        "protecting",
+        "sheltering",
+        "tending",
+        "soothing",
+        "healing",
+        "mending"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": null,
+    "interpretive_paragraph": "The results indicate that in the analyzed corpus, words related to police are more strongly associated with concepts of control than words related to social workers are. Conversely, social workers appear more closely linked to concepts of support. This pattern likely reflects the distinct institutional roles of these professions, where policing is often framed around maintaining order and enforcement, while social work is focused on providing aid and assistance. Such a finding is significant for social scientists because it reveals how language encodes the perceived functions of state authority. It demonstrates a clear linguistic divide between the punitive and supportive mechanisms of social management.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
