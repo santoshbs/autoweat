@@ -3475,5 +3475,157 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "55096359e9a9",
+    "timestamp": "2026-04-17T17:50:06.969925+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "humanities",
+    "contrast_label": "archaeologists vs astronomers on nostalgia vs anticipation",
+    "labels": {
+      "X": "archaeologists",
+      "Y": "astronomers",
+      "A": "nostalgia",
+      "B": "anticipation"
+    },
+    "canonical_keys": {
+      "X": "archaeologists",
+      "Y": "astronomers",
+      "A": "nostalgia",
+      "B": "anticipation"
+    },
+    "effect_size": 0.3162238944019905,
+    "p_value": 0.31346,
+    "n": {
+      "X": 21,
+      "Y": 21,
+      "A": 21,
+      "B": 21
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "archaeologist",
+        "excavator",
+        "digger",
+        "curator",
+        "scholar",
+        "researcher",
+        "antiquarian",
+        "academic",
+        "explorer",
+        "fieldworker",
+        "specialist",
+        "analyst",
+        "chronicler",
+        "preserver",
+        "conservator",
+        "student",
+        "professor",
+        "investigator",
+        "discoverer",
+        "expert",
+        "technician"
+      ],
+      "Y_used": [
+        "astronomer",
+        "astrophysicist",
+        "cosmologist",
+        "stargazer",
+        "researcher",
+        "scholar",
+        "academic",
+        "specialist",
+        "analyst",
+        "theorist",
+        "scientist",
+        "explorer",
+        "discoverer",
+        "physicist",
+        "professor",
+        "student",
+        "navigator",
+        "observer",
+        "planetary",
+        "galactic",
+        "expert"
+      ],
+      "A_used": [
+        "nostalgic",
+        "longing",
+        "remembrance",
+        "past",
+        "old",
+        "memory",
+        "yearning",
+        "antique",
+        "vintage",
+        "historic",
+        "retrospective",
+        "bygone",
+        "ancient",
+        "classic",
+        "traditional",
+        "sentimental",
+        "recalled",
+        "forgotten",
+        "lingering",
+        "wistful",
+        "poignant"
+      ],
+      "B_used": [
+        "expectant",
+        "future",
+        "upcoming",
+        "hopeful",
+        "eager",
+        "awaiting",
+        "prospective",
+        "imminent",
+        "pending",
+        "forecast",
+        "prediction",
+        "potential",
+        "looming",
+        "tomorrow",
+        "novelty",
+        "new",
+        "ahead",
+        "promised",
+        "oncoming",
+        "ready",
+        "poised"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Cultural tropes often link the study of ruins and the past with emotional longing, while astronomy is linked to the unknown future."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
