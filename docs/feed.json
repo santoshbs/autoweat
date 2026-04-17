@@ -760,5 +760,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "13c20d5ae337",
+    "timestamp": "2026-04-17T14:46:45.417446+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "wealthy actors vs poor actors on the dimension of generosity vs greed",
+    "labels": {
+      "X": "wealthy actors",
+      "Y": "poor actors",
+      "A": "generosity",
+      "B": "greed"
+    },
+    "canonical_keys": {
+      "X": "actors|wealthy",
+      "Y": "actors|poor",
+      "A": "generosity",
+      "B": "greed"
+    },
+    "effect_size": 0.4349623112219615,
+    "p_value": 0.17815,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "millionaire",
+        "billionaire",
+        "tycoon",
+        "mogul",
+        "aristocrat",
+        "elite",
+        "plutocrat",
+        "capitalist",
+        "bourgeois",
+        "rich",
+        "wealthy",
+        "affluent",
+        "opulent",
+        "prosperous",
+        "privileged",
+        "moneyed",
+        "lord",
+        "noble",
+        "boss",
+        "owner"
+      ],
+      "Y_used": [
+        "pauper",
+        "beggar",
+        "proletarian",
+        "peasant",
+        "underclass",
+        "impoverished",
+        "needy",
+        "destitute",
+        "broke",
+        "penniless",
+        "poor",
+        "disadvantaged",
+        "underprivileged",
+        "indigent",
+        "worker",
+        "laborer",
+        "servant",
+        "vagrant",
+        "derelict",
+        "tenant"
+      ],
+      "A_used": [
+        "generous",
+        "giving",
+        "charitable",
+        "altruistic",
+        "kind",
+        "benevolent",
+        "helpful",
+        "selfless",
+        "open",
+        "sharing",
+        "philanthropic",
+        "bounteous",
+        "liberal",
+        "munificent",
+        "caring",
+        "supportive",
+        "gracious",
+        "lavish",
+        "noble",
+        "warm"
+      ],
+      "B_used": [
+        "greedy",
+        "selfish",
+        "grasping",
+        "avaricious",
+        "stingy",
+        "miserly",
+        "hoarding",
+        "mercenary",
+        "acquisitive",
+        "covetous",
+        "mean",
+        "cold",
+        "cruel",
+        "heartless",
+        "calculating",
+        "predatory",
+        "rapacious",
+        "hungry",
+        "wanting",
+        "envious"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "low",
+      "rationale": "While common stereotypes associate wealth with greed, formal corpus language often links the wealthy to philanthropy and the poor to theft or desperation."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 5,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
