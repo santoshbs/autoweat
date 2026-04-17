@@ -408,5 +408,85 @@
       "soft"
     ],
     "first_seen": "2026-04-17T11:52:59.480424+00:00"
+  },
+  "group|members": {
+    "display_label": "in-group members",
+    "words": [
+      "friend",
+      "ally",
+      "teammate",
+      "compatriot",
+      "colleague",
+      "sibling",
+      "relative",
+      "cousin",
+      "neighbor",
+      "comrade",
+      "brother",
+      "sister",
+      "parent",
+      "grandparent",
+      "child",
+      "partner",
+      "mate",
+      "buddy",
+      "peer",
+      "classmate",
+      "housemate",
+      "roommate"
+    ],
+    "first_seen": "2026-04-17T11:56:32.258999+00:00"
+  },
+  "warmth": {
+    "display_label": "warmth words",
+    "words": [
+      "warm",
+      "friendly",
+      "caring",
+      "compassionate",
+      "kind",
+      "loving",
+      "gentle",
+      "affectionate",
+      "welcoming",
+      "approachable",
+      "supportive",
+      "understanding",
+      "benevolent",
+      "helpful",
+      "patient",
+      "courteous",
+      "grateful",
+      "respectful",
+      "sociable",
+      "pleasant"
+    ],
+    "first_seen": "2026-04-17T11:56:32.258999+00:00"
+  },
+  "competence": {
+    "display_label": "competence words",
+    "words": [
+      "competent",
+      "capable",
+      "skilled",
+      "intelligent",
+      "knowledgeable",
+      "efficient",
+      "logical",
+      "analytical",
+      "systematic",
+      "pragmatic",
+      "reliable",
+      "precise",
+      "authoritative",
+      "confident",
+      "resourceful",
+      "sharp",
+      "experienced",
+      "driven",
+      "decisive",
+      "visionary"
+    ],
+    "first_seen": "2026-04-17T11:56:32.258999+00:00"
   }
 }
