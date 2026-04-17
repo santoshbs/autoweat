@@ -4075,5 +4075,154 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "58578e15e413",
+    "timestamp": "2026-04-17T19:58:05.998454+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "organizational theory",
+    "contrast_label": "architects vs urban planners on individualism vs collectivism",
+    "labels": {
+      "X": "architects",
+      "Y": "urban planners",
+      "A": "individualism",
+      "B": "collectivism"
+    },
+    "canonical_keys": {
+      "X": "architects",
+      "Y": "planners|urban",
+      "A": "individualism",
+      "B": "collectivism"
+    },
+    "effect_size": 1.1861011484636452,
+    "p_value": 0.00015,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "architect",
+        "designer",
+        "builder",
+        "sketcher",
+        "draftsman",
+        "creator",
+        "visionary",
+        "artist",
+        "engineer",
+        "developer",
+        "stylist",
+        "professional",
+        "expert",
+        "master",
+        "author",
+        "sculptor",
+        "modeler",
+        "drafter",
+        "specialist",
+        "practitioner"
+      ],
+      "Y_used": [
+        "planner",
+        "administrator",
+        "coordinator",
+        "organizer",
+        "official",
+        "bureaucrat",
+        "regulator",
+        "manager",
+        "strategist",
+        "director",
+        "analyst",
+        "clerk",
+        "agent",
+        "governor",
+        "overseer",
+        "curator",
+        "steward",
+        "facilitator",
+        "moderator",
+        "supervisor"
+      ],
+      "A_used": [
+        "individual",
+        "personal",
+        "unique",
+        "solo",
+        "private",
+        "independent",
+        "singular",
+        "distinct",
+        "separate",
+        "autonomous",
+        "lone",
+        "self",
+        "particular",
+        "special",
+        "original",
+        "idiosyncratic",
+        "subjective",
+        "detached",
+        "sovereign",
+        "solitary"
+      ],
+      "B_used": [
+        "collective",
+        "social",
+        "shared",
+        "public",
+        "common",
+        "group",
+        "communal",
+        "joint",
+        "mutual",
+        "together",
+        "cooperative",
+        "unified",
+        "general",
+        "universal",
+        "plural",
+        "mass",
+        "societal",
+        "team",
+        "integrated",
+        "combined"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Architects are typically associated with individual artistic authorship, while urban planners are associated with systemic public coordination."
+    },
+    "interpretive_paragraph": "The results indicate that architects are more strongly associated with individualism than urban planners are, who lean more toward collectivism. This pattern likely stems from the cultural portrayal of the architect as a singular creative visionary in contrast to the urban planner's role in managing public policy and community interests. A social scientist might find this result significant as it demonstrates how language encodes professional identities along a spectrum of autonomy versus collaboration. Such findings highlight the subtle ways in which social structures and professional expectations are embedded within a corpus of web text.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology",
+        "organizational behavior"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
