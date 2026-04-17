@@ -906,5 +906,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "de67986b63c4",
+    "timestamp": "2026-04-17T14:52:30.135405+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "professors vs students on authority vs learning",
+    "labels": {
+      "X": "professors",
+      "Y": "students",
+      "A": "authority",
+      "B": "learning"
+    },
+    "canonical_keys": {
+      "X": "professors",
+      "Y": "students",
+      "A": "authority",
+      "B": "learning"
+    },
+    "effect_size": 0.3622779640900452,
+    "p_value": 0.26573,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "professor",
+        "teacher",
+        "instructor",
+        "lecturer",
+        "scholar",
+        "academic",
+        "mentor",
+        "dean",
+        "faculty",
+        "tutor",
+        "educator",
+        "principal",
+        "scientist",
+        "thinker",
+        "philosopher",
+        "author",
+        "writer",
+        "intellectual",
+        "curator",
+        "regent"
+      ],
+      "Y_used": [
+        "student",
+        "pupil",
+        "learner",
+        "freshman",
+        "sophomore",
+        "junior",
+        "senior",
+        "graduate",
+        "undergraduate",
+        "apprentice",
+        "novice",
+        "beginner",
+        "trainee",
+        "disciple",
+        "youth",
+        "teenager",
+        "adolescent",
+        "classmate",
+        "peer",
+        "undergrad"
+      ],
+      "A_used": [
+        "lead",
+        "command",
+        "direct",
+        "power",
+        "boss",
+        "expert",
+        "authority",
+        "master",
+        "chief",
+        "head",
+        "decide",
+        "control",
+        "order",
+        "rule",
+        "guide",
+        "govern",
+        "manage",
+        "dominate",
+        "preside",
+        "regulate"
+      ],
+      "B_used": [
+        "learn",
+        "study",
+        "curious",
+        "question",
+        "wonder",
+        "explore",
+        "discover",
+        "read",
+        "listen",
+        "absorb",
+        "grow",
+        "develop",
+        "search",
+        "ask",
+        "seek",
+        "probe",
+        "examine",
+        "practice",
+        "train",
+        "improve"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "high",
+      "rationale": "Institutional roles in academia strongly associate professors with power and direction, and students with the process of acquisition and study."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 6,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
