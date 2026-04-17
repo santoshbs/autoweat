@@ -154,5 +154,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "b2eaaeaeeece",
+    "timestamp": "2026-04-17T11:46:37.703832+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "urban vs rural language × progressive vs traditional concepts",
+    "labels": {
+      "X": "urban",
+      "Y": "rural",
+      "A": "progressive",
+      "B": "traditional"
+    },
+    "canonical_keys": {
+      "X": "urban",
+      "Y": "rural",
+      "A": "progressive",
+      "B": "traditional"
+    },
+    "effect_size": 1.1952205840592018,
+    "p_value": 3e-05,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "city",
+        "downtown",
+        "metropolitan",
+        "suburb",
+        "subway",
+        "freeway",
+        "traffic",
+        "skyscraper",
+        "billboard",
+        "mall",
+        "neon",
+        "cafe",
+        "bar",
+        "coffee",
+        "street",
+        "alley",
+        "sidewalk",
+        "cyclist",
+        "train",
+        "commuter"
+      ],
+      "Y_used": [
+        "countryside",
+        "farmland",
+        "meadow",
+        "pasture",
+        "village",
+        "farm",
+        "barn",
+        "farmhouse",
+        "silo",
+        "tractor",
+        "cattle",
+        "hay",
+        "harvest",
+        "fields",
+        "valley",
+        "forest",
+        "wood",
+        "creek",
+        "hill",
+        "hilltop"
+      ],
+      "A_used": [
+        "innovation",
+        "reform",
+        "modern",
+        "technology",
+        "new",
+        "futurism",
+        "liberal",
+        "inclusive",
+        "diversity",
+        "equality",
+        "education",
+        "science",
+        "research",
+        "sustainable",
+        "renewable",
+        "digital",
+        "empowerment",
+        "grassroots",
+        "open",
+        "collaborative"
+      ],
+      "B_used": [
+        "heritage",
+        "locality",
+        "simple",
+        "faith",
+        "handmade",
+        "conservative",
+        "family",
+        "agricultural",
+        "community",
+        "natural",
+        "culture",
+        "classic",
+        "old",
+        "customs",
+        "legacy",
+        "holiday",
+        "ceremonial",
+        "values",
+        "ancestral",
+        "pastoral"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "uncertain",
+      "confidence": "low",
+      "rationale": "It is not clear whether urban vocabulary will align more strongly with progressive terms or traditional terms."
+    },
+    "interpretive_paragraph": "The WEAT result shows that urban words (X) are more strongly associated with progressive terms (A) than rural words (Y) are with traditional terms (B), evidenced by the positive effect size. This indicates that language used in urban contexts leans toward progressive concepts while rural contexts lean toward traditional ones. A plausible reason is that urban environments frequently highlight technology, inclusive policies, and cultural diversity, which are framed using progressive vocabulary, whereas rural discourse often emphasizes heritage, self-reliance, and conventional values. This lexical pattern reflects how everyday language mirrors the social and cultural priorities of different geographic communities. For researchers studying social stratification, such findings illuminate how linguistic choices encode and potentially reinforce socio-geographic divisions, shedding light on the ways in which digital text constructions perpetuate distinct social identities.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gpt-oss:20b",
+      "proposer_mode": "novel",
+      "thinking_style": "gpt-oss",
+      "thinking_effort": "high",
+      "history_size_seen": 1,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
