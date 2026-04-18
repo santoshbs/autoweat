@@ -150,5 +150,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "2e0547efea65",
+    "timestamp": "2026-04-18T09:21:38.930181+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "healthcare actors and temporal pressure dimensions",
+    "labels": {
+      "X": "providers",
+      "Y": "patients",
+      "A": "urgency",
+      "B": "routine"
+    },
+    "canonical_keys": {
+      "X": "providers",
+      "Y": "patients",
+      "A": "urgency",
+      "B": "routine"
+    },
+    "effect_size": -1.2358967247350177,
+    "p_value": 3e-05,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "physician",
+        "surgeon",
+        "nurse",
+        "doctor",
+        "clinician",
+        "staff",
+        "medic",
+        "therapist",
+        "specialist",
+        "attendant",
+        "operator",
+        "handler",
+        "agent",
+        "official",
+        "worker",
+        "crew",
+        "unit",
+        "squad",
+        "team",
+        "responder"
+      ],
+      "Y_used": [
+        "sick",
+        "ill",
+        "injured",
+        "ailing",
+        "unwell",
+        "frail",
+        "delicate",
+        "infirm",
+        "weak",
+        "tired",
+        "resting",
+        "waiting",
+        "recovering",
+        "healing",
+        "mending",
+        "suffering",
+        "enduring",
+        "vulnerable",
+        "needy",
+        "bedridden"
+      ],
+      "A_used": [
+        "immediate",
+        "pressing",
+        "acute",
+        "rapid",
+        "swift",
+        "quick",
+        "sudden",
+        "fast",
+        "prompt",
+        "hasty",
+        "critical",
+        "severe",
+        "vital",
+        "essential",
+        "time",
+        "pressure",
+        "rush",
+        "sprint",
+        "race",
+        "strain"
+      ],
+      "B_used": [
+        "daily",
+        "regular",
+        "standard",
+        "usual",
+        "normal",
+        "typical",
+        "common",
+        "frequent",
+        "constant",
+        "steady",
+        "habit",
+        "custom",
+        "practice",
+        "procedure",
+        "protocol",
+        "order",
+        "cycle",
+        "pattern",
+        "sequence",
+        "schedule"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "negative",
+      "confidence": "medium",
+      "rationale": "While lay assumptions place patients in urgent contexts and clinicians in routine ones, triage literature and emergency department reporting may show providers associating more heavily with urgency vocabulary."
+    },
+    "interpretive_paragraph": "The significant negative score reveals that the providers set leans toward routine while the patients set leans toward urgency, establishing a clear semantic divide along the routine-to-urgency spectrum. This pattern emerges because online health content is heavily shaped by how care is organized and consumed, with administrative and scheduling materials emphasizing routine processes for providers while consumer forums and news coverage focus on acute symptoms for patients. The linguistic split mirrors a structural reality in which institutional actors are framed around protocols and individuals are framed around acute need. For social scientists studying health communication, this finding matters because it shows how everyday language encodes and potentially reinforces unequal power dynamics by normalizing a divide between institutional management and individual vulnerability. Tracking how these lexical associations vary across demographics could reveal whether such discourse mirrors systemic gaps in care access or actively shapes public expectations about medical responsibility.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 1,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
