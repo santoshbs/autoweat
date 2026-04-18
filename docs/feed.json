@@ -156,5 +156,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "1ea65a3a7de2",
+    "timestamp": "2026-04-18T11:23:35.532177+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "psychology",
+    "contrast_label": "experts vs laypeople on confidence vs hesitation",
+    "labels": {
+      "X": "experts",
+      "Y": "laypeople",
+      "A": "confidence",
+      "B": "hesitation"
+    },
+    "canonical_keys": {
+      "X": "experts",
+      "Y": "laypeople",
+      "A": "confidence",
+      "B": "hesitation"
+    },
+    "effect_size": 1.4370133207503093,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "expert",
+        "specialist",
+        "authority",
+        "professional",
+        "master",
+        "maven",
+        "connoisseur",
+        "adept",
+        "pundit",
+        "savant",
+        "veteran",
+        "pro",
+        "ace",
+        "scholar",
+        "technician",
+        "analyst",
+        "practitioner",
+        "consultant",
+        "guru",
+        "wizard"
+      ],
+      "Y_used": [
+        "layperson",
+        "amateur",
+        "novice",
+        "beginner",
+        "neophyte",
+        "outsider",
+        "layman",
+        "rookie",
+        "learner",
+        "apprentice",
+        "pupil",
+        "student",
+        "newcomer",
+        "hobbyist",
+        "generalist",
+        "commoner",
+        "civilian",
+        "plebeian",
+        "nonexpert",
+        "dilettante"
+      ],
+      "A_used": [
+        "confidence",
+        "certainty",
+        "assurance",
+        "poise",
+        "conviction",
+        "boldness",
+        "firmness",
+        "sureness",
+        "decisiveness",
+        "pride",
+        "courage",
+        "strength",
+        "resolve",
+        "stability",
+        "clarity",
+        "precision",
+        "focus",
+        "trust",
+        "belief",
+        "assertive"
+      ],
+      "B_used": [
+        "hesitation",
+        "doubt",
+        "uncertainty",
+        "wavering",
+        "pause",
+        "reluctance",
+        "caution",
+        "skepticism",
+        "ambiguity",
+        "nervousness",
+        "diffidence",
+        "confusion",
+        "insecurity",
+        "tentative",
+        "vacillation",
+        "worry",
+        "apprehension",
+        "shame",
+        "modesty",
+        "timidness"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "While experts are stereotypically associated with confidence, the Dunning-Kruger effect suggests that laypeople may often display higher confidence in their own limited knowledge."
+    },
+    "interpretive_paragraph": "The results show that words associated with experts are more strongly linked to confidence, while words associated with laypeople are more closely linked to hesitation. This pattern suggests a systematic linguistic association between specialized knowledge and decisiveness within the corpus. Such a trend likely arises because web-based text often presents expert discourse as authoritative and definitive, whereas lay perspectives are frequently framed as uncertain or inquisitive. For a social scientist, this finding is important because it demonstrates how language encodes and reinforces perceptions of epistemic authority. By associating expertise with confidence and lay status with hesitation, the text reflects and potentially perpetuates social hierarchies regarding who is viewed as a credible source of information.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 1,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
