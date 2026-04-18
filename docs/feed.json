@@ -5936,5 +5936,162 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "9ff8b4332d81",
+    "timestamp": "2026-04-18T02:41:12.129306+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "management",
+    "contrast_label": "association of business succession roles with preservation versus disruption",
+    "labels": {
+      "X": "heirs",
+      "Y": "founders",
+      "A": "preservation",
+      "B": "disruption"
+    },
+    "canonical_keys": {
+      "X": "heirs",
+      "Y": "founders",
+      "A": "preservation",
+      "B": "disruption"
+    },
+    "effect_size": 1.1891385882838201,
+    "p_value": 2e-05,
+    "n": {
+      "X": 22,
+      "Y": 22,
+      "A": 22,
+      "B": 22
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "heir",
+        "heiress",
+        "successor",
+        "inheritor",
+        "scion",
+        "beneficiary",
+        "descendant",
+        "offspring",
+        "child",
+        "son",
+        "daughter",
+        "progeny",
+        "recipient",
+        "survivor",
+        "replacement",
+        "trustee",
+        "relative",
+        "kin",
+        "member",
+        "youth",
+        "nephew",
+        "niece"
+      ],
+      "Y_used": [
+        "founder",
+        "creator",
+        "pioneer",
+        "architect",
+        "originator",
+        "author",
+        "inventor",
+        "builder",
+        "starter",
+        "entrepreneur",
+        "visionary",
+        "producer",
+        "developer",
+        "parent",
+        "head",
+        "chief",
+        "lead",
+        "maker",
+        "source",
+        "boss",
+        "owner",
+        "captain"
+      ],
+      "A_used": [
+        "keep",
+        "save",
+        "guard",
+        "protect",
+        "sustain",
+        "maintain",
+        "uphold",
+        "retain",
+        "conserve",
+        "steady",
+        "stable",
+        "fixed",
+        "lasting",
+        "enduring",
+        "constant",
+        "static",
+        "traditional",
+        "classic",
+        "old",
+        "hold",
+        "preserve",
+        "secure"
+      ],
+      "B_used": [
+        "change",
+        "shift",
+        "break",
+        "alter",
+        "modify",
+        "innovate",
+        "renew",
+        "reform",
+        "transform",
+        "evolve",
+        "update",
+        "switch",
+        "pivot",
+        "shock",
+        "radical",
+        "new",
+        "modern",
+        "fresh",
+        "different",
+        "novel",
+        "disrupt",
+        "vary"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "While stereotypes link heirs to preservation and founders to disruption, corporate histories often show heirs modernizing firms and founders clinging to legacy."
+    },
+    "interpretive_paragraph": "The result indicates that in the corpus, heirs are more strongly associated with preservation than founders are. Conversely, founders show a stronger relative association with disruption. This pattern likely emerges because web text often characterizes founders as trailblazers who break established norms, while heirs are framed as stewards of an existing legacy. Such a finding is significant for social scientists studying the intersection of power and continuity. It demonstrates how language encodes specific expectations about which social roles are tied to progress and which are tied to maintenance.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology",
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
