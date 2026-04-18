@@ -4681,5 +4681,31 @@
       "mentor"
     ],
     "first_seen": "2026-04-18T05:46:40.575322+00:00"
+  },
+  "creatives": {
+    "display_label": "creatives",
+    "words": [
+      "artist",
+      "designer",
+      "writer",
+      "musician",
+      "poet",
+      "painter",
+      "sculptor",
+      "actor",
+      "dancer",
+      "composer",
+      "illustrator",
+      "novelist",
+      "creator",
+      "stylist",
+      "crafter",
+      "visionary",
+      "dreamer",
+      "innovator",
+      "performer",
+      "author"
+    ],
+    "first_seen": "2026-04-18T06:02:32.041052+00:00"
   }
 }

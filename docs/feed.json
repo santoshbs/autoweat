@@ -6844,5 +6844,155 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "404c82c6e376",
+    "timestamp": "2026-04-18T06:02:32.041052+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "organizational behavior",
+    "contrast_label": "managers vs creatives on nurture vs analytical dimensions",
+    "labels": {
+      "X": "managers",
+      "Y": "creatives",
+      "A": "nurture",
+      "B": "analytical"
+    },
+    "canonical_keys": {
+      "X": "managers",
+      "Y": "creatives",
+      "A": "nurture",
+      "B": "analytical"
+    },
+    "effect_size": -0.8877626408818882,
+    "p_value": 0.00393,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 21,
+      "B": 21
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "manager",
+        "boss",
+        "supervisor",
+        "director",
+        "lead",
+        "executive",
+        "admin",
+        "head",
+        "chief",
+        "coordinator",
+        "overseer",
+        "principal",
+        "officer",
+        "superintendent",
+        "controller",
+        "moderator",
+        "captain",
+        "governor",
+        "warden",
+        "president"
+      ],
+      "Y_used": [
+        "artist",
+        "designer",
+        "writer",
+        "musician",
+        "poet",
+        "painter",
+        "sculptor",
+        "actor",
+        "dancer",
+        "composer",
+        "illustrator",
+        "novelist",
+        "creator",
+        "stylist",
+        "crafter",
+        "visionary",
+        "dreamer",
+        "innovator",
+        "performer",
+        "author"
+      ],
+      "A_used": [
+        "kind",
+        "warm",
+        "gentle",
+        "caring",
+        "soft",
+        "supportive",
+        "loving",
+        "patient",
+        "tender",
+        "sweet",
+        "helpful",
+        "empathetic",
+        "soothing",
+        "comforting",
+        "nurturing",
+        "mild",
+        "benign",
+        "compassionate",
+        "friendly",
+        "welcoming",
+        "tolerant"
+      ],
+      "B_used": [
+        "clear",
+        "calculated",
+        "rigorous",
+        "consistent",
+        "formal",
+        "precise",
+        "objective",
+        "rational",
+        "strict",
+        "exact",
+        "methodical",
+        "empirical",
+        "factual",
+        "systematic",
+        "concrete",
+        "linear",
+        "distinct",
+        "analytical",
+        "structured",
+        "logical",
+        "hard"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "uncertain",
+      "confidence": "low",
+      "rationale": "While stereotypes favor creatives as nurturing, modern management discourse heavily emphasizes emotional intelligence and people-care."
+    },
+    "interpretive_paragraph": "The result shows that in this corpus of web text, managers are more strongly associated with analytical terms than creatives are, while creatives lean more toward nurture terms. This pattern likely emerges from pervasive professional stereotypes that frame management as a role centered on logic and data, whereas creative work is viewed as a more emotionally expressive or supportive endeavor. For a social scientist, this association is significant because it reveals how language encodes implicit expectations about the types of labor associated with different career roles. By documenting these links, researchers can better understand how societal norms regarding professional identity are reinforced through everyday communication.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
