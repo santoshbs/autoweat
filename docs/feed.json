@@ -770,5 +770,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "2edb421a2789",
+    "timestamp": "2026-04-18T09:39:37.322286+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "teachers vs students × certainty vs curiosity",
+    "labels": {
+      "X": "teachers",
+      "Y": "students",
+      "A": "certainty",
+      "B": "curiosity"
+    },
+    "canonical_keys": {
+      "X": "teachers",
+      "Y": "students",
+      "A": "certainty",
+      "B": "curiosity"
+    },
+    "effect_size": -0.34742586300177064,
+    "p_value": 0.28861,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "teacher",
+        "instructor",
+        "educator",
+        "tutor",
+        "professor",
+        "lecturer",
+        "coach",
+        "mentor",
+        "guide",
+        "principal",
+        "faculty",
+        "classroom",
+        "chalk",
+        "lesson",
+        "syllabus",
+        "tenure",
+        "staff",
+        "seminar",
+        "lecture",
+        "slate"
+      ],
+      "Y_used": [
+        "pupil",
+        "learner",
+        "apprentice",
+        "trainee",
+        "novice",
+        "beginner",
+        "undergrad",
+        "graduate",
+        "degree",
+        "major",
+        "thesis",
+        "project",
+        "lab",
+        "assignment",
+        "paper",
+        "essay",
+        "test",
+        "quiz",
+        "marks",
+        "school"
+      ],
+      "A_used": [
+        "certainty",
+        "knowledge",
+        "facts",
+        "clarity",
+        "proof",
+        "evidence",
+        "doctrine",
+        "dogma",
+        "standard",
+        "protocol",
+        "method",
+        "system",
+        "logic",
+        "precision",
+        "exactness",
+        "rigor",
+        "authority",
+        "rule",
+        "order",
+        "structure"
+      ],
+      "B_used": [
+        "curiosity",
+        "doubt",
+        "questions",
+        "wonder",
+        "exploration",
+        "search",
+        "discovery",
+        "hypothesis",
+        "experiment",
+        "trial",
+        "probe",
+        "investigate",
+        "ponder",
+        "mull",
+        "reflect",
+        "consider",
+        "ask",
+        "query",
+        "interrogate",
+        "contemplate"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "negative",
+      "confidence": "low",
+      "rationale": "While everyday stereotypes frame teachers as bearers of fixed knowledge and students as seekers, corpus discourse often highlights pedagogical inquiry, lifelong learning, and teacher-led experimentation, reversing the assumed polarity."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 5,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
