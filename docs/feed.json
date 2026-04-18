@@ -1510,5 +1510,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "1850f0db30e7",
+    "timestamp": "2026-04-18T09:59:37.677475+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "io psychology",
+    "contrast_label": "autonomy expectations in supervisory versus subordinate roles",
+    "labels": {
+      "X": "supervisors",
+      "Y": "subordinates",
+      "A": "autonomy",
+      "B": "control"
+    },
+    "canonical_keys": {
+      "X": "supervisors",
+      "Y": "subordinates",
+      "A": "autonomy",
+      "B": "control"
+    },
+    "effect_size": -0.23275697560937098,
+    "p_value": 0.47531,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "supervisor",
+        "boss",
+        "manager",
+        "director",
+        "executive",
+        "chief",
+        "head",
+        "leader",
+        "guide",
+        "overseer",
+        "administrator",
+        "superintendent",
+        "governor",
+        "ruler",
+        "commander",
+        "captain",
+        "master",
+        "principal",
+        "delegate",
+        "foreman"
+      ],
+      "Y_used": [
+        "subordinate",
+        "employee",
+        "worker",
+        "staff",
+        "crew",
+        "member",
+        "associate",
+        "colleague",
+        "peer",
+        "equal",
+        "junior",
+        "assistant",
+        "aide",
+        "helper",
+        "server",
+        "waiter",
+        "clerk",
+        "laborer",
+        "operative",
+        "technician"
+      ],
+      "A_used": [
+        "liberty",
+        "freedom",
+        "independence",
+        "volition",
+        "agency",
+        "sovereignty",
+        "choice",
+        "option",
+        "selection",
+        "decision",
+        "will",
+        "intent",
+        "drive",
+        "purpose",
+        "aim",
+        "goal",
+        "target",
+        "mark",
+        "point",
+        "scope"
+      ],
+      "B_used": [
+        "control",
+        "authority",
+        "command",
+        "rule",
+        "regulation",
+        "governance",
+        "direction",
+        "management",
+        "administration",
+        "supervision",
+        "oversight",
+        "guidance",
+        "leadership",
+        "charge",
+        "care",
+        "custody",
+        "keep",
+        "hold",
+        "grip",
+        "clutch"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "high",
+      "rationale": "Io psychology literature consistently associates supervisory roles with control and directive behaviors, whereas subordinate roles are studied in relation to autonomy and self-direction."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 10,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
