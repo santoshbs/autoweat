@@ -6093,5 +6093,158 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "0afcfc2fd08e",
+    "timestamp": "2026-04-18T03:46:43.435054+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "anthropology",
+    "contrast_label": "nomads vs settlers on freedom vs stability",
+    "labels": {
+      "X": "nomads",
+      "Y": "settlers",
+      "A": "freedom",
+      "B": "stability"
+    },
+    "canonical_keys": {
+      "X": "nomads",
+      "Y": "settlers",
+      "A": "freedom",
+      "B": "stability"
+    },
+    "effect_size": 0.4467164287250421,
+    "p_value": 0.16653,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 22,
+      "B": 22
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "trekker",
+        "vagrant",
+        "traveler",
+        "transient",
+        "rover",
+        "explorer",
+        "migrant",
+        "scout",
+        "rambler",
+        "visitor",
+        "walker",
+        "drifter",
+        "pilgrim",
+        "guest",
+        "wanderer",
+        "exile",
+        "refugee",
+        "voyager",
+        "vagabond",
+        "wayfarer"
+      ],
+      "Y_used": [
+        "settler",
+        "resident",
+        "citizen",
+        "inhabitant",
+        "homeowner",
+        "villager",
+        "townsperson",
+        "local",
+        "dweller",
+        "occupant",
+        "colonist",
+        "pioneer",
+        "farmer",
+        "burgher",
+        "neighbor",
+        "native",
+        "denizen",
+        "tenant",
+        "landholder",
+        "householder"
+      ],
+      "A_used": [
+        "free",
+        "loose",
+        "open",
+        "wild",
+        "light",
+        "unbound",
+        "independent",
+        "roaming",
+        "agile",
+        "fluid",
+        "liberated",
+        "autonomous",
+        "effortless",
+        "spontaneous",
+        "unrestrained",
+        "limitless",
+        "vast",
+        "breezy",
+        "airy",
+        "floating",
+        "drifting",
+        "wandering"
+      ],
+      "B_used": [
+        "stable",
+        "fixed",
+        "solid",
+        "steady",
+        "firm",
+        "rooted",
+        "secure",
+        "permanent",
+        "constant",
+        "rigid",
+        "heavy",
+        "grounded",
+        "enduring",
+        "lasting",
+        "reliable",
+        "certain",
+        "sure",
+        "immobile",
+        "anchored",
+        "static",
+        "durable",
+        "persistent"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Nomadic lifestyles are culturally associated with liberty and movement, while settling is associated with permanence and security."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology",
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
