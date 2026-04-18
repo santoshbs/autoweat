@@ -3727,5 +3727,61 @@
       "relaxed"
     ],
     "first_seen": "2026-04-17T22:22:01.054266+00:00"
+  },
+  "analytical": {
+    "display_label": "analytical",
+    "words": [
+      "analytical",
+      "logical",
+      "rational",
+      "precise",
+      "objective",
+      "systematic",
+      "rigorous",
+      "calculated",
+      "factual",
+      "empirical",
+      "methodical",
+      "formal",
+      "concrete",
+      "distinct",
+      "clear",
+      "cold",
+      "hard",
+      "exact",
+      "consistent",
+      "structured",
+      "linear",
+      "strict"
+    ],
+    "first_seen": "2026-04-18T00:10:46.708997+00:00"
+  },
+  "expressive": {
+    "display_label": "expressive",
+    "words": [
+      "expressive",
+      "emotional",
+      "passionate",
+      "intuitive",
+      "spontaneous",
+      "creative",
+      "vivid",
+      "feeling",
+      "soulful",
+      "artistic",
+      "dramatic",
+      "fluid",
+      "warm",
+      "abstract",
+      "whimsical",
+      "lyrical",
+      "poignant",
+      "intense",
+      "open",
+      "free",
+      "raw",
+      "soft"
+    ],
+    "first_seen": "2026-04-18T00:10:46.708997+00:00"
   }
 }
