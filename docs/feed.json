@@ -5320,5 +5320,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "55e76a4fa4b7",
+    "timestamp": "2026-04-18T01:33:33.073194+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "immigrants vs expats on struggle vs privilege",
+    "labels": {
+      "X": "immigrants",
+      "Y": "expats",
+      "A": "struggle",
+      "B": "privilege"
+    },
+    "canonical_keys": {
+      "X": "immigrants",
+      "Y": "expats",
+      "A": "struggle",
+      "B": "privilege"
+    },
+    "effect_size": 0.6935530632940307,
+    "p_value": 0.02843,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "immigrant",
+        "migrant",
+        "newcomer",
+        "refugee",
+        "settler",
+        "alien",
+        "displaced",
+        "outsider",
+        "arrival",
+        "foreigner",
+        "wanderer",
+        "guest",
+        "resident",
+        "occupant",
+        "citizen",
+        "nationality",
+        "origin",
+        "heritage",
+        "asylum",
+        "seeker"
+      ],
+      "Y_used": [
+        "expat",
+        "expatriate",
+        "professional",
+        "diplomat",
+        "nomad",
+        "worker",
+        "employee",
+        "specialist",
+        "consultant",
+        "executive",
+        "resident",
+        "visitor",
+        "traveler",
+        "citizen",
+        "national",
+        "global",
+        "mobile",
+        "overseas",
+        "abroad",
+        "foreign"
+      ],
+      "A_used": [
+        "hard",
+        "difficult",
+        "pain",
+        "labor",
+        "effort",
+        "fight",
+        "stress",
+        "burden",
+        "grief",
+        "hardship",
+        "struggle",
+        "poor",
+        "low",
+        "weak",
+        "heavy",
+        "rough",
+        "tough",
+        "harsh",
+        "lean",
+        "meager"
+      ],
+      "B_used": [
+        "rich",
+        "wealth",
+        "luxury",
+        "power",
+        "ease",
+        "comfort",
+        "status",
+        "elite",
+        "high",
+        "gold",
+        "fancy",
+        "premium",
+        "choice",
+        "freedom",
+        "access",
+        "advantage",
+        "benefit",
+        "smooth",
+        "soft",
+        "plush"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "While both terms describe people living outside their native country, the term immigrant is socially coded toward lower socioeconomic status and hardship, while expat is coded toward professional mobility and wealth."
+    },
+    "interpretive_paragraph": "The result shows that in the analyzed corpus, immigrants are more strongly associated with struggle than expats are, while expats lean more toward privilege. This pattern likely exists because web text often frames migration from developing nations as a desperate necessity and migration from wealthy nations as a professional advantage. A social scientist studying migration would find this important because it reveals how language distinguishes between people performing the same action based on their perceived socio-economic status. Such a linguistic divide suggests that the labels used to describe migrants are not neutral but instead encode deep-seated social hierarchies.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
