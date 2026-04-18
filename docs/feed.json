@@ -1214,5 +1214,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "48c34a47c7dc",
+    "timestamp": "2026-04-18T09:48:49.035980+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "social psychology",
+    "contrast_label": "analytical reasoning versus social orientation by gender",
+    "labels": {
+      "X": "men",
+      "Y": "women",
+      "A": "analysis",
+      "B": "sociability"
+    },
+    "canonical_keys": {
+      "X": "men",
+      "Y": "women",
+      "A": "analysis",
+      "B": "sociability"
+    },
+    "effect_size": 0.10765521982179861,
+    "p_value": 0.7461,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "man",
+        "male",
+        "guy",
+        "fellow",
+        "chap",
+        "sir",
+        "husband",
+        "father",
+        "brother",
+        "son",
+        "uncle",
+        "king",
+        "prince",
+        "lord",
+        "knight",
+        "soldier",
+        "pilot",
+        "driver",
+        "hunter",
+        "builder"
+      ],
+      "Y_used": [
+        "woman",
+        "female",
+        "girl",
+        "lady",
+        "dame",
+        "madam",
+        "mother",
+        "wife",
+        "sister",
+        "daughter",
+        "aunt",
+        "queen",
+        "princess",
+        "matron",
+        "nanny",
+        "cook",
+        "weaver",
+        "nurse",
+        "maid",
+        "governess"
+      ],
+      "A_used": [
+        "logic",
+        "reason",
+        "fact",
+        "data",
+        "figure",
+        "math",
+        "count",
+        "number",
+        "value",
+        "price",
+        "cost",
+        "sum",
+        "total",
+        "gross",
+        "net",
+        "plus",
+        "minus",
+        "add",
+        "subtract",
+        "divide"
+      ],
+      "B_used": [
+        "people",
+        "folk",
+        "crew",
+        "gang",
+        "club",
+        "team",
+        "group",
+        "class",
+        "set",
+        "batch",
+        "pack",
+        "herd",
+        "flock",
+        "swarm",
+        "crowd",
+        "mob",
+        "public",
+        "mass",
+        "populace",
+        "society"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Cultural stereotypes and socialization research consistently associate men with analytical domains and women with communal ones, though empirical corpus data may show the association is weaker or reversed in professional contexts."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 8,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
