@@ -6692,5 +6692,157 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "b704280d5332",
+    "timestamp": "2026-04-18T05:46:40.575322+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "social psychology",
+    "contrast_label": "high-status professionals vs care-oriented professionals on competence vs warmth",
+    "labels": {
+      "X": "high-status professionals",
+      "Y": "care-oriented professionals",
+      "A": "competence",
+      "B": "warmth"
+    },
+    "canonical_keys": {
+      "X": "high|professionals|status",
+      "Y": "care|oriented|professionals",
+      "A": "competence",
+      "B": "warmth"
+    },
+    "effect_size": 1.477124546709436,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 22,
+      "B": 22
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "executive",
+        "director",
+        "surgeon",
+        "judge",
+        "pilot",
+        "engineer",
+        "professor",
+        "lawyer",
+        "manager",
+        "officer",
+        "expert",
+        "captain",
+        "architect",
+        "scientist",
+        "analyst",
+        "strategist",
+        "specialist",
+        "producer",
+        "editor",
+        "banker"
+      ],
+      "Y_used": [
+        "nurse",
+        "teacher",
+        "volunteer",
+        "parent",
+        "caregiver",
+        "counselor",
+        "therapist",
+        "assistant",
+        "helper",
+        "nanny",
+        "midwife",
+        "aide",
+        "companion",
+        "friend",
+        "priest",
+        "monk",
+        "nun",
+        "pastor",
+        "chaplain",
+        "mentor"
+      ],
+      "A_used": [
+        "smart",
+        "bright",
+        "capable",
+        "skilled",
+        "efficient",
+        "clever",
+        "expert",
+        "adept",
+        "proficient",
+        "sharp",
+        "intelligent",
+        "logical",
+        "precise",
+        "effective",
+        "talented",
+        "gifted",
+        "masterly",
+        "polished",
+        "deft",
+        "quick",
+        "agile",
+        "astute"
+      ],
+      "B_used": [
+        "kind",
+        "warm",
+        "friendly",
+        "gentle",
+        "sweet",
+        "caring",
+        "loving",
+        "soft",
+        "mild",
+        "nice",
+        "amiable",
+        "cordial",
+        "affectionate",
+        "tender",
+        "helpful",
+        "generous",
+        "pleasant",
+        "open",
+        "honest",
+        "sincere",
+        "trustful",
+        "empathetic"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "high",
+      "rationale": "The Stereotype Content Model suggests high-status roles are associated with high competence and lower warmth, while care-giving roles are associated with high warmth and lower competence."
+    },
+    "interpretive_paragraph": "The results show that high-status professionals are more strongly associated with competence than care-oriented professionals are, while care-oriented professionals lean more toward warmth. This pattern likely exists because English-language web text reflects broad societal stereotypes that link authority and expertise to high-status roles and empathy to care-giving roles. Such associations are frequently reinforced by the way different professions are described in media and job descriptions. For a social scientist, this finding is important because it illustrates how implicit biases are baked into the language used to describe the workforce. It reveals a linguistic encoding of social hierarchies that distinguishes between perceived intellectual capability and interpersonal warmth based on professional status.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]

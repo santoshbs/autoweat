@@ -4629,5 +4629,57 @@
       "standard"
     ],
     "first_seen": "2026-04-18T05:19:19.367302+00:00"
+  },
+  "high|professionals|status": {
+    "display_label": "high-status professionals",
+    "words": [
+      "executive",
+      "director",
+      "surgeon",
+      "judge",
+      "pilot",
+      "engineer",
+      "professor",
+      "lawyer",
+      "manager",
+      "officer",
+      "expert",
+      "captain",
+      "architect",
+      "scientist",
+      "analyst",
+      "strategist",
+      "specialist",
+      "producer",
+      "editor",
+      "banker"
+    ],
+    "first_seen": "2026-04-18T05:46:40.575322+00:00"
+  },
+  "care|oriented|professionals": {
+    "display_label": "care-oriented professionals",
+    "words": [
+      "nurse",
+      "teacher",
+      "volunteer",
+      "parent",
+      "caregiver",
+      "counselor",
+      "therapist",
+      "assistant",
+      "helper",
+      "nanny",
+      "midwife",
+      "aide",
+      "companion",
+      "friend",
+      "priest",
+      "monk",
+      "nun",
+      "pastor",
+      "chaplain",
+      "mentor"
+    ],
+    "first_seen": "2026-04-18T05:46:40.575322+00:00"
   }
 }
