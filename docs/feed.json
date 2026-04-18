@@ -6396,5 +6396,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "6d86f0718a1f",
+    "timestamp": "2026-04-18T04:16:11.385506+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "io psychology",
+    "contrast_label": "experts vs novices on confidence vs hesitation",
+    "labels": {
+      "X": "experts",
+      "Y": "novices",
+      "A": "confidence",
+      "B": "hesitation"
+    },
+    "canonical_keys": {
+      "X": "experts",
+      "Y": "novices",
+      "A": "confidence",
+      "B": "hesitation"
+    },
+    "effect_size": 1.4472281185485039,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "specialist",
+        "connoisseur",
+        "adept",
+        "pro",
+        "practitioner",
+        "expert",
+        "pundit",
+        "lead",
+        "master",
+        "veteran",
+        "ace",
+        "analyst",
+        "scholar",
+        "technician",
+        "professional",
+        "guru",
+        "chief",
+        "savant",
+        "authority",
+        "consultant"
+      ],
+      "Y_used": [
+        "novice",
+        "beginner",
+        "student",
+        "apprentice",
+        "rookie",
+        "trainee",
+        "amateur",
+        "learner",
+        "newcomer",
+        "recruit",
+        "freshman",
+        "tyro",
+        "neophyte",
+        "starter",
+        "probationer",
+        "greenhorn",
+        "pupil",
+        "initiate",
+        "novitiate",
+        "unskilled"
+      ],
+      "A_used": [
+        "confident",
+        "sure",
+        "bold",
+        "assertive",
+        "proud",
+        "firm",
+        "decisive",
+        "positive",
+        "strong",
+        "poised",
+        "fearless",
+        "arrogant",
+        "cocky",
+        "resolute",
+        "steady",
+        "unwavering",
+        "direct",
+        "convinced",
+        "certain",
+        "absolute"
+      ],
+      "B_used": [
+        "hesitant",
+        "unsure",
+        "doubtful",
+        "timid",
+        "shy",
+        "tentative",
+        "uncertain",
+        "wavering",
+        "nervous",
+        "cautious",
+        "reluctant",
+        "fearful",
+        "shaky",
+        "bashful",
+        "meek",
+        "diffident",
+        "indirect",
+        "apprehensive",
+        "vacillating",
+        "faltering"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Experts are typically associated with decisiveness and confidence, whereas novices are associated with uncertainty and hesitation."
+    },
+    "interpretive_paragraph": "The results show that the corpus associates experts more strongly with confidence than it does novices, who are more closely linked to hesitation. This pattern likely arises because web text often frames professional mastery through decisive terminology while describing beginners in terms of uncertainty or doubt. Such a finding is significant for social scientists interested in how language reinforces the connection between perceived expertise and certainty. It reveals how social hierarchies of knowledge are encoded through specific emotional and behavioral descriptors.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]

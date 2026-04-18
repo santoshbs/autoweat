@@ -4473,5 +4473,57 @@
       "tolerant"
     ],
     "first_seen": "2026-04-18T04:00:46.929412+00:00"
+  },
+  "novices": {
+    "display_label": "novices",
+    "words": [
+      "novice",
+      "beginner",
+      "student",
+      "apprentice",
+      "rookie",
+      "trainee",
+      "amateur",
+      "learner",
+      "newcomer",
+      "recruit",
+      "freshman",
+      "tyro",
+      "neophyte",
+      "starter",
+      "probationer",
+      "greenhorn",
+      "pupil",
+      "initiate",
+      "novitiate",
+      "unskilled"
+    ],
+    "first_seen": "2026-04-18T04:16:11.385506+00:00"
+  },
+  "hesitation": {
+    "display_label": "hesitation",
+    "words": [
+      "hesitant",
+      "unsure",
+      "doubtful",
+      "timid",
+      "shy",
+      "tentative",
+      "uncertain",
+      "wavering",
+      "nervous",
+      "cautious",
+      "reluctant",
+      "fearful",
+      "shaky",
+      "bashful",
+      "meek",
+      "diffident",
+      "indirect",
+      "apprehensive",
+      "vacillating",
+      "faltering"
+    ],
+    "first_seen": "2026-04-18T04:16:11.385506+00:00"
   }
 }
