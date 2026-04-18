@@ -4392,5 +4392,86 @@
       "persistent"
     ],
     "first_seen": "2026-04-18T03:46:43.435054+00:00"
+  },
+  "coaches": {
+    "display_label": "coaches",
+    "words": [
+      "coach",
+      "trainer",
+      "manager",
+      "captain",
+      "lead",
+      "specialist",
+      "pro",
+      "expert",
+      "veteran",
+      "master",
+      "leader",
+      "director",
+      "strategist",
+      "motivator",
+      "conditioner",
+      "scout",
+      "recruiter",
+      "official",
+      "handler",
+      "guide",
+      "coachman",
+      "steward"
+    ],
+    "first_seen": "2026-04-18T04:00:46.929412+00:00"
+  },
+  "teachers": {
+    "display_label": "teachers",
+    "words": [
+      "teacher",
+      "educator",
+      "professor",
+      "lecturer",
+      "academic",
+      "scholar",
+      "pedagogue",
+      "faculty",
+      "dean",
+      "principal",
+      "schoolmaster",
+      "schoolmistress",
+      "tutor",
+      "moderator",
+      "instructor",
+      "headmaster",
+      "curator",
+      "provost",
+      "regent",
+      "schoolteacher"
+    ],
+    "first_seen": "2026-04-18T04:00:46.929412+00:00"
+  },
+  "nurture": {
+    "display_label": "nurture",
+    "words": [
+      "kind",
+      "warm",
+      "gentle",
+      "caring",
+      "soft",
+      "supportive",
+      "loving",
+      "patient",
+      "tender",
+      "sweet",
+      "helpful",
+      "empathetic",
+      "soothing",
+      "comforting",
+      "nurturing",
+      "mild",
+      "benign",
+      "compassionate",
+      "friendly",
+      "welcoming",
+      "tolerant"
+    ],
+    "first_seen": "2026-04-18T04:00:46.929412+00:00"
   }
 }

@@ -6246,5 +6246,155 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "24adfe03dd28",
+    "timestamp": "2026-04-18T04:00:46.929412+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "psychology",
+    "contrast_label": "athletic coaching vs academic teaching on the dimension of rigor vs nurturance",
+    "labels": {
+      "X": "coaches",
+      "Y": "teachers",
+      "A": "discipline",
+      "B": "nurture"
+    },
+    "canonical_keys": {
+      "X": "coaches",
+      "Y": "teachers",
+      "A": "discipline",
+      "B": "nurture"
+    },
+    "effect_size": -0.25816683353069375,
+    "p_value": 0.43242,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 21,
+      "B": 21
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "coach",
+        "motivator",
+        "lead",
+        "leader",
+        "pro",
+        "strategist",
+        "manager",
+        "scout",
+        "conditioner",
+        "handler",
+        "director",
+        "recruiter",
+        "expert",
+        "guide",
+        "official",
+        "captain",
+        "steward",
+        "coachman",
+        "veteran",
+        "trainer"
+      ],
+      "Y_used": [
+        "teacher",
+        "educator",
+        "professor",
+        "lecturer",
+        "academic",
+        "scholar",
+        "pedagogue",
+        "faculty",
+        "dean",
+        "principal",
+        "schoolmaster",
+        "schoolmistress",
+        "tutor",
+        "moderator",
+        "instructor",
+        "headmaster",
+        "curator",
+        "provost",
+        "regent",
+        "schoolteacher"
+      ],
+      "A_used": [
+        "orderly",
+        "strict",
+        "rigid",
+        "structured",
+        "precise",
+        "systematic",
+        "controlled",
+        "focused",
+        "steady",
+        "constant",
+        "firm",
+        "rigorous",
+        "formal",
+        "neat",
+        "tidy",
+        "punctual",
+        "disciplined",
+        "methodical",
+        "dutiful",
+        "obedient",
+        "organized"
+      ],
+      "B_used": [
+        "kind",
+        "warm",
+        "gentle",
+        "caring",
+        "soft",
+        "supportive",
+        "loving",
+        "patient",
+        "tender",
+        "sweet",
+        "helpful",
+        "empathetic",
+        "soothing",
+        "comforting",
+        "nurturing",
+        "mild",
+        "benign",
+        "compassionate",
+        "friendly",
+        "welcoming",
+        "tolerant"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "low",
+      "rationale": "While stereotypical, modern shifts toward holistic coaching and standardized, rigid teaching may blur or reverse this association."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
