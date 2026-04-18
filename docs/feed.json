@@ -6544,5 +6544,153 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "05870e95db1d",
+    "timestamp": "2026-04-18T05:19:19.367302+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "economics",
+    "contrast_label": "consumers vs citizens on desire vs duty",
+    "labels": {
+      "X": "consumers",
+      "Y": "citizens",
+      "A": "desire",
+      "B": "duty"
+    },
+    "canonical_keys": {
+      "X": "consumers",
+      "Y": "citizens",
+      "A": "desire",
+      "B": "duty"
+    },
+    "effect_size": -0.3725056085084344,
+    "p_value": 0.24787,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "consumer",
+        "buyer",
+        "shopper",
+        "customer",
+        "user",
+        "client",
+        "purchaser",
+        "spender",
+        "patron",
+        "bidder",
+        "adopter",
+        "receiver",
+        "beneficiary",
+        "lessee",
+        "renter",
+        "subscriber",
+        "guest",
+        "passenger",
+        "attendee",
+        "member"
+      ],
+      "Y_used": [
+        "citizen",
+        "voter",
+        "resident",
+        "national",
+        "subject",
+        "constituent",
+        "local",
+        "inhabitant",
+        "taxpayer",
+        "denizen",
+        "native",
+        "patriot",
+        "member",
+        "parishioner",
+        "burgher",
+        "villager",
+        "townsman",
+        "civilian",
+        "folk",
+        "person"
+      ],
+      "A_used": [
+        "want",
+        "desire",
+        "crave",
+        "need",
+        "wish",
+        "greed",
+        "lust",
+        "longing",
+        "appetite",
+        "hunger",
+        "yearning",
+        "passion",
+        "itch",
+        "thirst",
+        "urge",
+        "drive",
+        "ambition",
+        "pleasure",
+        "luxury",
+        "fancy"
+      ],
+      "B_used": [
+        "duty",
+        "obligation",
+        "responsibility",
+        "burden",
+        "task",
+        "chore",
+        "requirement",
+        "mandate",
+        "honor",
+        "service",
+        "loyalty",
+        "promise",
+        "pledge",
+        "oath",
+        "constraint",
+        "pressure",
+        "weight",
+        "law",
+        "rule",
+        "standard"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "While the concepts are theoretically distinct, the modern cultural conflation of citizenship with consumption may weaken the association."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
