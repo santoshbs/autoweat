@@ -1362,5 +1362,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "e0a07c12313b",
+    "timestamp": "2026-04-18T09:56:25.038642+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "linguistics",
+    "contrast_label": "poetic emotionality vs historical objectivity",
+    "labels": {
+      "X": "poets",
+      "Y": "historians",
+      "A": "emotional expression",
+      "B": "factual reporting"
+    },
+    "canonical_keys": {
+      "X": "poets",
+      "Y": "historians",
+      "A": "emotional|expression",
+      "B": "factual|reporting"
+    },
+    "effect_size": 1.2301642694228805,
+    "p_value": 1e-05,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "poet",
+        "bard",
+        "lyricist",
+        "writer",
+        "author",
+        "creator",
+        "composer",
+        "scribe",
+        "illustrator",
+        "scribbler",
+        "wordslinger",
+        "rhymester",
+        "poetess",
+        "wordsmith",
+        "skald",
+        "minstrel",
+        "troubadour",
+        "playwright",
+        "poetaster",
+        "versifier"
+      ],
+      "Y_used": [
+        "historian",
+        "archivist",
+        "chronicler",
+        "antiquarian",
+        "genealogist",
+        "antiquary",
+        "recorder",
+        "registrar",
+        "scholar",
+        "researcher",
+        "analyst",
+        "observer",
+        "witness",
+        "annalist",
+        "indexer",
+        "cataloger",
+        "compiler",
+        "curator",
+        "explorer",
+        "archaeologist"
+      ],
+      "A_used": [
+        "feeling",
+        "passion",
+        "sentiment",
+        "affect",
+        "mood",
+        "temper",
+        "spirit",
+        "heart",
+        "soul",
+        "sympathy",
+        "empathy",
+        "warmth",
+        "kindness",
+        "concern",
+        "pity",
+        "grief",
+        "joy",
+        "anger",
+        "fear",
+        "hope"
+      ],
+      "B_used": [
+        "fact",
+        "truth",
+        "evidence",
+        "proof",
+        "data",
+        "figure",
+        "math",
+        "logic",
+        "reason",
+        "claim",
+        "argument",
+        "premise",
+        "thesis",
+        "hypothesis",
+        "theory",
+        "model",
+        "scheme",
+        "plan",
+        "design",
+        "structure"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "uncertain",
+      "confidence": "medium",
+      "rationale": "While cultural stereotypes separate poets as emotional and historians as objective, corpus analysis may reveal that poetic language relies heavily on concrete, evidentiary nouns while historical prose adopts a more interpretive and affective narrative tone."
+    },
+    "interpretive_paragraph": "The statistically significant effect indicates that within the corpus, the vocabulary associated with poets diverges markedly from that of historians. Specifically, poets show a substantially stronger association toward emotional expression than historians do, whereas historians align more closely with factual reporting relative to this comparison. This lexical pattern likely arises because digital encyclopedic entries and literary criticism tend to characterize poets through their subjective experiences and affective output, whereas descriptions of historians frequently emphasize their methodological rigor, adherence to evidence, and commitment to objective chronology. For social scientists, this finding highlights how natural language corpora can crystallize entrenched cultural hierarchies that valorize rationality and factual precision as markers of intellectual authority, simultaneously framing emotional expression as a domain distinct from analytical truth-making and raising critical questions about how linguistic data perpetuates narrow definitions of expertise and the emotional labor assigned to different social roles.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 9,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
