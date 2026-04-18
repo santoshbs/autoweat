@@ -5782,5 +5782,159 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "87f5eb74d71c",
+    "timestamp": "2026-04-18T02:29:32.492951+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "sociology",
+    "contrast_label": "law enforcement vs social activism on the dimension of order and chaos",
+    "labels": {
+      "X": "police",
+      "Y": "activists",
+      "A": "order",
+      "B": "chaos"
+    },
+    "canonical_keys": {
+      "X": "police",
+      "Y": "activists",
+      "A": "order",
+      "B": "chaos"
+    },
+    "effect_size": 0.25988610028980746,
+    "p_value": 0.4087,
+    "n": {
+      "X": 21,
+      "Y": 21,
+      "A": 22,
+      "B": 22
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "officer",
+        "cop",
+        "policeman",
+        "policewoman",
+        "patrolman",
+        "detective",
+        "sergeant",
+        "marshal",
+        "constable",
+        "deputy",
+        "trooper",
+        "warden",
+        "agent",
+        "guard",
+        "inspector",
+        "chief",
+        "lieutenant",
+        "commissioner",
+        "patrol",
+        "sentinel",
+        "peacekeeper"
+      ],
+      "Y_used": [
+        "organizer",
+        "speaker",
+        "rebel",
+        "member",
+        "radical",
+        "demonstrator",
+        "protester",
+        "pleader",
+        "advocate",
+        "agitator",
+        "insurgent",
+        "lobbyist",
+        "petitioner",
+        "activist",
+        "militant",
+        "marcher",
+        "dissident",
+        "crusader",
+        "campaigner",
+        "striker",
+        "partisan"
+      ],
+      "A_used": [
+        "order",
+        "stability",
+        "peace",
+        "law",
+        "rule",
+        "control",
+        "structure",
+        "quiet",
+        "calm",
+        "system",
+        "regularity",
+        "discipline",
+        "harmony",
+        "balance",
+        "logic",
+        "method",
+        "arrangement",
+        "sequence",
+        "steady",
+        "constant",
+        "fixed",
+        "formal"
+      ],
+      "B_used": [
+        "chaos",
+        "disorder",
+        "turmoil",
+        "riot",
+        "noise",
+        "confusion",
+        "mayhem",
+        "anarchy",
+        "unrest",
+        "turbulence",
+        "panic",
+        "frenzy",
+        "bedlam",
+        "havoc",
+        "clutter",
+        "jumble",
+        "mess",
+        "wild",
+        "erratic",
+        "random",
+        "unstable",
+        "volatile"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Police are culturally framed as the maintainers of stability and order, while social activists are often associated with disruption and unrest."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "social psychology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
