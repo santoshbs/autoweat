@@ -1066,5 +1066,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "c6c457b25a06",
+    "timestamp": "2026-04-18T09:45:57.760824+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "arts",
+    "contrast_label": "aesthetics vs utility in design professions",
+    "labels": {
+      "X": "architects",
+      "Y": "contractors",
+      "A": "aesthetics",
+      "B": "utility"
+    },
+    "canonical_keys": {
+      "X": "architects",
+      "Y": "contractors",
+      "A": "aesthetics",
+      "B": "utility"
+    },
+    "effect_size": 0.757011704806287,
+    "p_value": 0.01666,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "architect",
+        "designer",
+        "planner",
+        "cartographer",
+        "blueprint",
+        "schematic",
+        "layout",
+        "structure",
+        "edifice",
+        "building",
+        "engineer",
+        "surveyor",
+        "mapper",
+        "drafter",
+        "modeler",
+        "stylist",
+        "composer",
+        "creator",
+        "visionary",
+        "draftsman"
+      ],
+      "Y_used": [
+        "contractor",
+        "laborer",
+        "tradesman",
+        "operative",
+        "workman",
+        "worker",
+        "hand",
+        "manual",
+        "physical",
+        "bodily",
+        "corporeal",
+        "fleshly",
+        "material",
+        "tangible",
+        "solid",
+        "concrete",
+        "brick",
+        "mason",
+        "carpenter",
+        "joiner"
+      ],
+      "A_used": [
+        "beauty",
+        "grace",
+        "elegance",
+        "style",
+        "form",
+        "shape",
+        "pattern",
+        "symmetry",
+        "harmony",
+        "balance",
+        "proportion",
+        "artistic",
+        "aesthetic",
+        "creative",
+        "imaginative",
+        "inventive",
+        "original",
+        "novel",
+        "visual",
+        "graphic"
+      ],
+      "B_used": [
+        "function",
+        "utility",
+        "use",
+        "purpose",
+        "role",
+        "task",
+        "job",
+        "duty",
+        "effort",
+        "exertion",
+        "practical",
+        "pragmatic",
+        "realistic",
+        "serviceable",
+        "viable",
+        "usable",
+        "operational",
+        "productive",
+        "efficient",
+        "dynamic"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Professional training emphasizes visual form over pure function for architects, while contractors execute plans but increasingly market design-build services, making the corpus association ambiguous."
+    },
+    "interpretive_paragraph": "The significant WEAT result demonstrates that English-language web discourse consistently associates architects with aesthetics more strongly than it associates contractors with aesthetics, relative to the utility attribute. This positive directional effect reveals that online text routinely frames architects through a lens of visual design and artistic intent, while positioning contractors as more functionally oriented. This lexical split likely emerges because professional media and public forums habitually highlight the visual and conceptual dimensions of architectural projects, whereas reporting on contracting work prioritizes technical execution, building codes, and practical outcomes. For a social scientist, this pattern is important because it illustrates how digital corpora linguistically reinforce a traditional division between creative and manual labor, encoding professional hierarchies into everyday vocabulary. Examining such automatic associations helps reveal how language quietly sustains cultural distinctions that elevate abstract design over tangible construction work.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 7,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
