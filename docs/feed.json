@@ -918,5 +918,153 @@
         "presence_penalty": 1.5
       }
     }
+  },
+  {
+    "id": "38fb8592c20b",
+    "timestamp": "2026-04-18T09:43:12.590362+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "psychology",
+    "contrast_label": "medical professional stereotypes",
+    "labels": {
+      "X": "doctors",
+      "Y": "nurses",
+      "A": "expertise",
+      "B": "compassion"
+    },
+    "canonical_keys": {
+      "X": "doctors",
+      "Y": "nurses",
+      "A": "expertise",
+      "B": "compassion"
+    },
+    "effect_size": 0.46162848240599236,
+    "p_value": 0.15112,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "doctor",
+        "physician",
+        "surgeon",
+        "clinician",
+        "medic",
+        "specialist",
+        "practitioner",
+        "consultant",
+        "resident",
+        "fellow",
+        "intern",
+        "faculty",
+        "chief",
+        "board",
+        "house",
+        "primary",
+        "general",
+        "midwife",
+        "paramedic",
+        "healer"
+      ],
+      "Y_used": [
+        "nurse",
+        "carer",
+        "attendant",
+        "aide",
+        "orderly",
+        "warden",
+        "guardian",
+        "custodian",
+        "steward",
+        "ward",
+        "unit",
+        "shift",
+        "roster",
+        "rounds",
+        "chart",
+        "vital",
+        "pill",
+        "injection",
+        "bandage",
+        "ointment"
+      ],
+      "A_used": [
+        "expertise",
+        "skill",
+        "knowledge",
+        "mastery",
+        "proficiency",
+        "competence",
+        "ability",
+        "talent",
+        "craft",
+        "trade",
+        "practice",
+        "science",
+        "method",
+        "technique",
+        "procedure",
+        "protocol",
+        "standard",
+        "metric",
+        "benchmark",
+        "gauge"
+      ],
+      "B_used": [
+        "compassion",
+        "care",
+        "empathy",
+        "warmth",
+        "kindness",
+        "concern",
+        "sympathy",
+        "mercy",
+        "grace",
+        "charity",
+        "love",
+        "affection",
+        "tenderness",
+        "gentleness",
+        "softness",
+        "quiet",
+        "still",
+        "calm",
+        "peace",
+        "rest"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Cultural narratives typically assign analytical authority and technical mastery to physicians while framing nursing roles around emotional support and patient care."
+    },
+    "interpretive_paragraph": "",
+    "interpretive_fired": false,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "qwen3.6:35b-a3b-q8_0",
+      "proposer_mode": "well-studied",
+      "thinking_style": "qwen3",
+      "thinking_effort": "high",
+      "history_size_seen": 6,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 1.5
+      }
+    }
   }
 ]
