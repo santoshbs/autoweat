@@ -1,1 +1,106 @@
-{}
+{
+  "people|wealthy": {
+    "display_label": "wealthy people",
+    "words": [
+      "rich",
+      "affluent",
+      "opulent",
+      "prosperous",
+      "wealthy",
+      "privileged",
+      "elite",
+      "moneyed",
+      "upscale",
+      "plutocrat",
+      "capitalist",
+      "bourgeois",
+      "magnate",
+      "tycoon",
+      "millionaire",
+      "billionaire",
+      "aristocrat",
+      "patrician",
+      "mogul",
+      "lord"
+    ],
+    "first_seen": "2026-04-18T10:33:06.506605+00:00"
+  },
+  "people|poor": {
+    "display_label": "poor people",
+    "words": [
+      "poor",
+      "needy",
+      "broke",
+      "impoverished",
+      "destitute",
+      "underprivileged",
+      "penniless",
+      "indigent",
+      "disadvantaged",
+      "pauper",
+      "beggar",
+      "proletariat",
+      "struggling",
+      "bankrupt",
+      "insolvent",
+      "peasant",
+      "vagrant",
+      "nomad",
+      "urchin",
+      "serf"
+    ],
+    "first_seen": "2026-04-18T10:33:06.506605+00:00"
+  },
+  "warmth": {
+    "display_label": "warmth",
+    "words": [
+      "kind",
+      "friendly",
+      "warm",
+      "gentle",
+      "caring",
+      "sweet",
+      "helpful",
+      "amiable",
+      "cordial",
+      "affectionate",
+      "soft",
+      "nice",
+      "sympathetic",
+      "tender",
+      "loving",
+      "pleasant",
+      "gracious",
+      "benevolent",
+      "empathetic",
+      "welcoming"
+    ],
+    "first_seen": "2026-04-18T10:33:06.506605+00:00"
+  },
+  "competence": {
+    "display_label": "competence",
+    "words": [
+      "smart",
+      "capable",
+      "skilled",
+      "efficient",
+      "expert",
+      "bright",
+      "intelligent",
+      "adept",
+      "proficient",
+      "competent",
+      "clever",
+      "sharp",
+      "talented",
+      "effective",
+      "masterful",
+      "organized",
+      "disciplined",
+      "logical",
+      "rational",
+      "strategic"
+    ],
+    "first_seen": "2026-04-18T10:33:06.506605+00:00"
+  }
+}
