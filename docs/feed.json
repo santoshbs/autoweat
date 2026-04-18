@@ -5633,5 +5633,154 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "721494ce0785",
+    "timestamp": "2026-04-18T02:22:22.261740+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "arts",
+    "contrast_label": "poets vs journalists on ambiguity vs precision",
+    "labels": {
+      "X": "poets",
+      "Y": "journalists",
+      "A": "ambiguity",
+      "B": "precision"
+    },
+    "canonical_keys": {
+      "X": "poets",
+      "Y": "journalists",
+      "A": "ambiguity",
+      "B": "precision"
+    },
+    "effect_size": 1.0571299859744752,
+    "p_value": 0.00047,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "poet",
+        "lyricist",
+        "bard",
+        "sonneteer",
+        "versifier",
+        "author",
+        "artist",
+        "dreamer",
+        "romantic",
+        "rhymester",
+        "poetess",
+        "wordsmith",
+        "speaker",
+        "singer",
+        "creator",
+        "visionary",
+        "imagist",
+        "mystic",
+        "scribe",
+        "scholar"
+      ],
+      "Y_used": [
+        "journalist",
+        "reporter",
+        "correspondent",
+        "editor",
+        "columnist",
+        "anchor",
+        "pressman",
+        "newsman",
+        "newscaster",
+        "blogger",
+        "pundit",
+        "observer",
+        "commentator",
+        "analyst",
+        "contributor",
+        "stringer",
+        "copywriter",
+        "freelancer",
+        "publisher",
+        "broadcaster"
+      ],
+      "A_used": [
+        "ambiguous",
+        "vague",
+        "obscure",
+        "hazy",
+        "blurred",
+        "cryptic",
+        "elusive",
+        "unclear",
+        "veiled",
+        "subtle",
+        "open",
+        "mysterious",
+        "implicit",
+        "oblique",
+        "indeterminate",
+        "fluid",
+        "nebulous",
+        "puzzling",
+        "arcane",
+        "enigmatic"
+      ],
+      "B_used": [
+        "precise",
+        "exact",
+        "accurate",
+        "clear",
+        "explicit",
+        "specific",
+        "definite",
+        "sharp",
+        "distinct",
+        "concrete",
+        "literal",
+        "factual",
+        "direct",
+        "unambiguous",
+        "rigorous",
+        "pointed",
+        "succinct",
+        "certain",
+        "firm",
+        "fixed"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "Poets typically utilize evocative, open-ended language and metaphor, whereas journalists are professionally incentivized to prioritize clarity and factual precision."
+    },
+    "interpretive_paragraph": "The results indicate that in the analyzed corpus, words related to poets are more strongly associated with ambiguity than words related to journalists are. Conversely, journalists are more closely linked to precision. This pattern likely reflects common cultural perceptions of these professions, where poetry is viewed as an evocative and open-ended art form while journalism is seen as a discipline rooted in factual accuracy. A social scientist might find this interesting because it demonstrates how language encodes occupational stereotypes regarding communication styles. Such associations reveal how society distinguishes between the creative value of expression and the professional value of transparency.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 15,
+      "cooled_domains_at_proposal": [
+        "sociology",
+        "social psychology"
+      ],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
