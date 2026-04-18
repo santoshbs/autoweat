@@ -144,5 +144,151 @@
         "repeat_penalty": 1.0
       }
     }
+  },
+  {
+    "id": "38b851310b23",
+    "timestamp": "2026-04-18T10:37:31.493237+00:00",
+    "schema_version": "inductive.v9",
+    "domain": "humanities",
+    "contrast_label": "scientists vs philosophers regarding optimism vs pessimism",
+    "labels": {
+      "X": "scientists",
+      "Y": "philosophers",
+      "A": "optimism",
+      "B": "pessimism"
+    },
+    "canonical_keys": {
+      "X": "scientists",
+      "Y": "philosophers",
+      "A": "optimism",
+      "B": "pessimism"
+    },
+    "effect_size": 1.4427732807380722,
+    "p_value": 0.0,
+    "n": {
+      "X": 20,
+      "Y": 20,
+      "A": 20,
+      "B": 20
+    },
+    "n_permutations": 100000,
+    "exact": false,
+    "words": {
+      "X_used": [
+        "biologist",
+        "chemist",
+        "physicist",
+        "geologist",
+        "astronomer",
+        "botanist",
+        "zoologist",
+        "researcher",
+        "analyst",
+        "technician",
+        "expert",
+        "investigator",
+        "clinician",
+        "pathologist",
+        "geneticist",
+        "mathematician",
+        "oceanographer",
+        "meteorologist",
+        "epidemiologist",
+        "crystallographer"
+      ],
+      "Y_used": [
+        "thinker",
+        "ethicist",
+        "logician",
+        "metaphysician",
+        "epistemologist",
+        "sage",
+        "humanist",
+        "dialectician",
+        "rationalist",
+        "idealist",
+        "skeptic",
+        "stoic",
+        "cynic",
+        "sophist",
+        "moralist",
+        "ontologist",
+        "phenomenologist",
+        "existentialist",
+        "meditator",
+        "contemplative"
+      ],
+      "A_used": [
+        "hopeful",
+        "positive",
+        "bright",
+        "sanguine",
+        "upbeat",
+        "cheerful",
+        "confident",
+        "expectant",
+        "sunny",
+        "rosy",
+        "promising",
+        "bullish",
+        "eager",
+        "optimistic",
+        "radiant",
+        "glowing",
+        "idealistic",
+        "certain",
+        "assured",
+        "buoyant"
+      ],
+      "B_used": [
+        "bleak",
+        "dark",
+        "cynical",
+        "gloomy",
+        "hopeless",
+        "dour",
+        "cheerless",
+        "grim",
+        "morose",
+        "despondent",
+        "skeptical",
+        "defeatist",
+        "pessimistic",
+        "shadowy",
+        "somber",
+        "melancholy",
+        "fatalistic",
+        "wary",
+        "distrustful",
+        "dismal"
+      ],
+      "X_dropped": [],
+      "Y_dropped": [],
+      "A_dropped": [],
+      "B_dropped": []
+    },
+    "prediction": {
+      "expected_direction": "positive",
+      "confidence": "medium",
+      "rationale": "The corpus may associate the empirical progress of science with optimism and the existential inquiries of philosophy with pessimism."
+    },
+    "interpretive_paragraph": "The WEAT result shows that scientists are more strongly associated with optimism than philosophers are. This indicates that the corpus uses vocabulary related to scientists in closer proximity to optimism, while philosophers are more closely linked to pessimism. This pattern likely exists because web text often frames scientific work through the lens of progress and discovery, whereas philosophy is frequently discussed in the context of existential questioning or critical skepticism. A social scientist might find this interesting because it reveals how professional identities are emotionally coded in public discourse. It suggests that society implicitly associates the empirical pursuit of knowledge with positive outcomes and the conceptual pursuit of wisdom with more somber reflections.",
+    "interpretive_fired": true,
+    "config": {
+      "embedding_backend": "gensim:dolma.2024.300d.kv",
+      "proposer_model": "gemma4:31b-it-q8_0",
+      "proposer_mode": "novel",
+      "thinking_style": "gemma4",
+      "thinking_effort": "on",
+      "history_size_seen": 1,
+      "cooled_domains_at_proposal": [],
+      "sampling": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
+        "num_ctx": 32768,
+        "repeat_penalty": 1.0
+      }
+    }
   }
 ]
