@@ -24,6 +24,9 @@ Pipeline per iteration:
        V6. Domain cooling: if the chosen domain is cooled AND the
            warmup period has passed, issue a gentle warning (not a
            rejection — cooling is a nudge, not a hard rule).
+       V7. No word appears in 2+ pools (hard reject). Cross-pool
+           duplication creates self-similarity confounds that inflate
+           the WEAT effect independently of the contrast being tested.
      Retry up to 5 times, passing structured feedback to the LLM on
      each retry so it can correct specific problems.
   6. Compute WEAT on the validated proposal.
@@ -82,10 +85,16 @@ from autoweat.concepts import (
 
 AUTOWEAT_SCHEMA_VERSION = "inductive.v9"
 
-# ── Thresholds (matching the design decisions) ─────────────────────
-COOLING_THRESHOLD = 3      # domain uses in last 12 entries to cool it
+# ── Thresholds ────────────────────────────────────────────────────
+# Cooling: a domain is "cooled" (LLM nudged to avoid) when it has been
+# used at or above COOLING_THRESHOLD times in the last COOLING_WINDOW
+# entries. No cooling applies until the feed has COOLING_WARMUP entries.
+# v17.1: threshold lowered from 3 to 2 after a 47-test run showed
+# sociology + social psychology taking 49% of tests at threshold=3.
+COOLING_THRESHOLD = 2
 COOLING_WINDOW = 12
-COOLING_WARMUP = 12        # no cooling until feed has this many entries
+COOLING_WARMUP = 12
+
 WORD_LIST_REUSE_THRESHOLD = 0.70   # Jaccard for reused-concept word lists
 CONCEPT_MATCH_THRESHOLD = 0.60     # Jaccard for concept label matching
 MAX_PROPOSAL_RETRIES = 5
@@ -347,6 +356,29 @@ def validate_proposal(
                 "is not novel — redesign the contrast so the answer is "
                 "genuinely open, or pick an entirely different contrast."
             )
+
+    # ── V7: no word appears in 2+ pools ─────────────────────────
+    # Same word in multiple pools creates self-similarity confounds. A
+    # target word that is ALSO an attribute word guarantees its cosine
+    # with the attribute side. Strictly reject all cross-pool duplicates.
+    word_locations: dict[str, list[str]] = {}
+    for side, words in [
+        ("X", prop.X_words), ("Y", prop.Y_words),
+        ("A", prop.A_words), ("B", prop.B_words),
+    ]:
+        for w in words:
+            word_locations.setdefault(w, []).append(side)
+    duplicates = {w: pools for w, pools in word_locations.items() if len(pools) > 1}
+    if duplicates:
+        dupe_list = ", ".join(
+            f"'{w}' (in {'+'.join(pools)})" for w, pools in sorted(duplicates.items())
+        )
+        problems.append(
+            f"The following words appear in more than one pool: {dupe_list}. "
+            f"Every word must appear in exactly one of X, Y, A, B. If a "
+            f"word belongs in multiple pools, it is the wrong word — pick "
+            f"a more specific substitute for each pool, or drop the word."
+        )
 
     return problems
 

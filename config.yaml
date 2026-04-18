@@ -82,22 +82,22 @@ max_iterations: 10
 # when a system role message is included. /api/generate (which is what
 # AutoWEAT already uses) avoids the hang.
 #
-#proposer:
-#   model: 'qwen3.5:27b' #'qwen3.6:35b-a3b' #'qwen3.6:35b-a3b-q8_0' #"" #"qwen3.5:27b"
-#   host: "http://localhost:11434"
-#   persona_path: "persona.md"
-#   thinking_style: "qwen3"        # same Ollama `think` field as qwen3
-#   thinking_effort: "high"
-#   max_json_retries: 3
-#   # Qwen3.5 thinking-mode recommendations (Qwen team, late 2025):
-#   sampling:
-#     temperature: 1.0
-#     top_p: 0.95
-#     top_k: 20
-#     min_p: 0.0
-#     num_ctx: 32768
-#     repeat_penalty: 1.0
-#     presence_penalty: 1.5
+proposer:
+   model: 'qwen3.5:27b' #'qwen3.6:35b-a3b' #'qwen3.6:35b-a3b-q8_0' #"" #"qwen3.5:27b"
+   host: "http://localhost:11434"
+   persona_path: "persona.md"
+   thinking_style: "qwen3"        # same Ollama `think` field as qwen3
+   thinking_effort: "high"
+   max_json_retries: 3
+   # Qwen3.5 thinking-mode recommendations (Qwen team, late 2025):
+   sampling:
+     temperature: 1.0
+     top_p: 0.95
+     top_k: 20
+     min_p: 0.0
+     num_ctx: 32768
+     repeat_penalty: 1.0
+     presence_penalty: 1.5
 
 # ─── PRESET D: gemma4:31b with thinking on ────────────────────────────────
 # Gemma 4 (Google DeepMind, April 2026). 31B dense or 26b-a4b MoE.
@@ -110,20 +110,20 @@ max_iterations: 10
 # line, no API `think` field — just the token. AutoWEAT handles this when
 # thinking_style: gemma4.
 #
-proposer:
-   model: "gemma4:31b-it-q8_0"            # or "gemma4:26b" for the faster MoE
-   host: "http://localhost:11434"
-   persona_path: "persona.md"
-   thinking_style: "gemma4"
-   thinking_effort: "on"          # any truthy value enables <|think|>; "off" disables
-   max_json_retries: 3
-   # Recommended Gemma 4 sampling (Unsloth + Google AI for Developers):
-   sampling:
-     temperature: 1.0
-     top_p: 0.95
-     top_k: 64                    # NOTE: 64, not 0 or 20 — Gemma-specific
-     num_ctx: 32768               # 256k available; 32k is plenty for AutoWEAT
-     repeat_penalty: 1.0
+#proposer:
+#   model: "gemma4:31b-it-q8_0"            # or "gemma4:26b" for the faster MoE
+#   host: "http://localhost:11434"
+#   persona_path: "persona.md"
+#   thinking_style: "gemma4"
+#   thinking_effort: "on"          # any truthy value enables <|think|>; "off" disables
+#   max_json_retries: 3
+#   # Recommended Gemma 4 sampling (Unsloth + Google AI for Developers):
+#   sampling:
+#     temperature: 1.0
+#     top_p: 0.95
+#     top_k: 64                    # NOTE: 64, not 0 or 20 — Gemma-specific
+#     num_ctx: 32768               # 256k available; 32k is plenty for AutoWEAT
+#     repeat_penalty: 1.0
 
 # ─── PRESET E: llama3.1:8b (no thinking, fast baseline) ───────────────────
 # Useful for comparing proposal quality between a small non-reasoning model
